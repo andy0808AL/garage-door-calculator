@@ -292,13 +292,39 @@ var CTYPE={'D400-96':'1/8"','D400-144':'5/32"'};
 function getCT(d){return CTYPE[d]||'3/16"';}
 function getTracksData(){var grid=document.getElementById('jb-grid');var jb=['J-10','J-12','J-14','J-16'].map(function(t,i){var box=grid?grid.children[i]:null;var qEl=box?box.querySelector('.jb-qty'):null;return{label:t,qty:qEl?qEl.textContent:'--'};});return{vertical:document.getElementById('r-vertical').textContent,horizontal:document.getElementById('r-horizontal').textContent,projection:document.getElementById('r-2x2').textContent,sections:document.getElementById('r-panels').textContent,config:document.getElementById('r-config').textContent,jb:jb};}
 function getCablesData(){return{drum:document.getElementById('r-drum').textContent,qty:document.getElementById('r-drum-qty').textContent,ebf:document.getElementById('r-ebf').textContent,capacity:document.getElementById('r-capacity').textContent,ftsc:document.getElementById('r-ftsc').textContent,cableType:document.getElementById('r-cable-type').textContent,cable:document.getElementById('r-cable').textContent};}
+
+function saveForm(){
+  var fields=['width','height','highlift','weight','wo','mark','lites'];
+  var data={};
+  fields.forEach(function(id){data[id]=document.getElementById(id).value;});
+  data.trackType=document.getElementById('track-type').value;
+  data.liftType=document.getElementById('lift-type').value;
+  data.glass=document.getElementById('glass').value;
+  data.frame=document.getElementById('frame').value;
+  save({formData:data});
+}
+function restoreForm(){
+  var s=load();
+  if(!s.formData)return;
+  var d=s.formData;
+  var fields=['width','height','highlift','weight','wo','mark','lites'];
+  fields.forEach(function(id){if(d[id]!==undefined)document.getElementById(id).value=d[id];});
+  if(d.trackType){document.getElementById('track-type').value=d.trackType;}
+  if(d.liftType){
+    document.getElementById('lift-type').value=d.liftType;
+    document.getElementById('hl-field').classList.toggle('visible',d.liftType==='highlift');
+  }
+  if(d.glass){document.getElementById('glass').value=d.glass;}
+  if(d.frame){document.getElementById('frame').value=d.frame;}
+  calculate();
+}
 function setupListeners(){
-  ['width','height','highlift','weight'].forEach(function(id){document.getElementById(id).addEventListener('input',calculate);});
-  document.getElementById('track-type').addEventListener('change',calculate);
-  document.getElementById('lift-type').addEventListener('change',function(){document.getElementById('hl-field').classList.toggle('visible',this.value==='highlift');calculate();});
-  ['wo','mark','lites'].forEach(function(id){document.getElementById(id).addEventListener('input',updateLabels);});
-  document.getElementById('glass').addEventListener('change',updateLabels);
-  document.getElementById('frame').addEventListener('change',updateLabels);
+  ['width','height','highlift','weight'].forEach(function(id){document.getElementById(id).addEventListener('input',function(){calculate();saveForm();});});
+  document.getElementById('track-type').addEventListener('change',function(){calculate();saveForm();});
+  document.getElementById('lift-type').addEventListener('change',function(){document.getElementById('hl-field').classList.toggle('visible',this.value==='highlift');calculate();saveForm();});
+  ['wo','mark','lites'].forEach(function(id){document.getElementById(id).addEventListener('input',function(){updateLabels();saveForm();});});
+  document.getElementById('glass').addEventListener('change',function(){updateLabels();saveForm();});
+  document.getElementById('frame').addEventListener('change',function(){updateLabels();saveForm();});
 }
 function calculate(){
   var width=parseFloat(document.getElementById('width').value);
@@ -394,7 +420,7 @@ function clearAll(){
   document.getElementById('glass').value='';document.getElementById('frame').value='';
   document.getElementById('hl-field').classList.remove('visible');document.getElementById('panel-hint').textContent='';
   document.getElementById('results').classList.remove('visible');document.getElementById('print-all-wrap').classList.remove('visible');
-  CD={};labelRoles=[];curLabel=0;showTab(0);
+  CD={};labelRoles=[];curLabel=0;showTab(0);save({formData:{}});
 }
 function getInfo(){
   var w=document.getElementById('width').value,h=document.getElementById('height').value;
@@ -465,6 +491,7 @@ function doPrintAll(){
   }
 }
 try{rebuildDropdowns();}catch(e){console.error('rebuildDropdowns:',e);}
+try{restoreForm();}catch(e){console.error('restoreForm:',e);}
 try{setupListeners();}catch(e){console.error('setupListeners:',e);}
 try{curRotation=load().bigRotation||0;}catch(e){console.error('curRotation:',e);}
 try{checkServer();}catch(e){console.error('checkServer:',e);}
