@@ -268,109 +268,75 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 </div>
 
 <script>
-// ── DATA ───────────────────────────────────────────────────────────────────
-const JB=[{min:0,max:84,j10:4,j12:4,j14:4,j16:null},{min:85,max:96,j10:4,j12:5,j14:5,j16:null},{min:97,max:108,j10:4,j12:5,j14:5,j16:2},{min:109,max:120,j10:4,j12:5,j14:5,j16:4},{min:121,max:132,j10:4,j12:5,j14:5,j16:6},{min:133,max:144,j10:4,j12:6,j14:6,j16:6},{min:145,max:156,j10:4,j12:6,j14:6,j16:8},{min:157,max:168,j10:4,j12:6,j14:8,j16:8},{min:169,max:180,j10:4,j12:6,j14:8,j16:10},{min:181,max:192,j10:4,j12:6,j14:10,j16:10}];
+const SERVER='http://localhost:5000';
+const SK='gdCalc_v4';
 const DEF_GLASS=['Clear','5/16 GRAY-CLEAR','5/16 BRONZE-CLEAR','5/16 CLEAR-CLEAR','1/4 CLEAR','1/4 GRAY','1/4 BRONZE','OBSCURE'];
 const DEF_FRAME=['Black','White','Bronze','Anodized','Mill','Dark Bronze'];
 const DEF_PRINTERS=['ZDesigner GX420d','Westinghouse WHTP203e','Microsoft Print to PDF','Microsoft XPS Document Writer'];
-const SK='gdCalc_v3';
-let curLabel=0,labelRoles=[],CD={};
-
+const JB=[{min:0,max:84,j10:4,j12:4,j14:4,j16:null},{min:85,max:96,j10:4,j12:5,j14:5,j16:null},{min:97,max:108,j10:4,j12:5,j14:5,j16:2},{min:109,max:120,j10:4,j12:5,j14:5,j16:4},{min:121,max:132,j10:4,j12:5,j14:5,j16:6},{min:133,max:144,j10:4,j12:6,j14:6,j16:6},{min:145,max:156,j10:4,j12:6,j14:6,j16:8},{min:157,max:168,j10:4,j12:6,j14:8,j16:8},{min:169,max:180,j10:4,j12:6,j14:8,j16:10},{min:181,max:192,j10:4,j12:6,j14:10,j16:10}];
+let serverOK=false,curLabel=0,labelRoles=[],CD={},curRotation=0;
 function load(){try{return JSON.parse(localStorage.getItem(SK))||{};}catch(e){return{};}}
 function save(d){try{localStorage.setItem(SK,JSON.stringify({...load(),...d}));}catch(e){}}
+function toast(msg,ms){ms=ms||2500;const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),ms);}
 
-// ── TOAST ──────────────────────────────────────────────────────────────────
-function toast(msg,ms=2500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),ms);}
+function checkServer(){
+  fetch(SERVER+'/ping',{signal:AbortSignal.timeout(2000)})
+    .then(r=>r.json())
+    .then(d=>{
+      serverOK=true;
+      curRotation=d.bigRotation!==undefined?d.bigRotation:(load().bigRotation||0);
+      updateRotUI(curRotation);
+      if(d.printers){mergeServerPrinters(d.printers);}
+      document.getElementById('server-status').textContent='\uD83D\uDFE2 Print server connected';
+    })
+    .catch(()=>{
+      serverOK=false;
+      curRotation=load().bigRotation||0;
+      updateRotUI(curRotation);
+      document.getElementById('server-status').textContent='\uD83D\uDD34 Print server offline';
+    });
+}
+function mergeServerPrinters(printers){const s=load();const extra=s.extraPrinters||[];const newEx=printers.filter(p=>!DEF_PRINTERS.includes(p)&&!extra.includes(p));if(newEx.length>0)save({extraPrinters:extra.concat(newEx)});}
 
-// ── SETTINGS ───────────────────────────────────────────────────────────────
-function openSettings(){
-  document.getElementById('settings-overlay').classList.add('open');
-  document.getElementById('settings-drawer').classList.add('open');
-  document.body.style.overflow='hidden';
-  renderSettings();
-}
-function closeSettings(){
-  document.getElementById('settings-overlay').classList.remove('open');
-  document.getElementById('settings-drawer').classList.remove('open');
-  document.body.style.overflow='';
-}
+function openSettings(){document.getElementById('settings-overlay').classList.add('open');document.getElementById('settings-drawer').classList.add('open');document.body.style.overflow='hidden';renderSettings();}
+function closeSettings(){document.getElementById('settings-overlay').classList.remove('open');document.getElementById('settings-drawer').classList.remove('open');document.body.style.overflow='';}
 function getPrinters(){const s=load();return[...new Set([...DEF_PRINTERS,...(s.extraPrinters||[])])];}
 function renderSettings(){
-  const s=load();const printers=getPrinters();
-  const cfgs=[
-    {id:'cfg-tracks',key:'pTracks',dot:'dot-tracks',lbl:'lbl-tracks'},
-    {id:'cfg-cables',key:'pCables',dot:'dot-cables',lbl:'lbl-cables'},
-    {id:'cfg-small', key:'pSmall', dot:'dot-small', lbl:'lbl-small',  def:'ZDesigner GX420d'},
-    {id:'cfg-big',   key:'pBig',   dot:'dot-big',   lbl:'lbl-big',    def:'Westinghouse WHTP203e'},
-  ];
-  cfgs.forEach(c=>{
-    const sel=document.getElementById(c.id);
-    const cur=s[c.key]||c.def||printers[0]||'';
-    sel.innerHTML=printers.map(p=>`<option value="${p}" ${p===cur?'selected':''}>${p}</option>`).join('');
+  const s=load(),printers=getPrinters();
+  [{id:'cfg-tracks',key:'pTracks',dot:'dot-tracks',lbl:'lbl-tracks'},{id:'cfg-cables',key:'pCables',dot:'dot-cables',lbl:'lbl-cables'},{id:'cfg-small',key:'pSmall',dot:'dot-small',lbl:'lbl-small',def:'ZDesigner GX420d'},{id:'cfg-big',key:'pBig',dot:'dot-big',lbl:'lbl-big',def:'Westinghouse WHTP203e'}].forEach(c=>{
+    const sel=document.getElementById(c.id),cur=s[c.key]||c.def||printers[0]||'';
+    sel.innerHTML=printers.map(p=>`<option value="${p}"${p===cur?' selected':''}>${p}</option>`).join('');
     if(cur&&!printers.includes(cur))sel.innerHTML=`<option value="${cur}" selected>${cur}</option>`+sel.innerHTML;
-    const dot=document.getElementById(c.dot);const lbl=document.getElementById(c.lbl);
-    dot.className=cur?'status-dot':'status-dot unset';
-    lbl.textContent=cur||'Not set';
+    document.getElementById(c.dot).className=cur?'status-dot':'status-dot unset';
+    document.getElementById(c.lbl).textContent=cur||'Not set';
   });
-  // Glass list
-  const gl=load();const allGlass=[...DEF_GLASS,...(gl.extraGlass||[])];
-  document.getElementById('glass-list').innerHTML=allGlass.map(g=>{
-    const isDef=DEF_GLASS.includes(g);
-    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-border);font-size:13px;"><span>${g}</span>${isDef?'<span style="font-size:11px;color:#9ca3af">default</span>':`<button onclick="removeGlass('${g}')" style="border:none;background:none;color:var(--red);font-size:20px;cursor:pointer;line-height:1;padding:0 4px;">&times;</button>`}</div>`;
-  }).join('');
-  // Frame list
-  const allFrame=[...DEF_FRAME,...(load().extraFrame||[])]; const sr=load().bigRotation!==undefined?load().bigRotation:180; setTimeout(()=>updateRotationUI(sr),50);
-  document.getElementById('frame-list').innerHTML=allFrame.map(f=>{
-    const isDef=DEF_FRAME.includes(f);
-    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-border);font-size:13px;"><span>${f}</span>${isDef?'<span style="font-size:11px;color:#9ca3af">default</span>':`<button onclick="removeFrame('${f}')" style="border:none;background:none;color:var(--red);font-size:20px;cursor:pointer;line-height:1;padding:0 4px;">&times;</button>`}</div>`;
-  }).join('');
+  updateRotUI(curRotation);
+  const ag=[...DEF_GLASS,...(s.extraGlass||[])];
+  const af=[...DEF_FRAME,...(s.extraFrame||[])];
+  document.getElementById('glass-list').innerHTML=ag.map(g=>{const d=DEF_GLASS.includes(g);return`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-border);font-size:13px;"><span>${g}</span>${d?'<span style="font-size:11px;color:#9ca3af">default</span>':`<button onclick="removeGlass('${g}')" style="border:none;background:none;color:var(--red);font-size:20px;cursor:pointer;">&times;</button>`}</div>`;}).join('');
+  document.getElementById('frame-list').innerHTML=af.map(f=>{const d=DEF_FRAME.includes(f);return`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-border);font-size:13px;"><span>${f}</span>${d?'<span style="font-size:11px;color:#9ca3af">default</span>':`<button onclick="removeFrame('${f}')" style="border:none;background:none;color:var(--red);font-size:20px;cursor:pointer;">&times;</button>`}</div>`;}).join('');
 }
-function savePrinters(){
-  save({
-    pTracks:document.getElementById('cfg-tracks').value,
-    pCables:document.getElementById('cfg-cables').value,
-    pSmall: document.getElementById('cfg-small').value,
-    pBig:   document.getElementById('cfg-big').value,
-  });
-  renderSettings();
-  const c=document.getElementById('save-confirm');c.classList.add('show');setTimeout(()=>c.classList.remove('show'),2000);
+function savePrinters(){save({pTracks:document.getElementById('cfg-tracks').value,pCables:document.getElementById('cfg-cables').value,pSmall:document.getElementById('cfg-small').value,pBig:document.getElementById('cfg-big').value});const c=document.getElementById('save-confirm');c.classList.add('show');setTimeout(()=>c.classList.remove('show'),2000);}
+function setRotation(deg){
+  curRotation=deg;save({bigRotation:deg});updateRotUI(deg);renderBigLabelPreview();
+  fetch(SERVER+'/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bigRotation:deg})})
+    .then(()=>toast('\u2713 Rotation '+deg+'\u00b0 saved',1500))
+    .catch(()=>toast('Rotation '+deg+'\u00b0 saved locally',1500));
 }
-function addPrinter(){
-  const v=prompt('Enter printer name exactly as shown in Windows (Control Panel > Devices and Printers):');
-  if(!v||!v.trim())return;
-  const s=load();const ep=[...(s.extraPrinters||[])];
-  if(!ep.includes(v.trim()))ep.push(v.trim());
-  save({extraPrinters:ep});renderSettings();
-}
+function updateRotUI(deg){[0,90,180,270].forEach(d=>{const b=document.getElementById('rot-'+d);if(b)b.className='rot-btn'+(d===deg?' active':'');});const l=document.getElementById('lbl-rotation');if(l)l.textContent=deg+'\u00b0 current rotation';}
+function addPrinter(){const v=prompt('Enter printer name exactly as shown in Windows:');if(!v||!v.trim())return;const s=load();const ep=[...(s.extraPrinters||[])];if(!ep.includes(v.trim()))ep.push(v.trim());save({extraPrinters:ep});renderSettings();}
 function addGlass(){const v=prompt('Glass type:');if(!v||!v.trim())return;const s=load();const eg=[...(s.extraGlass||[])];if(!eg.includes(v.trim())&&!DEF_GLASS.includes(v.trim()))eg.push(v.trim());save({extraGlass:eg});rebuildDropdowns();renderSettings();}
 function removeGlass(g){const s=load();save({extraGlass:(s.extraGlass||[]).filter(x=>x!==g)});rebuildDropdowns();renderSettings();}
 function addFrame(){const v=prompt('Frame color:');if(!v||!v.trim())return;const s=load();const ef=[...(s.extraFrame||[])];if(!ef.includes(v.trim())&&!DEF_FRAME.includes(v.trim()))ef.push(v.trim());save({extraFrame:ef});rebuildDropdowns();renderSettings();}
 function removeFrame(f){const s=load();save({extraFrame:(s.extraFrame||[]).filter(x=>x!==f)});rebuildDropdowns();renderSettings();}
+function rebuildDropdowns(){const s=load();const ag=[...DEF_GLASS,...(s.extraGlass||[])];const af=[...DEF_FRAME,...(s.extraFrame||[])];const cg=document.getElementById('glass').value;const cf=document.getElementById('frame').value;document.getElementById('glass').innerHTML='<option value="">Select...</option>'+ag.map(g=>`<option${g===cg?' selected':''}>${g}</option>`).join('');document.getElementById('frame').innerHTML='<option value="">Select...</option>'+af.map(f=>`<option${f===cf?' selected':''}>${f}</option>`).join('');}
 
-function rebuildDropdowns(){
-  const s=load();
-  const ag=[...DEF_GLASS,...(s.extraGlass||[])];
-  const af=[...DEF_FRAME,...(s.extraFrame||[])];
-  const cg=document.getElementById('glass').value;
-  const cf=document.getElementById('frame').value;
-  document.getElementById('glass').innerHTML='<option value="">Select...</option>'+ag.map(g=>`<option ${g===cg?'selected':''}>${g}</option>`).join('');
-  document.getElementById('frame').innerHTML='<option value="">Select...</option>'+af.map(f=>`<option ${f===cf?'selected':''}>${f}</option>`).join('');
-}
-
-// ── CALC HELPERS ───────────────────────────────────────────────────────────
-function frac(val){
-  const w=Math.floor(val),d=val-w;
-  const fs=[[0,''],[0.125,'⅛'],[0.25,'¼'],[0.375,'⅜'],[0.5,'½'],[0.625,'⅝'],[0.75,'¾'],[0.875,'⅞'],[1,'']];
-  let best=fs[0],bd=999;for(const f of fs){const dd=Math.abs(d-f[0]);if(dd<bd){bd=dd;best=f;}}
-  if(best[0]===1)return(w+1)+'"';if(w===0)return best[1]?best[1]+'"':'0"';
-  return best[1]?w+' '+best[1]+'"':w+'"';
-}
+function frac(val){const w=Math.floor(val),d=val-w;const fs=[[0,''],[0.125,'\u215b'],[0.25,'\u00bc'],[0.375,'\u215c'],[0.5,'\u00bd'],[0.625,'\u215d'],[0.75,'\u00be'],[0.875,'\u215e'],[1,'']];let best=fs[0],bd=999;for(const f of fs){const dd=Math.abs(d-f[0]);if(dd<bd){bd=dd;best=f;}}if(best[0]===1)return(w+1)+'"';if(w===0)return best[1]?best[1]+'"':'0"';return best[1]?w+' '+best[1]+'"':w+'"';}
 function getJB(v){return JB.find(r=>v>=r.min&&v<=r.max)||JB[JB.length-1];}
 function getPanels(h){if(h<=99.625)return 4;if(h<=123.625)return 5;if(h<=147.625)return 6;if(h<=171.625)return 7;return 8;}
 function get2x2(p){return 6.5+(p-4)*0.25;}
 const CTYPE={'D400-96':'1/8"','D400-144':'5/32"'};function getCT(d){return CTYPE[d]||'3/16"';}
 
-// ── LISTENERS ──────────────────────────────────────────────────────────────
 function setupListeners(){
   ['width','height','highlift','weight'].forEach(id=>document.getElementById(id).addEventListener('input',calculate));
   document.getElementById('track-type').addEventListener('change',calculate);
@@ -380,7 +346,6 @@ function setupListeners(){
   document.getElementById('frame').addEventListener('change',updateLabels);
 }
 
-// ── CALCULATE ──────────────────────────────────────────────────────────────
 function calculate(){
   const width=parseFloat(document.getElementById('width').value);
   const height=parseFloat(document.getElementById('height').value);
@@ -389,35 +354,35 @@ function calculate(){
   const hl=parseFloat(document.getElementById('highlift').value)||0;
   const wt=parseFloat(document.getElementById('weight').value);
   const hasWeight=!isNaN(wt)&&wt>0;
-  if(!isNaN(height)&&height>0)document.getElementById('panel-hint').textContent='→ '+getPanels(height)+' sections';
+  if(!isNaN(height)&&height>0)document.getElementById('panel-hint').textContent='\u2192 '+getPanels(height)+' sections';
   else document.getElementById('panel-hint').textContent='';
   if(!width||!height||!tt||!lt){document.getElementById('results').classList.remove('visible');document.getElementById('print-all-wrap').classList.remove('visible');return;}
   if(lt==='highlift'&&!hl)return;
   if(lt==='lhr'&&!tt.includes('LHR'))return;
-  const panels=getPanels(height);const x2=get2x2(panels);
+  const panels=getPanels(height),x2=get2x2(panels);
   let vert,horiz;
   if(lt==='highlift'){vert=(height-8)+(hl-9);horiz=(height+12)-(hl-9);}
   else if(lt==='lhr'){vert=tt==='3-LHR'?height-18:height-16;horiz=height+12;}
   else{vert=height-8;horiz=height+12;}
   const jb=getJB(vert);
-  const tlbl={'3-15R':'3" 15R','2-12R':'2" 12R','3-LHR':'3" LHR','2-LHR':'2" LHR'};
-  const llbl={standard:'Standard Lift',highlift:'High Lift ('+hl+'")',lhr:'Low Headroom'};
+  const tlbl={'3-15R':'3\" 15R','2-12R':'2\" 12R','3-LHR':'3\" LHR','2-LHR':'2\" LHR'};
+  const llbl={standard:'Standard Lift',highlift:'High Lift ('+hl+'\")',lhr:'Low Headroom'};
   CD={width,height,tt,lt,hl,wt,hasWeight,panels,x2,vert,horiz,jb,tlbl,llbl};
   document.getElementById('r-vertical').textContent=frac(vert);
   document.getElementById('r-horizontal').textContent=frac(horiz);
   document.getElementById('r-2x2').textContent=frac(x2)+' projection';
   document.getElementById('r-panels').textContent=panels+' sections';
-  document.getElementById('r-config').textContent=tlbl[tt]+' · '+llbl[lt];
-  document.getElementById('jb-grid').innerHTML=['J-10','J-12','J-14','J-16'].map((t,i)=>{const q=[jb.j10,jb.j12,jb.j14,jb.j16][i];return'<div class="jb-box"><div class="jb-type">'+t+'</div>'+(q!==null?'<div class="jb-qty">'+q+'</div>':'<div class="jb-na">—</div>')+'</div>';}).join('');
-  const notice=document.getElementById('weight-notice');const cableDiv=document.getElementById('cable-results');
+  document.getElementById('r-config').textContent=tlbl[tt]+' \u00b7 '+llbl[lt];
+  document.getElementById('jb-grid').innerHTML=['J-10','J-12','J-14','J-16'].map((t,i)=>{const q=[jb.j10,jb.j12,jb.j14,jb.j16][i];return'<div class="jb-box"><div class="jb-type">'+t+'</div>'+(q!==null?'<div class="jb-qty">'+q+'</div>':'<div class="jb-na">\u2014</div>')+'</div>';}).join('');
+  const notice=document.getElementById('weight-notice'),cableDiv=document.getElementById('cable-results');
   if(!hasWeight){notice.style.display='block';cableDiv.style.display='none';}
   else{
     notice.style.display='none';cableDiv.style.display='block';
     let drum,cap,ebf,ebfA,cA;
-    if(lt==='highlift'){if(hl<=54){drum='D525-54';cap=500;ebf='EBP 4 3/8"';ebfA=3.125;cA=66;}else if(wt<=1000){drum='D575-120';cap=500;ebf='EBP 6"';ebfA=4.875;cA=133;}else{drum='D800-120';cap=1100;ebf='EBP 6"';ebfA=4.875;cA=137;}}
-    else{if(height<=96){drum='D400-96';cap=265;ebf='EBP 3 3/8"';ebfA=3.125;cA=8;}else if(height<=144){drum='D400-144';cap=375;ebf='EBP 3 3/8"';ebfA=3.125;cA=8;}else{drum='5250-18 (525-216)';cap=750;ebf='EBP 3 3/8"';ebfA=3.125;cA=10;}}
+    if(lt==='highlift'){if(hl<=54){drum='D525-54';cap=500;ebf='EBP 4 3/8\"';ebfA=3.125;cA=66;}else if(wt<=1000){drum='D575-120';cap=500;ebf='EBP 6\"';ebfA=4.875;cA=133;}else{drum='D800-120';cap=1100;ebf='EBP 6\"';ebfA=4.875;cA=137;}}
+    else{if(height<=96){drum='D400-96';cap=265;ebf='EBP 3 3/8\"';ebfA=3.125;cA=8;}else if(height<=144){drum='D400-144';cap=375;ebf='EBP 3 3/8\"';ebfA=3.125;cA=8;}else{drum='5250-18 (525-216)';cap=750;ebf='EBP 3 3/8\"';ebfA=3.125;cA=10;}}
     const toff={'3-15R':17,'3-LHR':25,'2-LHR':19,'2-12R':13.125}[tt];
-    const ftsc=vert+toff+ebfA;const cable=Math.ceil(lt==='highlift'?ftsc+cA-hl:ftsc+cA);
+    const ftsc=vert+toff+ebfA,cable=Math.ceil(lt==='highlift'?ftsc+cA-hl:ftsc+cA);
     CD={...CD,drum,cap,ebf,ftsc,cable,cableType:getCT(drum)};
     document.getElementById('r-drum').textContent=drum;document.getElementById('r-drum-qty').textContent='2 (left & right)';
     document.getElementById('r-ebf').textContent=ebf+' x2';document.getElementById('r-capacity').textContent=(cap*2)+' lbs total';
@@ -428,206 +393,110 @@ function calculate(){
   updateLabels();
 }
 
-// ── LABELS ─────────────────────────────────────────────────────────────────
 function updateLabels(){
-  const wo=document.getElementById('wo').value.trim();
-  const mark=document.getElementById('mark').value.trim();
-  const lites=document.getElementById('lites').value.trim();
-  const glass=document.getElementById('glass').value;
-  const frame=document.getElementById('frame').value;
+  const wo=document.getElementById('wo').value.trim(),mark=document.getElementById('mark').value.trim(),lites=document.getElementById('lites').value.trim(),glass=document.getElementById('glass').value,frame=document.getElementById('frame').value;
   const panels=CD.panels||getPanels(parseFloat(document.getElementById('height').value)||0)||4;
-  const width=document.getElementById('width').value;
-  const height=document.getElementById('height').value;
+  const width=document.getElementById('width').value,height=document.getElementById('height').value;
   const hasLabel=wo||mark||lites||glass||frame;
   document.getElementById('label-missing').style.display=hasLabel?'none':'block';
-  document.getElementById('label-content').style.display=hasLabel?'block':'none'; if(hasLabel) setTimeout(()=>applyPreviewRotation(window._curRotation||load().bigRotation||0),50);
+  document.getElementById('label-content').style.display=hasLabel?'block':'none';
   if(!hasLabel)return;
-  if(panels>=2){labelRoles=['Top',...Array.from({length:panels-2},(_,i)=>'Center '+(i+1)),'Bottom'];}
-  else{labelRoles=['Top'];}
+  if(panels>=2){labelRoles=['Top',...Array.from({length:panels-2},(_,i)=>'Center '+(i+1)),'Bottom'];}else{labelRoles=['Top'];}
   curLabel=Math.min(curLabel,labelRoles.length-1);
-  const role=labelRoles[curLabel]||'';
-  const size=width&&height?width+' X '+height:'';
-  document.getElementById('sl-left').innerHTML='<div class="lrow"><strong>W/O: '+(wo||'—')+'</strong></div><div class="lrow">Mark: '+(mark||'—')+'</div><div class="lrow">Panels: '+(panels||'—')+'</div><div class="lrow">Size: '+(size||'—')+'</div>';
-  document.getElementById('sl-right').innerHTML='<div class="lrow">Lites: '+(lites||'—')+'</div><div class="lrow">Glass: '+(glass||'—')+'</div><div class="lrow">Frame: '+(frame||'—')+'</div><div class="lrow">Panel: '+role+'</div>';
-  document.getElementById('bl-wo').textContent='W/O: '+(wo||'—');
-  
-  document.getElementById('label-nav-text').textContent=(curLabel+1)+' / '+labelRoles.length; renderBigLabelPreview(); renderBigLabelPreview();
-}
-function prevLabel(){curLabel=Math.max(0,curLabel-1);updateLabels();}
-function nextLabel(){curLabel=Math.min(labelRoles.length-1,curLabel+1);updateLabels();}
-
-// ── TABS ───────────────────────────────────────────────────────────────────
-function showTab(n){
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===n));
-  document.querySelectorAll('.page').forEach((p,i)=>p.classList.toggle('active',i===n));
-}
-
-// ── CLEAR ──────────────────────────────────────────────────────────────────
-function clearAll(){
-  ['width','height','highlift','weight','wo','mark','lites'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('track-type').value='';document.getElementById('lift-type').value='';
-  document.getElementById('glass').value='';document.getElementById('frame').value='';
-  document.getElementById('hl-field').classList.remove('visible');document.getElementById('panel-hint').textContent='';
-  document.getElementById('results').classList.remove('visible');document.getElementById('print-all-wrap').classList.remove('visible');
-  CD={};labelRoles=[];curLabel=0;showTab(0);
-}
-
-// ── SILENT PRINT (sends directly to printer, no preview) ──────────────────
-function buildTracksHTML(){
-  const info=getInfo();
-  const jbs=['J-10','J-12','J-14','J-16'].map((t,i)=>{const box=document.getElementById('jb-grid').children[i];const q=box.querySelector('.jb-qty')?box.querySelector('.jb-qty').textContent:'—';return'<div style="border:1px solid #ddd;border-radius:6px;padding:12px;text-align:center"><div style="font-size:12px;color:#666;margin-bottom:6px">'+t+'</div><div style="font-size:26px;font-weight:bold">'+q+'</div></div>';}).join('');
-  return'<!DOCTYPE html><html><head><title>TRACKS</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#222;max-width:600px;margin:0 auto}h1{font-size:18px;margin-bottom:3px}p{font-size:12px;color:#666;margin-bottom:16px}@media print{body{padding:10px}}</style></head><body>'
-    +'<h1>Garage Door — TRACKS</h1><p>'+info+'</p><hr style="margin-bottom:16px;border:none;border-top:1px solid #ddd">'
-    +'<table style="width:100%;border-collapse:collapse;margin-bottom:20px"><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold;width:50%">Vertical (L & R)</td><td style="padding:10px;border:1px solid #ddd;font-size:22px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-vertical').textContent+'</td></tr>'
-    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Horizontal (L & R)</td><td style="padding:10px;border:1px solid #ddd;font-size:22px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-horizontal').textContent+'</td></tr>'
-    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">2x2 projection</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-2x2').textContent+'</td></tr>'
-    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Sections</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-panels').textContent+'</td></tr>'
-    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Configuration</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-config').textContent+'</td></tr></table>'
-    +'<h3 style="margin-bottom:10px;font-size:12px;color:#666;text-transform:uppercase">Jamb Brackets per side</h3>'
-    +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">'+jbs+'</div>'
-    +'</body></html>';
-}
-function buildCablesHTML(){
-  const info=getInfo();
-  return'<!DOCTYPE html><html><head><title>CABLES</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#222;max-width:600px;margin:0 auto}h1{font-size:18px;margin-bottom:3px}p{font-size:12px;color:#666;margin-bottom:16px}@media print{body{padding:10px}}</style></head><body>'
-    +'<h1>Garage Door — CABLES</h1><p>'+info+'</p><hr style="margin-bottom:16px;border:none;border-top:1px solid #ddd">'
-    +'<table style="width:100%;border-collapse:collapse"><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold;width:50%">Selected drum</td><td style="padding:10px;border:1px solid #ddd;font-size:20px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-drum').textContent+'</td></tr>'
-    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Quantity</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-drum-qty').textContent+'</td></tr>'
-    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">End bearing plate</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-ebf').textContent+'</td></tr>'
-    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Total capacity</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-capacity').textContent+'</td></tr>'
-    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Floor to shaft center</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-ftsc').textContent+'</td></tr>'
-    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Cable type</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-cable-type').textContent+'</td></tr>'
-    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Cable length (L & R)</td><td style="padding:10px;border:1px solid #ddd;font-size:26px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-cable').textContent+'</td></tr></table>'
-    +'</body></html>';
-}
-
-// Silent print: open hidden iframe, load content, trigger print with specific printer via CSS
-function silentPrintDoc(htmlContent,printerName,label){
-  toast('Sending '+label+' to '+printerName+'...');
-  const iframe=document.createElement('iframe');
-  iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:1200px;height:900px;border:none;';
-  document.body.appendChild(iframe);
-  const printCSS='@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}';
-  const fullHTML=htmlContent.replace('</head>','<style>'+printCSS+'</style></head>');
-  iframe.contentDocument.open();iframe.contentDocument.write(fullHTML);iframe.contentDocument.close();
-  iframe.contentWindow.focus();
-  setTimeout(()=>{try{iframe.contentWindow.print();}catch(e){toast('Print error: '+e.message,3000);}setTimeout(()=>{if(iframe.parentNode)iframe.parentNode.removeChild(iframe);},3000);},800);
-}
-
-function buildSmallLabelsHTML(wo,mark,lites,glass,frame,panels,size){
-  let body='<!DOCTYPE html><html><head><title>Small Labels</title><style>*{box-sizing:border-box;margin:0;padding:0;}@page{size:4in 1in;margin:0;}body{margin:0;padding:0;}</style></head><body>';
-  labelRoles.forEach(role=>{
-    body+=`<div style="width:4in;height:1in;border:2px solid #222;padding:6px 10px;display:grid;grid-template-columns:1fr 1fr;font-family:Arial,sans-serif;font-size:9pt;page-break-after:always;overflow:hidden;">
-      <div><div><strong>W/O: ${wo||'—'}</strong></div><div>Mark: ${mark||'—'}</div><div>Panels: ${panels}</div><div>Size: ${size||'—'}</div></div>
-      <div><div>Lites: ${lites||'—'}</div><div>Glass: ${glass||'—'}</div><div>Frame: ${frame||'—'}</div><div>Panel: ${role}</div></div>
-    </div>`;
-  });
-  return body+'</body></html>';
-}
-
-function buildBigLabelsHTML(wo,panels){
-  let body='<!DOCTYPE html><html><head><title>Big Labels</title><style>*{box-sizing:border-box;margin:0;padding:0;}@page{size:3in 6in portrait;margin:0;}body{margin:0;padding:0;font-family:Arial,sans-serif;}</style></head><body>';
-  labelRoles.forEach((role,i)=>{
-    const woText='W/O: '+(wo||'\u2014');
-    body+=`<div style="width:3in;height:6in;border:3px solid #222;padding:6px 6px 4px;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always;overflow:hidden;box-sizing:border-box;"><svg width="100%" style="flex:1;min-height:0;" viewBox="0 0 270 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"><text x="135" y="260" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="130" textLength="258" lengthAdjust="spacingAndGlyphs">${woText}</text></svg><div style="font-size:15pt;font-weight:700;text-align:right;padding:2px 4px;flex-shrink:0;">${role} (${i+1}/${panels})</div></div>`;
-  });
-  return body+'</body></html>';
-}
-
-
-// ── SERVER DETECTION ──────────────────────────────────────────────────────────
-const SERVER_URL = 'http://localhost:5000';
-let serverAvailable = false;
-let serverPrinters = [];
-
-function setRotation(deg){
-  window._curRot = deg;
-  save({bigRotation: deg});
-  // Update button styles
-  [0,90,180,270].forEach(function(d){
-    var b = document.getElementById('rot-'+d);
-    if(b) b.className = 'rot-btn' + (d===deg?' active':'');
-  });
-  var lbl = document.getElementById('lbl-rotation');
-  if(lbl) lbl.textContent = deg + '° saved';
-  var dot = document.getElementById('dot-rotation');
-  if(dot) dot.className = 'status-dot';
-  // Send to server
-  fetch('http://localhost:5000/settings', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({bigRotation: deg})
-  }).then(function(r){ return r.json(); }).then(function(){
-    toast('✓ Rotation ' + deg + '° saved to server', 2000);
-  }).catch(function(){
-    toast('Rotation ' + deg + '° saved locally', 1500);
-  });
-  // Update preview
-  renderBigLabelPreview();
-}
-
-function updateRotationUI(deg){
-  window._curRot = deg;
-  [0,90,180,270].forEach(d=>{
-    const b=document.getElementById('rot-'+d);
-    if(b) b.classList.toggle('active', d===deg);
-  });
-  const lbl=document.getElementById('lbl-rotation');
-  if(lbl) lbl.textContent = deg+'° current rotation';
-}
-
-function applyPreviewRotation(deg){
-  window._curRot = deg;
+  const role=labelRoles[curLabel]||'',size=width&&height?width+' X '+height:'';
+  document.getElementById('sl-left').innerHTML='<div class="lrow"><strong>W/O: '+(wo||'\u2014')+'</strong></div><div class="lrow">Mark: '+(mark||'\u2014')+'</div><div class="lrow">Panels: '+(panels||'\u2014')+'</div><div class="lrow">Size: '+(size||'\u2014')+'</div>';
+  document.getElementById('sl-right').innerHTML='<div class="lrow">Lites: '+(lites||'\u2014')+'</div><div class="lrow">Glass: '+(glass||'\u2014')+'</div><div class="lrow">Frame: '+(frame||'\u2014')+'</div><div class="lrow">Panel: '+role+'</div>';
+  document.getElementById('label-nav-text').textContent=(curLabel+1)+' / '+labelRoles.length;
   renderBigLabelPreview();
 }
 
 function renderBigLabelPreview(){
-  const wrap = document.getElementById('big-label-preview-wrap');
-  if(!wrap) return;
-  const deg = window._curRot || 0;
-  const wo = document.getElementById('wo').value.trim();
-  const role = (labelRoles && labelRoles[curLabel]) || '';
-  const panels = CD.panels || 4;
-  const woText = 'W/O: ' + (wo||'—');
-  const panelText = role+' ('+(curLabel+1)+'/'+panels+')';
-  const landscape = deg===90 || deg===270;
-  const flip = deg===180 || deg===270;
-
+  const container=document.getElementById('big-label-preview');if(!container)return;
+  const wo=document.getElementById('wo').value.trim(),deg=curRotation;
+  const role=(labelRoles&&labelRoles[curLabel])||'',panels=CD.panels||4;
+  const woText='W/O: '+(wo||'\u2014'),panelText=role+' ('+(curLabel+1)+'/'+panels+')';
+  const landscape=deg===90||deg===270,flip=deg===180||deg===270;
+  const pAlign=(flip&&!landscape)||deg===270?'left':'right';
+  let html;
   if(landscape){
-    wrap.style.cssText = 'border:3px solid #222;border-radius:3px;background:white;font-family:Arial,sans-serif;padding:8px;display:flex;flex-direction:column;justify-content:space-between;aspect-ratio:2/1;min-height:110px;max-height:170px;overflow:hidden;';
-    wrap.innerHTML =
+    html='<div class="big-label-wrap" style="aspect-ratio:2/1;min-height:110px;max-height:160px;">'+
       '<svg width="100%" style="flex:1;display:block;min-height:0;" viewBox="0 0 500 160" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">'+
-      (flip ? '<g transform="rotate(180 250 80)">' : '')+
-      '<text x="250" y="85" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="60" textLength="480" lengthAdjust="spacingAndGlyphs">'+woText+'</text>'+
-      (flip ? '</g>' : '')+
-      '</svg>'+
-      '<div style="font-size:15px;font-weight:700;text-align:'+(deg===270?'left':'right')+';color:#111;padding-top:4px;">'+panelText+'</div>';
-  } else {
-    wrap.style.cssText = 'border:3px solid #222;border-radius:3px;background:white;font-family:Arial,sans-serif;padding:8px;display:flex;flex-direction:column;justify-content:space-between;aspect-ratio:1/2;min-height:200px;max-height:350px;overflow:hidden;';
-    wrap.innerHTML =
+      (flip?'<g transform="rotate(180 250 80)">':'')+
+      '<text x="250" y="82" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="62" textLength="480" lengthAdjust="spacingAndGlyphs">'+woText+'</text>'+
+      (flip?'</g>':'')+
+      '</svg><div class="big-label-panel" style="text-align:'+pAlign+';">'+panelText+'</div></div>';
+  }else{
+    html='<div class="big-label-wrap" style="aspect-ratio:1/2;min-height:200px;max-height:340px;">'+
       '<svg width="100%" style="flex:1;display:block;min-height:0;" viewBox="0 0 270 200" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">'+
-      (flip ? '<g transform="rotate(180 135 100)">' : '')+
+      (flip?'<g transform="rotate(180 135 100)">':'')+
       '<text x="135" y="100" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="55" textLength="258" lengthAdjust="spacingAndGlyphs">'+woText+'</text>'+
-      (flip ? '</g>' : '')+
-      '</svg>'+
-      '<div style="font-size:15px;font-weight:700;text-align:'+(flip?'left':'right')+';color:#111;padding-top:4px;">'+panelText+'</div>';
+      (flip?'</g>':'')+
+      '</svg><div class="big-label-panel" style="text-align:'+pAlign+';">'+panelText+'</div></div>';
+  }
+  container.innerHTML=html;
+}
+
+function prevLabel(){curLabel=Math.max(0,curLabel-1);updateLabels();}
+function nextLabel(){curLabel=Math.min(labelRoles.length-1,curLabel+1);updateLabels();}
+function showTab(n){document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===n));document.querySelectorAll('.page').forEach((p,i)=>p.classList.toggle('active',i===n));}
+function clearAll(){['width','height','highlift','weight','wo','mark','lites'].forEach(id=>document.getElementById(id).value='');document.getElementById('track-type').value='';document.getElementById('lift-type').value='';document.getElementById('glass').value='';document.getElementById('frame').value='';document.getElementById('hl-field').classList.remove('visible');document.getElementById('panel-hint').textContent='';document.getElementById('results').classList.remove('visible');document.getElementById('print-all-wrap').classList.remove('visible');CD={};labelRoles=[];curLabel=0;showTab(0);}
+
+function getInfo(){const w=document.getElementById('width').value,h=document.getElementById('height').value;const ts=document.getElementById('track-type'),ls=document.getElementById('lift-type');const tt=ts.options[ts.selectedIndex]?.text||'',lt=ls.options[ls.selectedIndex]?.text||'';const hl=document.getElementById('highlift').value,wt=document.getElementById('weight').value;return'Width: '+w+'" | Height: '+h+'" | '+tt+' | '+lt+(hl?' | HL: '+hl+'"':'')+(wt?' | Weight: '+wt+' lbs':'');}
+
+function buildTracksHTML(){const info=getInfo();const jbs=['J-10','J-12','J-14','J-16'].map((t,i)=>{const box=document.getElementById('jb-grid').children[i];const q=box?.querySelector('.jb-qty')?.textContent||'\u2014';return'<div style="border:1px solid #ddd;border-radius:6px;padding:12px;text-align:center"><div style="font-size:12px;color:#666;margin-bottom:6px">'+t+'</div><div style="font-size:26px;font-weight:bold">'+q+'</div></div>';}).join('');return'<!DOCTYPE html><html><head><title>TRACKS</title><style>@page{size:letter portrait;margin:15mm;}body{font-family:Arial,sans-serif;padding:0;color:#222;max-width:600px;margin:0 auto}h1{font-size:18px;margin-bottom:3px}p{font-size:12px;color:#666;margin-bottom:16px}</style></head><body><h1>Garage Door \u2014 TRACKS</h1><p>'+info+'</p><hr style="margin-bottom:16px;border:none;border-top:1px solid #ddd"><table style="width:100%;border-collapse:collapse;margin-bottom:20px"><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold;width:50%">Vertical (L & R)</td><td style="padding:10px;border:1px solid #ddd;font-size:22px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-vertical').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Horizontal (L & R)</td><td style="padding:10px;border:1px solid #ddd;font-size:22px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-horizontal').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">2x2 projection</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-2x2').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Sections</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-panels').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Configuration</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-config').textContent+'</td></tr></table><h3 style="margin-bottom:10px;font-size:12px;color:#666;text-transform:uppercase">Jamb Brackets per side</h3><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">'+jbs+'</div></body></html>';}
+function buildCablesHTML(){const info=getInfo();return'<!DOCTYPE html><html><head><title>CABLES</title><style>@page{size:letter portrait;margin:15mm;}body{font-family:Arial,sans-serif;padding:0;color:#222;max-width:600px;margin:0 auto}h1{font-size:18px;margin-bottom:3px}p{font-size:12px;color:#666;margin-bottom:16px}</style></head><body><h1>Garage Door \u2014 CABLES</h1><p>'+info+'</p><hr style="margin-bottom:16px;border:none;border-top:1px solid #ddd"><table style="width:100%;border-collapse:collapse"><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold;width:50%">Selected drum</td><td style="padding:10px;border:1px solid #ddd;font-size:20px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-drum').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Quantity</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-drum-qty').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">End bearing plate</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-ebf').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Total capacity</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-capacity').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Floor to shaft center</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-ftsc').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Cable type</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-cable-type').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Cable length (L & R)</td><td style="padding:10px;border:1px solid #ddd;font-size:26px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-cable').textContent+'</td></tr></table></body></html>';}
+
+function getLabelData(){const wo=document.getElementById('wo').value.trim(),mark=document.getElementById('mark').value.trim(),lites=document.getElementById('lites').value.trim(),glass=document.getElementById('glass').value,frame=document.getElementById('frame').value,panels=CD.panels||4,size=CD.width&&CD.height?CD.width+' X '+CD.height:'';return{wo,mark,lites,glass,frame,panels,size,roles:labelRoles};}
+
+function browserPrint(htmlContent){const iframe=document.createElement('iframe');iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none;';document.body.appendChild(iframe);iframe.contentDocument.open();iframe.contentDocument.write(htmlContent);iframe.contentDocument.close();iframe.contentWindow.focus();setTimeout(()=>{try{iframe.contentWindow.print();}catch(e){}setTimeout(()=>{if(iframe.parentNode)iframe.parentNode.removeChild(iframe);},3000);},500);}
+
+function doPrint(type){
+  const s=load();
+  if(type==='tracks'){
+    if(serverOK){
+      toast('Sending Tracks to '+(s.pTracks||'printer')+'...',2000);
+      fetch(SERVER+'/print/tracks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({html:buildTracksHTML(),printer:s.pTracks||''})})
+        .then(r=>r.json()).then(d=>toast(d.status==='ok'?'\u2713 Tracks printed':'\u2717 '+d.error,3000)).catch(e=>toast('Error: '+e.message,3000));
+    }else{browserPrint(buildTracksHTML());}
+  }else if(type==='cables'){
+    if(!CD.hasWeight){toast('Enter door weight first');return;}
+    if(serverOK){
+      toast('Sending Cables to '+(s.pCables||'printer')+'...',2000);
+      fetch(SERVER+'/print/cables',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({html:buildCablesHTML(),printer:s.pCables||''})})
+        .then(r=>r.json()).then(d=>toast(d.status==='ok'?'\u2713 Cables printed':'\u2717 '+d.error,3000)).catch(e=>toast('Error: '+e.message,3000));
+    }else{browserPrint(buildCablesHTML());}
+  }else if(type==='labels'){
+    if(serverOK){
+      const ld=getLabelData();
+      toast('Printing labels...',4000);
+      fetch(SERVER+'/print/labels',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...ld,printerSmall:s.pSmall||'',printerBig:s.pBig||'',printSmall:true,printBig:true,bigRotation:curRotation})})
+        .then(r=>r.json()).then(d=>toast(d.status==='ok'?'\u2713 Labels: '+d.printed.length+' jobs':'\u2717 '+d.error,3000)).catch(e=>toast('Error: '+e.message,3000));
+    }else{toast('Print server offline \u2014 start gd_print_server.py',3000);}
   }
 }
 
-function getInfo(){
-  const w=document.getElementById('width').value,h=document.getElementById('height').value;
-  const ts=document.getElementById('track-type'),ls=document.getElementById('lift-type');
-  const tt=ts.options[ts.selectedIndex]?.text||'',lt=ls.options[ls.selectedIndex]?.text||'';
-  const hl=document.getElementById('highlift').value,wt=document.getElementById('weight').value;
-  return'Width: '+w+'" | Height: '+h+'" | '+tt+' | '+lt+(hl?' | HL: '+hl+'"':'')+(wt?' | Weight: '+wt+' lbs':'');
+function doPrintAll(){
+  const s=load(),ld=getLabelData();
+  if(serverOK){
+    toast('Printing all...',5000);
+    fetch(SERVER+'/print/tracks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({html:buildTracksHTML(),printer:s.pTracks||''})}).catch(()=>{});
+    if(CD.hasWeight)setTimeout(()=>fetch(SERVER+'/print/cables',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({html:buildCablesHTML(),printer:s.pCables||''})}).catch(()=>{}),600);
+    if(ld.wo||ld.mark){
+      setTimeout(()=>fetch(SERVER+'/print/labels',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...ld,printerSmall:s.pSmall||'',printerBig:s.pBig||'',printSmall:true,printBig:true,bigRotation:curRotation})})
+        .then(r=>r.json()).then(d=>toast('\u2713 All printed!',3000)).catch(e=>toast('Label error: '+e.message,3000)),1200);
+    }else{setTimeout(()=>toast('\u2713 Tracks & Cables sent!',2000),800);}
+  }else{
+    toast('Print server offline \u2014 using browser print',3000);
+    browserPrint(buildTracksHTML());
+    if(CD.hasWeight)setTimeout(()=>browserPrint(buildCablesHTML()),700);
+  }
 }
 
-// ── INIT ───────────────────────────────────────────────────────────────────
 rebuildDropdowns();
 setupListeners();
-window._curRot=load().bigRotation||0;
-setTimeout(()=>{updateRotationUI(window._curRot);renderBigLabelPreview();},500);
-const initRot=load().bigRotation||0;setTimeout(()=>applyPreviewRotation(initRot),300);
+curRotation=load().bigRotation||0;
+checkServer();
+setInterval(checkServer,15000);
 </script>
 </body>
 </html>
