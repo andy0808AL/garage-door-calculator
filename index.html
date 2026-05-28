@@ -88,6 +88,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .print-all-btn:active{opacity:0.85;}
 .springs-msg{text-align:center;padding:24px 16px;color:var(--text-muted);font-size:14px;line-height:1.6;}
 .open-btn{display:inline-block;margin-top:16px;padding:12px 24px;background:var(--blue);color:white;border-radius:var(--radius-sm);font-size:15px;font-weight:600;text-decoration:none;}
+.suggest-list{position:absolute;top:100%;left:0;right:0;background:white;border:1.5px solid var(--blue-border);border-radius:var(--radius-sm);z-index:100;box-shadow:0 4px 12px rgba(0,0,0,0.12);overflow:hidden;}
+.suggest-list div{padding:10px 14px;font-size:15px;cursor:pointer;border-bottom:1px solid var(--gray-border);}
+.suggest-list div:last-child{border-bottom:none;}
+.suggest-list div:hover{background:var(--blue-light);color:var(--blue);}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;color:white;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:500;z-index:999;display:none;white-space:nowrap;}
 </style>
 </head>
@@ -118,6 +122,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     </div>
     <div class="settings-section"><div class="settings-section-title">Glass Options</div><div id="glass-list"></div><button class="add-printer-btn" onclick="addGlass()">+ Add glass type</button></div>
     <div class="settings-section"><div class="settings-section-title">Frame Color Options</div><div id="frame-list"></div><button class="add-printer-btn" onclick="addFrame()">+ Add frame color</button></div>
+    <div class="settings-section">
+      <div class="settings-section-title">&#128421; Jamb Bracket Quantities (per side)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;">
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px;">J-10</label>
+          <input type="number" id="jb-j10" min="0" max="20" style="width:100%;height:38px;padding:0 10px;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);background:var(--gray-light);font-size:15px;" onchange="saveJBSettings()">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px;">J-12</label>
+          <input type="number" id="jb-j12" min="0" max="20" style="width:100%;height:38px;padding:0 10px;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);background:var(--gray-light);font-size:15px;" onchange="saveJBSettings()">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px;">J-14</label>
+          <input type="number" id="jb-j14" min="0" max="20" style="width:100%;height:38px;padding:0 10px;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);background:var(--gray-light);font-size:15px;" onchange="saveJBSettings()">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px;">J-16</label>
+          <input type="number" id="jb-j16" min="0" max="20" style="width:100%;height:38px;padding:0 10px;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);background:var(--gray-light);font-size:15px;" onchange="saveJBSettings()">
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);">These override the calculated values.</div>
+      <button class="add-printer-btn" onclick="resetJBSettings()" style="margin-top:8px;">Reset to calculated defaults</button>
+    </div>
   </div>
 </div>
 <div class="top-bar">
@@ -137,8 +164,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   <div class="card">
     <div class="card-title">Door Information</div>
     <div class="field-row">
-      <div class="field"><label>Width (inches)</label><input type="number" id="width" placeholder="e.g. 192" inputmode="decimal"></div>
-      <div class="field"><label>Height (inches)</label><input type="number" id="height" placeholder="e.g. 96" inputmode="decimal"><div class="panel-hint" id="panel-hint"></div></div>
+      <div class="field" style="position:relative;">
+    <label>Width (inches)</label>
+    <input type="number" id="width" placeholder="e.g. 192" inputmode="decimal" autocomplete="off"
+      onmouseenter="showSuggest('width-suggest')" onfocus="showSuggest('width-suggest')"
+      onblur="setTimeout(function(){hideSuggest('width-suggest')},200)">
+    <div id="width-suggest" class="suggest-list" style="display:none;">
+      <div onclick="setSuggest('width',84)">84"</div>
+      <div onclick="setSuggest('width',96)">96"</div>
+      <div onclick="setSuggest('width',108)">108"</div>
+      <div onclick="setSuggest('width',120)">120"</div>
+      <div onclick="setSuggest('width',192)">192"</div>
+      <div onclick="setSuggest('width',216)">216"</div>
+    </div>
+  </div>
+      <div class="field" style="position:relative;">
+    <label>Height (inches)</label>
+    <input type="number" id="height" placeholder="e.g. 96" inputmode="decimal" autocomplete="off"
+      onmouseenter="showSuggest('height-suggest')" onfocus="showSuggest('height-suggest')"
+      onblur="setTimeout(function(){hideSuggest('height-suggest')},200)">
+    <div id="height-suggest" class="suggest-list" style="display:none;">
+      <div onclick="setSuggest('height',84)">84"</div>
+      <div onclick="setSuggest('height',96)">96"</div>
+      <div onclick="setSuggest('height',108)">108"</div>
+      <div onclick="setSuggest('height',120)">120"</div>
+      <div onclick="setSuggest('height',144)">144"</div>
+    </div>
+    <div class="panel-hint" id="panel-hint"></div>
+  </div>
     </div>
     <div class="field-row">
       <div class="field"><label>Track type</label><select id="track-type"><option value="">Select...</option><option value="3-15R">3" 15R</option><option value="2-12R">2" 12R</option><option value="3-LHR">3" LHR</option><option value="2-LHR">2" LHR</option></select></div>
@@ -154,10 +207,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <div class="card-title">Label Information <span class="badge">Optional</span></div>
     <div class="field-row">
       <div class="field"><label>W/O #</label><input type="text" id="wo" placeholder="e.g. 721"></div>
-      <div class="field"><label>Mark</label><input type="text" id="mark" placeholder="e.g. A"></div>
+      <div class="field"><label>Mark</label>
+    <select id="mark" onchange="updateLabels();saveForm();">
+      <option value="">Select...</option>
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+      <option value="D">D</option>
+      <option value="E">E</option>
+    </select>
+  </div>
     </div>
     <div class="field-row">
-      <div class="field"><label>Lites</label><input type="text" id="lites" placeholder="e.g. 2"></div>
+      <div class="field"><label>Lites</label>
+    <select id="lites" onchange="updateLabels();saveForm();">
+      <option value="">Select...</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+  </div>
       <div class="field"><label>Glass</label><select id="glass"><option value="">Select...</option></select></div>
     </div>
     <div class="field"><label>Frame Color</label><select id="frame"><option value="">Select...</option></select></div>
@@ -253,7 +324,7 @@ function mergeServerPrinters(printers){
   var newEx=printers.filter(function(p){return DEF_PRINTERS.indexOf(p)<0&&extra.indexOf(p)<0;});
   if(newEx.length>0){save({extraPrinters:extra.concat(newEx)});}
 }
-function openSettings(){document.getElementById('settings-overlay').classList.add('open');document.getElementById('settings-drawer').classList.add('open');document.body.style.overflow='hidden';renderSettings();}
+function openSettings(){document.getElementById('settings-overlay').classList.add('open');document.getElementById('settings-drawer').classList.add('open');document.body.style.overflow='hidden';renderSettings();loadJBSettingsUI();}
 function closeSettings(){document.getElementById('settings-overlay').classList.remove('open');document.getElementById('settings-drawer').classList.remove('open');document.body.style.overflow='';}
 function getPrinters(){var s=load();var all=DEF_PRINTERS.concat(s.extraPrinters||[]);return all.filter(function(v,i,a){return a.indexOf(v)===i;});}
 function renderSettings(){
@@ -299,9 +370,11 @@ function getTracksData(){var grid=document.getElementById('jb-grid');var jb=['J-
 function getCablesData(){return{drum:document.getElementById('r-drum').textContent,qty:document.getElementById('r-drum-qty').textContent,ebf:document.getElementById('r-ebf').textContent,capacity:document.getElementById('r-capacity').textContent,ftsc:document.getElementById('r-ftsc').textContent,cableType:document.getElementById('r-cable-type').textContent,cable:document.getElementById('r-cable').textContent};}
 
 function saveForm(){
-  var fields=['width','height','highlift','weight','wo','mark','lites'];
+  var fields=['width','height','highlift','weight','wo'];
   var data={};
   fields.forEach(function(id){data[id]=document.getElementById(id).value;});
+  data.mark=document.getElementById('mark').value;
+  data.lites=document.getElementById('lites').value;
   data.trackType=document.getElementById('track-type').value;
   data.liftType=document.getElementById('lift-type').value;
   data.glass=document.getElementById('glass').value;
@@ -312,8 +385,10 @@ function restoreForm(){
   var s=load();
   if(!s.formData)return;
   var d=s.formData;
-  var fields=['width','height','highlift','weight','wo','mark','lites'];
+  var fields=['width','height','highlift','weight','wo'];
   fields.forEach(function(id){if(d[id]!==undefined)document.getElementById(id).value=d[id];});
+  if(d.mark){document.getElementById('mark').value=d.mark;}
+  if(d.lites){document.getElementById('lites').value=d.lites;}
   if(d.trackType){document.getElementById('track-type').value=d.trackType;}
   if(d.liftType){
     document.getElementById('lift-type').value=d.liftType;
@@ -322,6 +397,50 @@ function restoreForm(){
   if(d.glass){document.getElementById('glass').value=d.glass;}
   if(d.frame){document.getElementById('frame').value=d.frame;}
   calculate();
+}
+
+function showSuggest(id){var el=document.getElementById(id);if(el)el.style.display='block';}
+function hideSuggest(id){var el=document.getElementById(id);if(el)el.style.display='none';}
+function setSuggest(fieldId,val){
+  var el=document.getElementById(fieldId);
+  if(el){el.value=val;el.dispatchEvent(new Event('input'));}
+  hideSuggest(fieldId+'-suggest');
+}
+
+function saveJBSettings(){
+  var j10=document.getElementById('jb-j10').value;
+  var j12=document.getElementById('jb-j12').value;
+  var j14=document.getElementById('jb-j14').value;
+  var j16=document.getElementById('jb-j16').value;
+  var overrides={};
+  if(j10!=='')overrides.j10=parseInt(j10);
+  if(j12!=='')overrides.j12=parseInt(j12);
+  if(j14!=='')overrides.j14=parseInt(j14);
+  if(j16!=='')overrides.j16=parseInt(j16);
+  save({jbOverrides:overrides});
+  calculate();
+}
+
+function resetJBSettings(){
+  save({jbOverrides:{}});
+  document.getElementById('jb-j10').value='';
+  document.getElementById('jb-j12').value='';
+  document.getElementById('jb-j14').value='';
+  document.getElementById('jb-j16').value='';
+  calculate();
+}
+
+function loadJBSettingsUI(){
+  var s=load();var ov=s.jbOverrides||{};
+  document.getElementById('jb-j10').value=ov.j10!==undefined?ov.j10:'';
+  document.getElementById('jb-j12').value=ov.j12!==undefined?ov.j12:'';
+  document.getElementById('jb-j14').value=ov.j14!==undefined?ov.j14:'';
+  document.getElementById('jb-j16').value=ov.j16!==undefined?ov.j16:'';
+}
+
+function getJBOverride(key,calculated){
+  var s=load();var ov=s.jbOverrides||{};
+  return ov[key]!==undefined?ov[key]:calculated;
 }
 function setupListeners(){
   ['width','height','highlift','weight'].forEach(function(id){document.getElementById(id).addEventListener('input',function(){calculate();saveForm();});});
@@ -358,7 +477,16 @@ function calculate(){
   document.getElementById('r-2x2').textContent=frac(x2)+' projection';
   document.getElementById('r-panels').textContent=panels+' sections';
   document.getElementById('r-config').textContent=tlbl[tt]+' - '+llbl[lt];
-  document.getElementById('jb-grid').innerHTML=['J-10','J-12','J-14','J-16'].map(function(t,i){var q=[jb.j10,jb.j12,jb.j14,jb.j16][i];return'<div class="jb-box"><div class="jb-type">'+t+'</div>'+(q!==null?'<div class="jb-qty">'+q+'</div>':'<div class="jb-na">--</div>')+'</div>';}).join('');
+  var jbKeys=['j10','j12','j14','j16'];
+  document.getElementById('jb-grid').innerHTML=['J-10','J-12','J-14','J-16'].map(function(t,i){
+    var calc=[jb.j10,jb.j12,jb.j14,jb.j16][i];
+    var q=getJBOverride(jbKeys[i],calc);
+    var isOverridden=(load().jbOverrides||{})[jbKeys[i]]!==undefined;
+    return'<div class="jb-box"'+(isOverridden?' style="border:2px solid var(--blue);"':'')+'>'+
+      '<div class="jb-type">'+t+'</div>'+
+      (q!==null?'<div class="jb-qty">'+q+'</div>':'<div class="jb-na">--</div>')+
+    '</div>';
+  }).join('');
   var notice=document.getElementById('weight-notice'),cableDiv=document.getElementById('cable-results');
   if(!hasWeight){notice.style.display='block';cableDiv.style.display='none';}
   else{
