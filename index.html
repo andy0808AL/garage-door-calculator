@@ -214,7 +214,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
         <div class="result-row"><span class="rlabel">Configuration</span><span class="rvalue" id="r-config" style="font-size:13px;text-align:right;max-width:55%">&mdash;</span></div>
       </div>
       <div class="card"><div class="card-title">Jamb Brackets &mdash; per side</div><div class="jb-grid" id="jb-grid"></div></div>
-      <button class="print-btn" onclick="silentPrint('tracks')">&#128424; Print Tracks</button>
+      <button class="print-btn" onclick="doPrint('tracks')">&#128424; Print Tracks</button>
     </div>
 
     <!-- CABLES -->
@@ -231,7 +231,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
           <div class="result-row"><span class="rlabel">Floor to shaft center</span><span class="rvalue" id="r-ftsc">&mdash;</span></div>
           <div class="cable-box"><div><div class="cable-size" id="r-cable">&mdash;</div><div class="cable-sub">Cable length &middot; left &amp; right</div></div><div class="cable-badge" id="r-cable-type">&mdash;</div></div>
         </div>
-        <button class="print-btn" onclick="silentPrint('cables')">&#128424; Print Cables</button>
+        <button class="print-btn" onclick="doPrint('cables')">&#128424; Print Cables</button>
       </div>
     </div>
 
@@ -251,19 +251,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
         <div class="label-preview-title">Small Label (4" &times; 1") &mdash; GX420d</div>
         <div class="small-label"><div id="sl-left"></div><div id="sl-right"></div></div>
         <div class="label-preview-title">Big Label (3" &times; 6") &mdash; Westinghouse WHTP203e</div>
-        <div class="big-label-wrap" id="big-label-preview-wrap"></div><div class="label-nav">
+        <div id="big-label-preview"></div>
+        <div class="label-nav">
           <button onclick="prevLabel()">&#8592;</button>
           <span id="label-nav-text">1 / 1</span>
           <button onclick="nextLabel()">&#8594;</button>
         </div>
-        <button class="print-btn" onclick="silentPrint('labels')">&#128424; Print Labels</button>
+        <button class="print-btn" onclick="doPrint('labels')">&#128424; Print Labels</button>
       </div>
     </div>
   </div>
 
   <!-- PRINT ALL -->
   <div class="results" id="print-all-wrap" style="margin-top:4px">
-    <button class="print-all-btn" onclick="silentPrintAll()">&#128424;&nbsp; Print All</button>
+    <button class="print-all-btn" onclick="doPrintAll()">&#128424;&nbsp; Print All</button>
   </div>
 </div>
 
