@@ -194,8 +194,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   </div>
     </div>
     <div class="field-row">
-      <div class="field"><label>Track type</label><select id="track-type"><option value="">Select...</option><option value="3-15R">3" 15R</option><option value="2-12R">2" 12R</option><option value="3-LHR">3" LHR</option><option value="2-LHR">2" LHR</option></select></div>
-      <div class="field"><label>Lift type</label><select id="lift-type"><option value="">Select...</option><option value="standard">Standard</option><option value="highlift">High Lift</option><option value="lhr">Low Headroom</option></select></div>
+      <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-track')" onmouseleave="hideSuggest('cs-track')">
+    <label>Track type</label>
+    <input type="text" id="track-type-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
+    <input type="hidden" id="track-type" value="">
+    <div id="cs-track" class="suggest-list">
+      <div onmousedown="setSelect('track-type','3-15R','3&quot; 15R')">3" 15R</div>
+      <div onmousedown="setSelect('track-type','2-12R','2&quot; 12R')">2" 12R</div>
+      <div onmousedown="setSelect('track-type','3-LHR','3&quot; LHR')">3" LHR</div>
+      <div onmousedown="setSelect('track-type','2-LHR','2&quot; LHR')">2" LHR</div>
+    </div>
+  </div>
+      <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-lift')" onmouseleave="hideSuggest('cs-lift')">
+    <label>Lift type</label>
+    <input type="text" id="lift-type-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
+    <input type="hidden" id="lift-type" value="">
+    <div id="cs-lift" class="suggest-list">
+      <div onmousedown="setSelect('lift-type','standard','Standard')">Standard</div>
+      <div onmousedown="setSelect('lift-type','highlift','High Lift')">High Lift</div>
+      <div onmousedown="setSelect('lift-type','lhr','Low Headroom')">Low Headroom</div>
+    </div>
+  </div>
     </div>
     <div class="field-row">
       <div class="field hl-field" id="hl-field"><label>High Lift (in)</label><input type="number" id="highlift" placeholder="e.g. 24" inputmode="decimal"></div>
@@ -207,31 +226,45 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <div class="card-title">Label Information <span class="badge">Optional</span></div>
     <div class="field-row">
       <div class="field"><label>W/O #</label><input type="text" id="wo" placeholder="e.g. 721"></div>
-      <div class="field"><label>Mark</label>
-    <select id="mark" onchange="updateLabels();saveForm();">
-      <option value="">Select...</option>
-      <option value="A">A</option>
-      <option value="B">B</option>
-      <option value="C">C</option>
-      <option value="D">D</option>
-      <option value="E">E</option>
-    </select>
+      <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-mark')" onmouseleave="hideSuggest('cs-mark')">
+    <label>Mark</label>
+    <input type="text" id="mark-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
+    <input type="hidden" id="mark" value="">
+    <div id="cs-mark" class="suggest-list">
+      <div onmousedown="setSelect('mark','A','A',true)">A</div>
+      <div onmousedown="setSelect('mark','B','B',true)">B</div>
+      <div onmousedown="setSelect('mark','C','C',true)">C</div>
+      <div onmousedown="setSelect('mark','D','D',true)">D</div>
+      <div onmousedown="setSelect('mark','E','E',true)">E</div>
+    </div>
   </div>
     </div>
     <div class="field-row">
-      <div class="field"><label>Lites</label>
-    <select id="lites" onchange="updateLabels();saveForm();">
-      <option value="">Select...</option>
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="3">3</option>
-      <option value="4">4</option>
-      <option value="5">5</option>
-    </select>
-  </div>
-      <div class="field"><label>Glass</label><select id="glass"><option value="">Select...</option></select></div>
+      <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-lites')" onmouseleave="hideSuggest('cs-lites')">
+    <label>Lites</label>
+    <input type="text" id="lites-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
+    <input type="hidden" id="lites" value="">
+    <div id="cs-lites" class="suggest-list">
+      <div onmousedown="setSelect('lites','1','1',true)">1</div>
+      <div onmousedown="setSelect('lites','2','2',true)">2</div>
+      <div onmousedown="setSelect('lites','3','3',true)">3</div>
+      <div onmousedown="setSelect('lites','4','4',true)">4</div>
+      <div onmousedown="setSelect('lites','5','5',true)">5</div>
     </div>
-    <div class="field"><label>Frame Color</label><select id="frame"><option value="">Select...</option></select></div>
+  </div>
+      <div class="field" style="position:relative;" onmouseenter="buildGlassOptions();showSuggest('cs-glass')" onmouseleave="hideSuggest('cs-glass')">
+    <label>Glass</label>
+    <input type="text" id="glass-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
+    <input type="hidden" id="glass" value="">
+    <div id="cs-glass" class="suggest-list"></div>
+  </div>
+    </div>
+    <div class="field" style="position:relative;" onmouseenter="buildFrameOptions();showSuggest('cs-frame')" onmouseleave="hideSuggest('cs-frame')">
+    <label>Frame Color</label>
+    <input type="text" id="frame-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
+    <input type="hidden" id="frame" value="">
+    <div id="cs-frame" class="suggest-list"></div>
+  </div>
   </div>
   <div class="results" id="results">
     <div class="tabs">
@@ -378,8 +411,8 @@ function saveForm(){
   var fields=['width','height','highlift','weight','wo'];
   var data={};
   fields.forEach(function(id){data[id]=document.getElementById(id).value;});
-  data.mark=document.getElementById('mark').value;
-  data.lites=document.getElementById('lites').value;
+  data.mark=document.getElementById('mark')?document.getElementById('mark').value:'';
+  data.lites=document.getElementById('lites')?document.getElementById('lites').value:'';
   data.trackType=document.getElementById('track-type').value;
   data.liftType=document.getElementById('lift-type').value;
   data.glass=document.getElementById('glass').value;
@@ -392,8 +425,8 @@ function restoreForm(){
   var d=s.formData;
   var fields=['width','height','highlift','weight','wo'];
   fields.forEach(function(id){if(d[id]!==undefined)document.getElementById(id).value=d[id];});
-  if(d.mark){document.getElementById('mark').value=d.mark;}
-  if(d.lites){document.getElementById('lites').value=d.lites;}
+  if(d.mark){var mi=document.getElementById('mark');var md=document.getElementById('mark-display');if(mi)mi.value=d.mark;if(md)md.value=d.mark;}
+  if(d.lites){var li=document.getElementById('lites');var ld=document.getElementById('lites-display');if(li)li.value=d.lites;if(ld)ld.value=d.lites;}
   if(d.trackType){document.getElementById('track-type').value=d.trackType;}
   if(d.liftType){
     document.getElementById('lift-type').value=d.liftType;
@@ -404,6 +437,50 @@ function restoreForm(){
   calculate();
 }
 
+
+function setSelect(fieldId, val, label, triggerLabels){
+  document.getElementById(fieldId).value = val;
+  var disp = document.getElementById(fieldId+'-display');
+  if(disp) disp.value = label || val;
+  hideSuggest('cs-'+fieldId);
+  if(triggerLabels){ updateLabels(); saveForm(); }
+  else {
+    if(fieldId==='lift-type'){
+      document.getElementById('hl-field').classList.toggle('visible', val==='highlift');
+    }
+    calculate(); saveForm();
+  }
+}
+function buildGlassOptions(){
+  var list=document.getElementById('cs-glass');
+  if(!list||list.children.length>0)return;
+  var cur=document.getElementById('glass').value;
+  list.innerHTML=getAllGlass().map(function(g){
+    return '<div onmousedown="setSelect(\'glass\',\''+g+'\',\''+g+'\',true)"'+(g===cur?' style="font-weight:700;"':'')+'>'+g+'</div>';
+  }).join('');
+}
+function buildFrameOptions(){
+  var list=document.getElementById('cs-frame');
+  if(!list||list.children.length>0)return;
+  var cur=document.getElementById('frame').value;
+  list.innerHTML=getAllFrame().map(function(f){
+    return '<div onmousedown="setSelect(\'frame\',\''+f+'\',\''+f+'\',true)"'+(f===cur?' style="font-weight:700;"':'')+'>'+f+'</div>';
+  }).join('');
+}
+function syncDisplayFields(){
+  var map={
+    'track-type':{'3-15R':'3" 15R','2-12R':'2" 12R','3-LHR':'3" LHR','2-LHR':'2" LHR'},
+    'lift-type':{'standard':'Standard','highlift':'High Lift','lhr':'Low Headroom'}
+  };
+  ['track-type','lift-type','mark','lites','glass','frame'].forEach(function(id){
+    var inp=document.getElementById(id);
+    var disp=document.getElementById(id+'-display');
+    if(!inp||!disp)return;
+    var v=inp.value;
+    var m=map[id];
+    disp.value = m ? (m[v]||v||'') : (v||'');
+  });
+}
 function showSuggest(id){var el=document.getElementById(id);if(el)el.style.display='block';}
 function hideSuggest(id){var el=document.getElementById(id);if(el)el.style.display='none';}
 function setSuggest(fieldId,val){
@@ -449,11 +526,11 @@ function getJBOverride(key,calculated){
 }
 function setupListeners(){
   ['width','height','highlift','weight'].forEach(function(id){document.getElementById(id).addEventListener('input',function(){calculate();saveForm();});});
-  document.getElementById('track-type').addEventListener('change',function(){calculate();saveForm();});
-  document.getElementById('lift-type').addEventListener('change',function(){document.getElementById('hl-field').classList.toggle('visible',this.value==='highlift');calculate();saveForm();});
+  // track-type handled by setSelect
+  // lift-type handled by setSelect
   ['wo','mark','lites'].forEach(function(id){document.getElementById(id).addEventListener('input',function(){updateLabels();saveForm();});});
-  document.getElementById('glass').addEventListener('change',function(){updateLabels();saveForm();});
-  document.getElementById('frame').addEventListener('change',function(){updateLabels();saveForm();});
+  // glass handled by setSelect
+  // frame handled by setSelect
 }
 function calculate(){
   var width=parseFloat(document.getElementById('width').value);
@@ -558,7 +635,7 @@ function clearAll(){
   document.getElementById('glass').value='';document.getElementById('frame').value='';
   document.getElementById('hl-field').classList.remove('visible');document.getElementById('panel-hint').textContent='';
   document.getElementById('results').classList.remove('visible');document.getElementById('print-all-wrap').classList.remove('visible');
-  CD={};labelRoles=[];curLabel=0;showTab(0);save({formData:{}});
+  CD={};labelRoles=[];curLabel=0;showTab(0);save({formData:{}});['track-type','lift-type','mark','lites','glass','frame'].forEach(function(id){var d=document.getElementById(id+'-display');if(d)d.value='';var i=document.getElementById(id);if(i)i.value='';});
 }
 function getInfo(){
   var w=document.getElementById('width').value,h=document.getElementById('height').value;
@@ -629,7 +706,7 @@ function doPrintAll(){
   }
 }
 try{rebuildDropdowns();}catch(e){console.error('rebuildDropdowns:',e);}
-try{restoreForm();}catch(e){console.error('restoreForm:',e);}
+try{restoreForm();syncDisplayFields();}catch(e){console.error('restoreForm:',e);}
 try{setupListeners();}catch(e){console.error('setupListeners:',e);}
 try{curRotation=load().bigRotation||0;}catch(e){console.error('curRotation:',e);}
 try{checkServer();}catch(e){console.error('checkServer:',e);}
