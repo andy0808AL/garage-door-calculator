@@ -539,16 +539,10 @@ function buildSmallLabelsHTML(wo,mark,lites,glass,frame,panels,size){
 }
 
 function buildBigLabelsHTML(wo,panels){
-  let body='<!DOCTYPE html><html><head><title>Big Labels</title><style>*{box-sizing:border-box;margin:0;padding:0;}@page{size:3in 6in;margin:0;margin:0;}body{margin:0;padding:0;font-family:Arial,sans-serif;}</style></head><body>';
+  let body='<!DOCTYPE html><html><head><title>Big Labels</title><style>*{box-sizing:border-box;margin:0;padding:0;}@page{size:3in 6in portrait;margin:0;}body{margin:0;padding:0;font-family:Arial,sans-serif;}</style></head><body>';
   labelRoles.forEach((role,i)=>{
-    // W/O text fills the label — use viewport units relative to 3in width
-    // At 96dpi: 3in=288px, 6in=576px. Font ~200px to fill width for short W/O numbers
-    body+=`<div style="width:3in;height:6in;border:3px solid #222;padding:12px 10px 10px;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always;overflow:hidden;">
-      <div style="flex:1;display:flex;align-items:center;justify-content:center;">
-        <div style="font-size:clamp(40px,18vw,140px);font-weight:900;text-align:center;line-height:1;white-space:nowrap;max-width:100%;font-size:min(18vw,130px);">W/O: ${wo||'—'}</div>
-      </div>
-      <div style="font-size:22pt;font-weight:700;text-align:right;">${role} (${i+1}/${panels})</div>
-    </div>`;
+    const woText='W/O: '+(wo||'\u2014');
+    body+=`<div style="width:3in;height:6in;border:3px solid #222;padding:6px 6px 4px;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always;overflow:hidden;box-sizing:border-box;"><svg width="100%" style="flex:1;min-height:0;" viewBox="0 0 270 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"><text x="135" y="260" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="130" textLength="258" lengthAdjust="spacingAndGlyphs">${woText}</text></svg><div style="font-size:15pt;font-weight:700;text-align:right;padding:2px 4px;flex-shrink:0;">${role} (${i+1}/${panels})</div></div>`;
   });
   return body+'</body></html>';
 }
