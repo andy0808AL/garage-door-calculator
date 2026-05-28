@@ -539,7 +539,7 @@ function buildSmallLabelsHTML(wo,mark,lites,glass,frame,panels,size){
 }
 
 function buildBigLabelsHTML(wo,panels){
-  let body='<!DOCTYPE html><html><head><title>Big Labels</title><style>*{box-sizing:border-box;margin:0;padding:0;}@page{size:3in 6in;margin:0;}body{margin:0;padding:0;font-family:Arial,sans-serif;}</style></head><body>';
+  let body='<!DOCTYPE html><html><head><title>Big Labels</title><style>*{box-sizing:border-box;margin:0;padding:0;}@page{size:3in 6in;margin:0;margin:0;}body{margin:0;padding:0;font-family:Arial,sans-serif;}</style></head><body>';
   labelRoles.forEach((role,i)=>{
     // W/O text fills the label — use viewport units relative to 3in width
     // At 96dpi: 3in=288px, 6in=576px. Font ~200px to fill width for short W/O numbers
