@@ -464,11 +464,11 @@ function doPrintAll(){
     setTimeout(function(){toast('Tracks & Cables sent!',2000);},800);
   }
 }
-rebuildDropdowns();
-setupListeners();
-curRotation=load().bigRotation||0;
-checkServer();
-setInterval(checkServer,15000);
+try{rebuildDropdowns();}catch(e){console.error('rebuildDropdowns:',e);}
+try{setupListeners();}catch(e){console.error('setupListeners:',e);}
+try{curRotation=load().bigRotation||0;}catch(e){console.error('curRotation:',e);}
+try{checkServer();}catch(e){console.error('checkServer:',e);}
+try{setInterval(checkServer,15000);}catch(e){}
 </script>
 </body>
 </html>
