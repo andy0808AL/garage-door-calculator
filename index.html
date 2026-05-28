@@ -506,25 +506,16 @@ function buildCablesHTML(){
 }
 
 // Silent print: open hidden iframe, load content, trigger print with specific printer via CSS
-function silentPrintDoc(htmlContent, printerName, label){
-  toast('Printing '+label+' to '+printerName+'...');
+function silentPrintDoc(htmlContent,printerName,label){
+  toast('Sending '+label+' to '+printerName+'...');
   const iframe=document.createElement('iframe');
-  iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none;';
+  iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:1200px;height:900px;border:none;';
   document.body.appendChild(iframe);
-  // Inject CSS to target specific printer — this sets the printer in the @page rule
-  const printCSS='@page{size:letter;margin:15mm;}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}';
+  const printCSS='@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}';
   const fullHTML=htmlContent.replace('</head>','<style>'+printCSS+'</style></head>');
-  iframe.contentDocument.open();
-  iframe.contentDocument.write(fullHTML);
-  iframe.contentDocument.close();
+  iframe.contentDocument.open();iframe.contentDocument.write(fullHTML);iframe.contentDocument.close();
   iframe.contentWindow.focus();
-  setTimeout(()=>{
-    // Set destination printer programmatically via window.print options (Chrome supports this)
-    try{
-      iframe.contentWindow.print();
-    }catch(e){toast('Print error: '+e.message,3000);}
-    setTimeout(()=>{if(iframe.parentNode)iframe.parentNode.removeChild(iframe);},3000);
-  },500);
+  setTimeout(()=>{try{iframe.contentWindow.print();}catch(e){toast('Print error: '+e.message,3000);}setTimeout(()=>{if(iframe.parentNode)iframe.parentNode.removeChild(iframe);},3000);},800);
 }
 
 function buildSmallLabelsHTML(wo,mark,lites,glass,frame,panels,size){
