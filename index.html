@@ -194,29 +194,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   </div>
     </div>
     <div class="field-row">
-      <div class="field"><label>Track type</label>
-    <div class="custom-select-wrap" onmouseenter="showCustom('cs-track')" onmouseleave="hideCustom('cs-track')">
-      <div class="custom-select-btn" id="cs-track-btn">Select...</div>
-      <input type="hidden" id="track-type" value="">
-      <div class="custom-select-list" id="cs-track">
-        <div onmousedown="setCustom('cs-track','track-type','3-15R','3&quot; 15R')">3" 15R</div>
-        <div onmousedown="setCustom('cs-track','track-type','2-12R','2&quot; 12R')">2" 12R</div>
-        <div onmousedown="setCustom('cs-track','track-type','3-LHR','3&quot; LHR')">3" LHR</div>
-        <div onmousedown="setCustom('cs-track','track-type','2-LHR','2&quot; LHR')">2" LHR</div>
-      </div>
-    </div>
-  </div>
-      <div class="field"><label>Lift type</label>
-    <div class="custom-select-wrap" onmouseenter="showCustom('cs-lift')" onmouseleave="hideCustom('cs-lift')">
-      <div class="custom-select-btn" id="cs-lift-btn">Select...</div>
-      <input type="hidden" id="lift-type" value="">
-      <div class="custom-select-list" id="cs-lift">
-        <div onmousedown="setCustom('cs-lift','lift-type','standard','Standard')">Standard</div>
-        <div onmousedown="setCustom('cs-lift','lift-type','highlift','High Lift')">High Lift</div>
-        <div onmousedown="setCustom('cs-lift','lift-type','lhr','Low Headroom')">Low Headroom</div>
-      </div>
-    </div>
-  </div>
+      <div class="field"><label>Track type</label><select id="track-type"><option value="">Select...</option><option value="3-15R">3" 15R</option><option value="2-12R">2" 12R</option><option value="3-LHR">3" LHR</option><option value="2-LHR">2" LHR</option></select></div>
+      <div class="field"><label>Lift type</label><select id="lift-type"><option value="">Select...</option><option value="standard">Standard</option><option value="highlift">High Lift</option><option value="lhr">Low Headroom</option></select></div>
     </div>
     <div class="field-row">
       <div class="field hl-field" id="hl-field"><label>High Lift (in)</label><input type="number" id="highlift" placeholder="e.g. 24" inputmode="decimal"></div>
@@ -229,48 +208,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <div class="field-row">
       <div class="field"><label>W/O #</label><input type="text" id="wo" placeholder="e.g. 721"></div>
       <div class="field"><label>Mark</label>
-    <div class="custom-select-wrap" onmouseenter="showCustom('cs-mark')" onmouseleave="hideCustom('cs-mark')">
-      <div class="custom-select-btn" id="cs-mark-btn">Select...</div>
-      <input type="hidden" id="mark" value="">
-      <div class="custom-select-list" id="cs-mark">
-        <div onmousedown="setCustom('cs-mark','mark','A','A',true)">A</div>
-        <div onmousedown="setCustom('cs-mark','mark','B','B',true)">B</div>
-        <div onmousedown="setCustom('cs-mark','mark','C','C',true)">C</div>
-        <div onmousedown="setCustom('cs-mark','mark','D','D',true)">D</div>
-        <div onmousedown="setCustom('cs-mark','mark','E','E',true)">E</div>
-      </div>
-    </div>
+    <select id="mark" onchange="updateLabels();saveForm();">
+      <option value="">Select...</option>
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+      <option value="D">D</option>
+      <option value="E">E</option>
+    </select>
   </div>
     </div>
     <div class="field-row">
       <div class="field"><label>Lites</label>
-    <div class="custom-select-wrap" onmouseenter="showCustom('cs-lites')" onmouseleave="hideCustom('cs-lites')">
-      <div class="custom-select-btn" id="cs-lites-btn">Select...</div>
-      <input type="hidden" id="lites" value="">
-      <div class="custom-select-list" id="cs-lites">
-        <div onmousedown="setCustom('cs-lites','lites','1','1',true)">1</div>
-        <div onmousedown="setCustom('cs-lites','lites','2','2',true)">2</div>
-        <div onmousedown="setCustom('cs-lites','lites','3','3',true)">3</div>
-        <div onmousedown="setCustom('cs-lites','lites','4','4',true)">4</div>
-        <div onmousedown="setCustom('cs-lites','lites','5','5',true)">5</div>
-      </div>
-    </div>
+    <select id="lites" onchange="updateLabels();saveForm();">
+      <option value="">Select...</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
   </div>
-      <div class="field"><label>Glass</label>
-    <div class="custom-select-wrap" onmouseenter="buildAndShow('cs-glass','glass')" onmouseleave="hideCustom('cs-glass')">
-      <div class="custom-select-btn" id="cs-glass-btn">Select...</div>
-      <input type="hidden" id="glass" value="">
-      <div class="custom-select-list" id="cs-glass"></div>
+      <div class="field"><label>Glass</label><select id="glass"><option value="">Select...</option></select></div>
     </div>
-  </div>
-    </div>
-    <div class="field"><label>Frame Color</label>
-    <div class="custom-select-wrap" onmouseenter="buildAndShow('cs-frame','frame')" onmouseleave="hideCustom('cs-frame')">
-      <div class="custom-select-btn" id="cs-frame-btn">Select...</div>
-      <input type="hidden" id="frame" value="">
-      <div class="custom-select-list" id="cs-frame"></div>
-    </div>
-  </div>
+    <div class="field"><label>Frame Color</label><select id="frame"><option value="">Select...</option></select></div>
   </div>
   <div class="results" id="results">
     <div class="tabs">
@@ -403,7 +364,7 @@ function removeAnyFrame(f){var all=getAllFrame().filter(function(x){return x!==f
 function removeGlass(g){var s=load();save({extraGlass:(s.extraGlass||[]).filter(function(x){return x!==g;})});rebuildDropdowns();renderSettings();}
 function addFrame(){var v=prompt('Frame color:');if(!v||!v.trim())return;var all=getAllFrame();if(all.indexOf(v.trim())<0)all.push(v.trim());save({allFrame:all});rebuildDropdowns();renderSettings();}
 function removeFrame(f){var s=load();save({extraFrame:(s.extraFrame||[]).filter(function(x){return x!==f;})});rebuildDropdowns();renderSettings();}
-function rebuildDropdowns(){var cg=document.getElementById('glass')?document.getElementById('glass').value:'';var cf=document.getElementById('frame')?document.getElementById('frame').value:'';if(cg){var gb=document.getElementById('cs-glass-btn');if(gb)gb.textContent=cg;}if(cf){var fb=document.getElementById('cs-frame-btn');if(fb)fb.textContent=cf;}}
+function rebuildDropdowns(){var s=load();var ag=getAllGlass();var af=getAllFrame();var cg=document.getElementById('glass').value;var cf=document.getElementById('frame').value;document.getElementById('glass').innerHTML='<option value="">Select...</option>'+ag.map(function(g){return'<option'+(g===cg?' selected':'')+'>'+g+'</option>';}).join('');document.getElementById('frame').innerHTML='<option value="">Select...</option>'+af.map(function(f){return'<option'+(f===cf?' selected':'')+'>'+f+'</option>';}).join('');}
 function frac(val){var w=Math.floor(val),d=val-w;var fs=[[0,''],[0.125,'1/8'],[0.25,'1/4'],[0.375,'3/8'],[0.5,'1/2'],[0.625,'5/8'],[0.75,'3/4'],[0.875,'7/8'],[1,'']];var best=fs[0],bd=999;fs.forEach(function(f){var dd=Math.abs(d-f[0]);if(dd<bd){bd=dd;best=f;}});if(best[0]===1)return(w+1)+'"';if(w===0)return best[1]?best[1]+'"':'0"';return best[1]?w+' '+best[1]+'"':w+'"';}
 function getJB(v){return JB.filter(function(r){return v>=r.min&&v<=r.max;})[0]||JB[JB.length-1];}
 function getPanels(h){if(h<=99.625)return 4;if(h<=123.625)return 5;if(h<=147.625)return 6;if(h<=171.625)return 7;return 8;}
@@ -443,50 +404,6 @@ function restoreForm(){
   calculate();
 }
 
-
-function showCustom(id){var el=document.getElementById(id);if(el)el.style.display='block';}
-function hideCustom(id){var el=document.getElementById(id);if(el)el.style.display='none';}
-
-function setCustom(listId,fieldId,val,label,triggerUpdate){
-  var inp=document.getElementById(fieldId);
-  if(inp){inp.value=val;inp.dispatchEvent(new Event('change'));}
-  var btn=document.getElementById(listId+'-btn');
-  if(btn)btn.textContent=label||val;
-  hideCustom(listId);
-  if(triggerUpdate){updateLabels();saveForm();}
-  else{calculate();saveForm();}
-}
-
-function buildAndShow(listId,fieldId){
-  var list=document.getElementById(listId);
-  if(!list)return;
-  var items=fieldId==='glass'?getAllGlass():getAllFrame();
-  var curVal=document.getElementById(fieldId)?document.getElementById(fieldId).value:'';
-  list.innerHTML=items.map(function(v){
-    return '<div onmousedown="setCustom(\''+listId+'\',\''+fieldId+'\',\''+v.replace(/'/g,"\\'")+'\',' +
-           '\''+v.replace(/'/g,"\\'")+'\',' +
-           'true)"'+(v===curVal?' style="font-weight:700;color:var(--blue);"':'')+'>'+v+'</div>';
-  }).join('');
-  list.style.display='block';
-}
-
-function syncCustomBtns(){
-  var fields=[
-    {id:'track-type',btn:'cs-track-btn',map:{'3-15R':'3" 15R','2-12R':'2" 12R','3-LHR':'3" LHR','2-LHR':'2" LHR','':'Select...'}},
-    {id:'lift-type',btn:'cs-lift-btn',map:{'standard':'Standard','highlift':'High Lift','lhr':'Low Headroom','':'Select...'}},
-    {id:'mark',btn:'cs-mark-btn',map:{}},
-    {id:'lites',btn:'cs-lites-btn',map:{}},
-    {id:'glass',btn:'cs-glass-btn',map:{}},
-    {id:'frame',btn:'cs-frame-btn',map:{}},
-  ];
-  fields.forEach(function(f){
-    var inp=document.getElementById(f.id);
-    var btn=document.getElementById(f.btn);
-    if(!inp||!btn)return;
-    var v=inp.value;
-    btn.textContent=(f.map[v]!==undefined?f.map[v]:(v||'Select...'));
-  });
-}
 function showSuggest(id){var el=document.getElementById(id);if(el)el.style.display='block';}
 function hideSuggest(id){var el=document.getElementById(id);if(el)el.style.display='none';}
 function setSuggest(fieldId,val){
@@ -641,7 +558,7 @@ function clearAll(){
   document.getElementById('glass').value='';document.getElementById('frame').value='';
   document.getElementById('hl-field').classList.remove('visible');document.getElementById('panel-hint').textContent='';
   document.getElementById('results').classList.remove('visible');document.getElementById('print-all-wrap').classList.remove('visible');
-  CD={};labelRoles=[];curLabel=0;showTab(0);save({formData:{}});['cs-track-btn','cs-lift-btn','cs-mark-btn','cs-lites-btn','cs-glass-btn','cs-frame-btn'].forEach(function(id){var b=document.getElementById(id);if(b)b.textContent='Select...';});
+  CD={};labelRoles=[];curLabel=0;showTab(0);save({formData:{}});
 }
 function getInfo(){
   var w=document.getElementById('width').value,h=document.getElementById('height').value;
@@ -712,7 +629,7 @@ function doPrintAll(){
   }
 }
 try{rebuildDropdowns();}catch(e){console.error('rebuildDropdowns:',e);}
-try{restoreForm();syncCustomBtns();}catch(e){console.error('restoreForm:',e);}
+try{restoreForm();}catch(e){console.error('restoreForm:',e);}
 try{setupListeners();}catch(e){console.error('setupListeners:',e);}
 try{curRotation=load().bigRotation||0;}catch(e){console.error('curRotation:',e);}
 try{checkServer();}catch(e){console.error('checkServer:',e);}
