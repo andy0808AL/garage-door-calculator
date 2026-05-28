@@ -454,8 +454,8 @@ function updateLabels(){
   document.getElementById('sl-left').innerHTML='<div class="lrow"><strong>W/O: '+(wo||'—')+'</strong></div><div class="lrow">Mark: '+(mark||'—')+'</div><div class="lrow">Panels: '+(panels||'—')+'</div><div class="lrow">Size: '+(size||'—')+'</div>';
   document.getElementById('sl-right').innerHTML='<div class="lrow">Lites: '+(lites||'—')+'</div><div class="lrow">Glass: '+(glass||'—')+'</div><div class="lrow">Frame: '+(frame||'—')+'</div><div class="lrow">Panel: '+role+'</div>';
   document.getElementById('bl-wo').textContent='W/O: '+(wo||'—');
-  document.getElementById('bl-panel').textContent=role+' ('+(curLabel+1)+'/'+panels+')';
-  document.getElementById('label-nav-text').textContent=(curLabel+1)+' / '+labelRoles.length;
+  // panel handled by renderBigLabelPreview
+  document.getElementById('label-nav-text').textContent=(curLabel+1)+' / '+labelRoles.length; renderBigLabelPreview();
 }
 function prevLabel(){curLabel=Math.max(0,curLabel-1);updateLabels();}
 function nextLabel(){curLabel=Math.min(labelRoles.length-1,curLabel+1);updateLabels();}
@@ -546,51 +546,49 @@ let serverPrinters = [];
 
 function setRotation(deg){save({bigRotation:deg});window._curRotation=deg;updateRotationUI(deg);applyPreviewRotation(deg);fetch(SERVER_URL+"/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bigRotation:deg})}).then(r=>r.json()).then(()=>{toast("✓ Rotation set to "+deg+"°",2000);}).catch(()=>{});}function updateRotationUI(deg){[0,90,180,270].forEach(d=>{const b=document.getElementById("rot-"+d);if(b)b.classList.toggle("active",d===deg);});const l=document.getElementById("lbl-rotation");const d2=document.getElementById("dot-rotation");if(l)l.textContent=deg+"° current rotation";if(d2)d2.className="status-dot";applyPreviewRotation(deg);}function applyPreviewRotation(deg){
   window._curRotation = deg;
-  const wrap = document.getElementById('big-label-preview-wrap');
-  if(!wrap) return;
-  const svg = document.getElementById('bl-wo-svg');
-  const panel = document.getElementById('bl-panel');
-  if(!svg || !panel) return;
+  // Rebuild the big label preview based on rotation
+  renderBigLabelPreview();
+}
 
-  // Remove CSS transform - instead rebuild the container shape
-  wrap.style.transform = '';
-  wrap.style.margin = '0';
+function renderBigLabelPreview(){
+  const container = document.getElementById('big-label-preview-container');
+  if(!container) return;
+  const wo = document.getElementById('wo').value.trim();
+  const deg = window._curRotation || 0;
+  const role = (labelRoles && labelRoles[curLabel]) || '';
+  const panels = CD.panels || 4;
+  const panelText = role + ' (' + (curLabel+1) + '/' + panels + ')';
+  const woText = 'W/O: ' + (wo || '—');
 
+  // Portrait (0° or 180°): tall narrow label
+  // Landscape (90° or 270°): wide short label
   const is90or270 = deg === 90 || deg === 270;
+  const flip180 = deg === 180 || deg === 270;
 
   if(is90or270){
-    // Landscape: wide and short
-    wrap.style.aspectRatio = '2/1';
-    wrap.style.maxHeight = '160px';
-    wrap.style.minHeight = '100px';
-    svg.setAttribute('viewBox', '0 0 500 200');
-    svg.querySelector('text').setAttribute('x', '250');
-    svg.querySelector('text').setAttribute('y', '105');
-    svg.querySelector('text').setAttribute('font-size', '55');
-    svg.querySelector('text').setAttribute('textLength', '480');
-    if(deg === 270){
-      panel.style.textAlign = 'left';
-    } else {
-      panel.style.textAlign = 'right';
-    }
+    // Landscape: 6"x3" shape
+    const svgW = 500, svgH = 200;
+    const textX = svgW/2, textY = svgH/2;
+    const panelAlign = deg === 270 ? 'left' : 'right';
+    container.innerHTML = '<div class="big-label-wrap" style="aspect-ratio:2/1;max-height:160px;min-height:100px;">' +
+      '<svg width="100%" style="flex:1;display:block;" viewBox="0 0 '+svgW+' '+svgH+'" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">' +
+      (flip180 ? '<g transform="rotate(180 '+svgW/2+' '+svgH/2+')">' : '') +
+      '<text x="'+textX+'" y="'+textY+'" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="55" textLength="'+(svgW-20)+'" lengthAdjust="spacingAndGlyphs">'+woText+'</text>' +
+      (flip180 ? '</g>' : '') +
+      '</svg>' +
+      '<div class="big-label-panel" style="text-align:'+panelAlign+'">'+panelText+'</div>' +
+      '</div>';
   } else {
-    // Portrait: tall and narrow (original)
-    wrap.style.aspectRatio = '1/2';
-    wrap.style.maxHeight = '350px';
-    wrap.style.minHeight = '200px';
-    svg.setAttribute('viewBox', '0 0 270 200');
-    svg.querySelector('text').setAttribute('x', '135');
-    svg.querySelector('text').setAttribute('y', '100');
-    svg.querySelector('text').setAttribute('font-size', '55');
-    svg.querySelector('text').setAttribute('textLength', '258');
-    panel.style.textAlign = 'right';
-    if(deg === 180){
-      // Upside down: flip text
-      svg.style.transform = 'rotate(180deg)';
-      panel.style.textAlign = 'left';
-    } else {
-      svg.style.transform = '';
-    }
+    // Portrait: 3"x6" shape
+    const svgW = 270, svgH = 200;
+    container.innerHTML = '<div class="big-label-wrap" id="big-label-preview-wrap">' +
+      '<svg width="100%" style="flex:1;display:block;" viewBox="0 0 '+svgW+' '+svgH+'" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">' +
+      (flip180 ? '<g transform="rotate(180 '+svgW/2+' '+svgH/2+')">' : '') +
+      '<text x="'+svgW/2+'" y="100" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="55" textLength="258" lengthAdjust="spacingAndGlyphs">'+woText+'</text>' +
+      (flip180 ? '</g>' : '') +
+      '</svg>' +
+      '<div class="big-label-panel" style="text-align:'+(flip180?'left':'right')+'">'+panelText+'</div>' +
+      '</div>';
   }
 }async function checkServer() {
   try {
