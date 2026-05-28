@@ -705,6 +705,7 @@ function doPrintAll(){
     setTimeout(function(){toast('Tracks & Cables sent!',2000);},800);
   }
 }
+document.querySelectorAll('.suggest-list').forEach(function(el){el.classList.remove('open');});
 try{rebuildDropdowns();}catch(e){console.error('rebuildDropdowns:',e);}
 try{restoreForm();syncDisplayFields();}catch(e){console.error('restoreForm:',e);}
 try{setupListeners();}catch(e){console.error('setupListeners:',e);}
