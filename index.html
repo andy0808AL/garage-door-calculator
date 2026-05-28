@@ -8,10 +8,10 @@
 <meta name="apple-mobile-web-app-title" content="GD Calc">
 <title>Garage Door Calculator</title><!-- v1779999770205 -->
 <style>
-:root{--blue:#1a4f8a;--blue-light:#e8f0fb;--blue-border:#b5d0f0;--red:#c0392b;--red-light:#fdf0ef;--gray:#6b7280;--gray-light:#f4f5f7;--gray-border:#e2e4e8;--text:#111827;--text-muted:#6b7280;--white:#fff;--radius:12px;--radius-sm:8px;}
+:root{--blue:#1B2A6B;--blue-light:#e8eaf6;--blue-border:#9fa8da;--red:#C0272D;--red-light:#fdecea;--gray:#6b7280;--gray-light:#f4f5f7;--gray-border:#e2e4e8;--text:#111827;--text-muted:#6b7280;--white:#fff;--radius:12px;--radius-sm:8px;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:#f0f2f5;color:var(--text);min-height:100vh;padding-bottom:40px;}
-.top-bar{background:var(--blue);color:white;padding:54px 20px 16px;position:sticky;top:0;z-index:200;display:flex;justify-content:space-between;align-items:flex-end;}
+.top-bar{background:var(--blue);color:white;padding:54px 20px 12px;position:sticky;top:0;z-index:200;display:flex;justify-content:space-between;align-items:center;}
 .top-bar-left h1{font-size:20px;font-weight:600;}
 .top-bar-left p{font-size:13px;opacity:0.75;margin-top:2px;}
 #server-status{font-size:11px;margin-top:3px;opacity:0.9;}
@@ -84,7 +84,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .label-nav span{font-size:13px;color:var(--text-muted);font-weight:600;}
 .print-btn{width:100%;height:46px;margin-top:10px;background:var(--blue);border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
 .print-btn:active{opacity:0.85;}
-.print-all-btn{width:100%;height:52px;margin-top:4px;background:#166534;border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:700;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.print-all-btn{width:100%;height:52px;margin-top:4px;background:#C0272D;border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:700;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
 .print-all-btn:active{opacity:0.85;}
 .springs-msg{text-align:center;padding:24px 16px;color:var(--text-muted);font-size:14px;line-height:1.6;}
 .open-btn{display:inline-block;margin-top:16px;padding:12px 24px;background:var(--blue);color:white;border-radius:var(--radius-sm);font-size:15px;font-weight:600;text-decoration:none;}
@@ -121,10 +121,33 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   </div>
 </div>
 <div class="top-bar">
-  <div class="top-bar-left">
-    <h1>&#128682; Garage Door Calculator</h1>
-    <p>Tracks &middot; Cables &middot; Drums &middot; Labels</p>
-    <div id="server-status">Checking print server...</div>
+  <div class="top-bar-left" style="display:flex;align-items:center;gap:12px;">
+    <div style="background:white;border-radius:8px;padding:4px 8px;flex-shrink:0;">
+      <svg width="48" height="40" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+        <!-- Garage door building -->
+        <polygon points="30,70 60,45 90,70" fill="#C0272D"/>
+        <rect x="30" y="70" width="30" height="25" fill="#1B6BBF"/>
+        <rect x="60" y="70" width="30" height="25" fill="#fff"/>
+        <!-- Flag stripes on right side -->
+        <rect x="60" y="70" width="30" height="4" fill="#C0272D"/>
+        <rect x="60" y="74" width="30" height="4" fill="#fff"/>
+        <rect x="60" y="78" width="30" height="4" fill="#C0272D"/>
+        <rect x="60" y="82" width="30" height="4" fill="#fff"/>
+        <rect x="60" y="86" width="30" height="4" fill="#C0272D"/>
+        <!-- Window panes on left side -->
+        <rect x="33" y="73" width="12" height="8" fill="#7ec8e3" rx="1"/>
+        <rect x="47" y="73" width="12" height="8" fill="#7ec8e3" rx="1"/>
+        <rect x="33" y="83" width="12" height="8" fill="#7ec8e3" rx="1"/>
+        <rect x="47" y="83" width="12" height="8" fill="#7ec8e3" rx="1"/>
+        <!-- Orbit ring -->
+        <ellipse cx="60" cy="90" rx="40" ry="8" fill="none" stroke="#1B2A6B" stroke-width="3"/>
+      </svg>
+    </div>
+    <div>
+      <div style="font-size:13px;font-weight:800;letter-spacing:0.05em;line-height:1.1;">AA IMPACT <span style="color:#C0272D;">GARAGE DOOR</span></div>
+      <div style="font-size:11px;opacity:0.8;margin-top:1px;">Tracks &middot; Cables &middot; Drums &middot; Labels</div>
+      <div id="server-status" style="font-size:10px;margin-top:2px;opacity:0.85;">Checking print server...</div>
+    </div>
   </div>
   <button class="settings-icon-btn" onclick="openSettings()">&#9881;</button>
 </div>
