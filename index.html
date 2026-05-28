@@ -542,19 +542,27 @@ let serverPrinters = [];
 
 function setRotation(deg){
   window._curRot = deg;
-  save({bigRotation:deg});
-  // Update button UI
-  [0,90,180,270].forEach(d=>{
-    const b=document.getElementById('rot-'+d);
-    if(b) b.classList.toggle('active', d===deg);
+  save({bigRotation: deg});
+  // Update button styles
+  [0,90,180,270].forEach(function(d){
+    var b = document.getElementById('rot-'+d);
+    if(b) b.className = 'rot-btn' + (d===deg?' active':'');
   });
-  const lbl=document.getElementById('lbl-rotation');
-  if(lbl) lbl.textContent = deg+'° saved';
-  // Update server
-  fetch(SERVER_URL+'/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bigRotation:deg})})
-    .then(()=>toast('✓ Rotation '+deg+'° saved',1500))
-    .catch(()=>{});
-  // Redraw preview
+  var lbl = document.getElementById('lbl-rotation');
+  if(lbl) lbl.textContent = deg + '° saved';
+  var dot = document.getElementById('dot-rotation');
+  if(dot) dot.className = 'status-dot';
+  // Send to server
+  fetch('http://localhost:5000/settings', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({bigRotation: deg})
+  }).then(function(r){ return r.json(); }).then(function(){
+    toast('✓ Rotation ' + deg + '° saved to server', 2000);
+  }).catch(function(){
+    toast('Rotation ' + deg + '° saved locally', 1500);
+  });
+  // Update preview
   renderBigLabelPreview();
 }
 
