@@ -164,7 +164,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   <div class="card">
     <div class="card-title">Door Information</div>
     <div class="field-row">
-      <div class="field" style="position:relative;">
+      <div class="field" style="position:relative;" onmouseenter="showSuggest('width-suggest')" onmouseleave="hideSuggest('width-suggest')">
     <label>Width (inches)</label>
     <input type="number" id="width" placeholder="e.g. 192" inputmode="decimal" autocomplete="off"
       onmouseenter="showSuggest('width-suggest')" onfocus="showSuggest('width-suggest')"
@@ -178,7 +178,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       <div onclick="setSuggest('width',216)">216"</div>
     </div>
   </div>
-      <div class="field" style="position:relative;">
+      <div class="field" style="position:relative;" onmouseenter="showSuggest('height-suggest')" onmouseleave="hideSuggest('height-suggest')">
     <label>Height (inches)</label>
     <input type="number" id="height" placeholder="e.g. 96" inputmode="decimal" autocomplete="off"
       onmouseenter="showSuggest('height-suggest')" onfocus="showSuggest('height-suggest')"
