@@ -251,11 +251,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
         <div class="label-preview-title">Small Label (4" &times; 1") &mdash; GX420d</div>
         <div class="small-label"><div id="sl-left"></div><div id="sl-right"></div></div>
         <div class="label-preview-title">Big Label (3" &times; 6") &mdash; Westinghouse WHTP203e</div>
-        <div class="big-label-wrap" id="big-label-preview-wrap">
-          <div class="big-label-wo" id="bl-wo">W/O: —</div>
-          <div class="big-label-panel" id="bl-panel">—</div>
-        </div>
-        <div class="label-nav">
+        <div class="big-label-wrap" id="big-label-preview-wrap"></div><div class="label-nav">
           <button onclick="prevLabel()">&#8592;</button>
           <span id="label-nav-text">1 / 1</span>
           <button onclick="nextLabel()">&#8594;</button>
@@ -455,7 +451,7 @@ function updateLabels(){
   document.getElementById('sl-right').innerHTML='<div class="lrow">Lites: '+(lites||'—')+'</div><div class="lrow">Glass: '+(glass||'—')+'</div><div class="lrow">Frame: '+(frame||'—')+'</div><div class="lrow">Panel: '+role+'</div>';
   document.getElementById('bl-wo').textContent='W/O: '+(wo||'—');
   
-  document.getElementById('label-nav-text').textContent=(curLabel+1)+' / '+labelRoles.length; renderBigLabelPreview();
+  document.getElementById('label-nav-text').textContent=(curLabel+1)+' / '+labelRoles.length; renderBigLabelPreview(); renderBigLabelPreview();
 }
 function prevLabel(){curLabel=Math.max(0,curLabel-1);updateLabels();}
 function nextLabel(){curLabel=Math.min(labelRoles.length-1,curLabel+1);updateLabels();}
@@ -544,196 +540,71 @@ const SERVER_URL = 'http://localhost:5000';
 let serverAvailable = false;
 let serverPrinters = [];
 
-function setRotation(deg){save({bigRotation:deg});window._curRotation=deg;updateRotationUI(deg);applyPreviewRotation(deg);fetch(SERVER_URL+"/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bigRotation:deg})}).then(r=>r.json()).then(()=>{toast("✓ Rotation set to "+deg+"°",2000);}).catch(()=>{});}function updateRotationUI(deg){[0,90,180,270].forEach(d=>{const b=document.getElementById("rot-"+d);if(b)b.classList.toggle("active",d===deg);});const l=document.getElementById("lbl-rotation");const d2=document.getElementById("dot-rotation");if(l)l.textContent=deg+"° current rotation";if(d2)d2.className="status-dot";applyPreviewRotation(deg);}function applyPreviewRotation(deg){
-  window._curRotation = deg;
+function setRotation(deg){
+  window._curRot = deg;
+  save({bigRotation:deg});
+  // Update button UI
+  [0,90,180,270].forEach(d=>{
+    const b=document.getElementById('rot-'+d);
+    if(b) b.classList.toggle('active', d===deg);
+  });
+  const lbl=document.getElementById('lbl-rotation');
+  if(lbl) lbl.textContent = deg+'° saved';
+  // Update server
+  fetch(SERVER_URL+'/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bigRotation:deg})})
+    .then(()=>toast('✓ Rotation '+deg+'° saved',1500))
+    .catch(()=>{});
+  // Redraw preview
+  renderBigLabelPreview();
+}
+
+function updateRotationUI(deg){
+  window._curRot = deg;
+  [0,90,180,270].forEach(d=>{
+    const b=document.getElementById('rot-'+d);
+    if(b) b.classList.toggle('active', d===deg);
+  });
+  const lbl=document.getElementById('lbl-rotation');
+  if(lbl) lbl.textContent = deg+'° current rotation';
+}
+
+function applyPreviewRotation(deg){
+  window._curRot = deg;
   renderBigLabelPreview();
 }
 
 function renderBigLabelPreview(){
   const wrap = document.getElementById('big-label-preview-wrap');
   if(!wrap) return;
+  const deg = window._curRot || 0;
   const wo = document.getElementById('wo').value.trim();
-  const deg = window._curRotation || 0;
   const role = (labelRoles && labelRoles[curLabel]) || '';
   const panels = CD.panels || 4;
-  const woText = 'W/O: ' + (wo || '—');
-  const panelText = role + ' (' + (curLabel+1) + '/' + panels + ')';
-  const is90or270 = deg === 90 || deg === 270;
-  const flip = deg === 180 || deg === 270;
+  const woText = 'W/O: ' + (wo||'—');
+  const panelText = role+' ('+(curLabel+1)+'/'+panels+')';
+  const landscape = deg===90 || deg===270;
+  const flip = deg===180 || deg===270;
 
-  if(is90or270){
-    // Landscape shape
-    wrap.style.aspectRatio = '2/1';
-    wrap.style.minHeight = '120px';
-    wrap.style.maxHeight = '180px';
+  if(landscape){
+    wrap.style.cssText = 'border:3px solid #222;border-radius:3px;background:white;font-family:Arial,sans-serif;padding:8px;display:flex;flex-direction:column;justify-content:space-between;aspect-ratio:2/1;min-height:110px;max-height:170px;overflow:hidden;';
     wrap.innerHTML =
-      '<svg width="100%" style="flex:1;display:block;" viewBox="0 0 500 180" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">' +
-      (flip ? '<g transform="rotate(180 250 90)">' : '') +
-      '<text x="250" y="95" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="60" textLength="480" lengthAdjust="spacingAndGlyphs">' + woText + '</text>' +
-      (flip ? '</g>' : '') +
-      '</svg>' +
-      '<div class="big-label-panel" style="text-align:' + (deg===270?'left':'right') + ';">' + panelText + '</div>';
+      '<svg width="100%" style="flex:1;display:block;min-height:0;" viewBox="0 0 500 160" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">'+
+      (flip ? '<g transform="rotate(180 250 80)">' : '')+
+      '<text x="250" y="85" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="60" textLength="480" lengthAdjust="spacingAndGlyphs">'+woText+'</text>'+
+      (flip ? '</g>' : '')+
+      '</svg>'+
+      '<div style="font-size:15px;font-weight:700;text-align:'+(deg===270?'left':'right')+';color:#111;padding-top:4px;">'+panelText+'</div>';
   } else {
-    // Portrait shape
-    wrap.style.aspectRatio = '1/2';
-    wrap.style.minHeight = '200px';
-    wrap.style.maxHeight = '350px';
+    wrap.style.cssText = 'border:3px solid #222;border-radius:3px;background:white;font-family:Arial,sans-serif;padding:8px;display:flex;flex-direction:column;justify-content:space-between;aspect-ratio:1/2;min-height:200px;max-height:350px;overflow:hidden;';
     wrap.innerHTML =
-      '<svg width="100%" style="flex:1;display:block;" viewBox="0 0 270 200" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">' +
-      (flip ? '<g transform="rotate(180 135 100)">' : '') +
-      '<text x="135" y="100" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="55" textLength="258" lengthAdjust="spacingAndGlyphs">' + woText + '</text>' +
-      (flip ? '</g>' : '') +
-      '</svg>' +
-      '<div class="big-label-panel" style="text-align:' + (flip?'left':'right') + ';">' + panelText + '</div>';
-  }
-}async function checkServer() {
-  try {
-    const r = await fetch(SERVER_URL + '/ping', {signal: AbortSignal.timeout(1500)});
-    const d = await r.json();
-    serverAvailable = d.status === 'ok'; if(d.bigRotation !== undefined){updateRotationUI(d.bigRotation);applyPreviewRotation(d.bigRotation);}else{const lr=load().bigRotation||0;applyPreviewRotation(lr);}
-    if(d.printers && d.printers.length > 0) {
-      serverPrinters = d.printers;
-      mergeServerPrinters(d.printers);
-    }
-  } catch(e) {
-    serverAvailable = false;
-  }
-  updateServerStatus();
-}
-
-function mergeServerPrinters(printers) {
-  // Add real Windows printers to all dropdowns in settings
-  const existing = getPrinters();
-  const merged = [...new Set([...existing, ...printers])];
-  const s = load();
-  save({extraPrinters: printers.filter(p => !['ZDesigner GX420d','Westinghouse WHTP203e','Microsoft Print to PDF','Microsoft XPS Document Writer'].includes(p))});
-}
-
-function updateServerStatus() {
-  const existing = document.getElementById('server-status');
-  if(existing) {
-    existing.textContent = serverAvailable ? '🟢 Print server connected' : '🔴 Print server offline — using browser print';
-    existing.style.color = serverAvailable ? '#166534' : '#92400e';
+      '<svg width="100%" style="flex:1;display:block;min-height:0;" viewBox="0 0 270 200" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">'+
+      (flip ? '<g transform="rotate(180 135 100)">' : '')+
+      '<text x="135" y="100" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="55" textLength="258" lengthAdjust="spacingAndGlyphs">'+woText+'</text>'+
+      (flip ? '</g>' : '')+
+      '</svg>'+
+      '<div style="font-size:15px;font-weight:700;text-align:'+(flip?'left':'right')+';color:#111;padding-top:4px;">'+panelText+'</div>';
   }
 }
-
-// Check server on load and every 10 seconds
-checkServer();
-setInterval(checkServer, 10000);
-
-function getRoles(panels) {
-  if(panels >= 2) return ['Top', ...Array.from({length:panels-2},(_,i)=>'Center '+(i+1)), 'Bottom'];
-  return ['Top'];
-}
-
-async function serverPrint(endpoint, payload) {
-  const r = await fetch(SERVER_URL + endpoint, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(15000)
-  });
-  return await r.json();
-}
-
-function silentPrint(type){
-  const s=load();
-  if(type==='tracks'){
-    if(serverAvailable){
-      toast('Sending Tracks to ' + (s.pTracks||'printer') + '...');
-      serverPrint('/print/tracks', {html: buildTracksHTML(), printer: s.pTracks||''})
-        .then(d => toast(d.status==='ok' ? '✓ Tracks printed' : '✗ Error: '+d.error, 3000))
-        .catch(e => { toast('Server error - using browser print'); silentPrintDoc(buildTracksHTML(), s.pTracks||'', 'Tracks'); });
-    } else {
-      silentPrintDoc(buildTracksHTML(), s.pTracks||'', 'Tracks');
-    }
-  } else if(type==='cables'){
-    if(!CD.hasWeight){toast('Enter door weight first');return;}
-    if(serverAvailable){
-      toast('Sending Cables to ' + (s.pCables||'printer') + '...');
-      serverPrint('/print/cables', {html: buildCablesHTML(), printer: s.pCables||''})
-        .then(d => toast(d.status==='ok' ? '✓ Cables printed' : '✗ Error: '+d.error, 3000))
-        .catch(e => { toast('Server error - using browser print'); silentPrintDoc(buildCablesHTML(), s.pCables||'', 'Cables'); });
-    } else {
-      silentPrintDoc(buildCablesHTML(), s.pCables||'', 'Cables');
-    }
-  } else if(type==='labels'){
-    const wo=document.getElementById('wo').value.trim();
-    const mark=document.getElementById('mark').value.trim();
-    const lites=document.getElementById('lites').value.trim();
-    const glass=document.getElementById('glass').value;
-    const frame=document.getElementById('frame').value;
-    const panels=CD.panels||4;
-    const size=CD.width&&CD.height?CD.width+' X '+CD.height:'';
-    const roles=getRoles(panels);
-    if(serverAvailable){
-      toast('Printing labels via server...', 4000);
-      serverPrint('/print/labels', {
-        wo, mark, lites, glass, frame, panels, size, roles,
-        printerSmall: s.pSmall||'', printerBig: s.pBig||'',
-        printSmall: true, printBig: true
-      }).then(d => toast(d.status==='ok' ? '✓ Labels printed: '+d.printed.length+' jobs' : '✗ '+d.error, 3000))
-        .catch(e => { toast('Server error: '+e.message, 3000); });
-    } else {
-      const labelRolesLocal = roles;
-      silentPrintDoc(buildSmallLabelsHTML(wo,mark,lites,glass,frame,panels,size), s.pSmall||'', 'Small Labels');
-      setTimeout(()=>silentPrintDoc(buildBigLabelsHTML(wo,panels), s.pBig||'', 'Big Labels'), 800);
-    }
-  }
-}
-
-function silentPrintAll(){
-  const s=load();
-  const wo=document.getElementById('wo').value.trim();
-  const mark=document.getElementById('mark').value.trim();
-  const hasLabels=wo||mark;
-  if(serverAvailable){
-    toast('Printing all via server...', 5000);
-    // Tracks
-    serverPrint('/print/tracks', {html: buildTracksHTML(), printer: s.pTracks||''})
-      .then(d => console.log('Tracks:', d.status));
-    // Cables
-    if(CD.hasWeight) {
-      setTimeout(() =>
-        serverPrint('/print/cables', {html: buildCablesHTML(), printer: s.pCables||''})
-          .then(d => console.log('Cables:', d.status)), 500);
-    }
-    // Labels
-    if(hasLabels){
-      const lites=document.getElementById('lites').value.trim();
-      const glass=document.getElementById('glass').value;
-      const frame=document.getElementById('frame').value;
-      const panels=CD.panels||4;
-      const size=CD.width&&CD.height?CD.width+' X '+CD.height:'';
-      const roles=getRoles(panels);
-      setTimeout(() =>
-        serverPrint('/print/labels', {
-          wo, mark, lites, glass, frame, panels, size, roles,
-          printerSmall: s.pSmall||'', printerBig: s.pBig||'',
-          printSmall: true, printBig: true
-        }).then(d => toast('✓ All printed! Labels: '+d.printed.length+' jobs', 3000))
-          .catch(e => toast('Label error: '+e.message, 3000)),
-      1000);
-    } else {
-      setTimeout(() => toast('✓ Tracks & Cables sent to printers', 3000), 600);
-    }
-  } else {
-    // Fallback: browser print
-    toast('Print server offline — using browser print', 3000);
-    silentPrintDoc(buildTracksHTML(), s.pTracks||'', 'Tracks');
-    if(CD.hasWeight) setTimeout(()=>silentPrintDoc(buildCablesHTML(), s.pCables||'', 'Cables'),700);
-    if(hasLabels){
-      const lites=document.getElementById('lites').value.trim();
-      const glass=document.getElementById('glass').value;
-      const frame=document.getElementById('frame').value;
-      const panels=CD.panels||4;
-      const size=CD.width&&CD.height?CD.width+' X '+CD.height:'';
-      setTimeout(()=>silentPrintDoc(buildSmallLabelsHTML(wo,mark,lites,glass,frame,panels,size),s.pSmall||'','Small Labels'),1400);
-      setTimeout(()=>silentPrintDoc(buildBigLabelsHTML(wo,panels),s.pBig||'','Big Labels'),2200);
-    }
-  }
-}
-
 
 function getInfo(){
   const w=document.getElementById('width').value,h=document.getElementById('height').value;
@@ -746,6 +617,8 @@ function getInfo(){
 // ── INIT ───────────────────────────────────────────────────────────────────
 rebuildDropdowns();
 setupListeners();
+window._curRot=load().bigRotation||0;
+setTimeout(()=>{updateRotationUI(window._curRot);renderBigLabelPreview();},500);
 const initRot=load().bigRotation||0;setTimeout(()=>applyPreviewRotation(initRot),300);
 </script>
 </body>
