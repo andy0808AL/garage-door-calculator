@@ -8,17 +8,51 @@
 <meta name="apple-mobile-web-app-title" content="GD Calc">
 <title>Garage Door Calculator</title>
 <style>
-:root{--blue:#1a4f8a;--blue-light:#e8f0fb;--blue-border:#b5d0f0;--red:#c0392b;--red-light:#fdf0ef;--green:#166534;--green-light:#dcfce7;--green-border:#86efac;--gray:#6b7280;--gray-light:#f4f5f7;--gray-border:#e2e4e8;--text:#111827;--text-muted:#6b7280;--white:#ffffff;--radius:12px;--radius-sm:8px;}
+:root{--blue:#1a4f8a;--blue-light:#e8f0fb;--blue-border:#b5d0f0;--red:#c0392b;--red-light:#fdf0ef;--gray-light:#f4f5f7;--gray-border:#e2e4e8;--text:#111827;--text-muted:#6b7280;--white:#ffffff;--radius:12px;--radius-sm:8px;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:#f0f2f5;color:var(--text);min-height:100vh;padding-bottom:40px;}
-.top-bar{background:var(--blue);color:white;padding:54px 20px 16px;position:sticky;top:0;z-index:100;}
-.top-bar h1{font-size:20px;font-weight:600;}
-.top-bar p{font-size:13px;opacity:0.75;margin-top:2px;}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:#f0f2f5;color:var(--text);min-height:100vh;padding-bottom:60px;}
+
+/* TOP BAR */
+.top-bar{background:var(--blue);color:white;padding:54px 20px 14px;position:sticky;top:0;z-index:200;display:flex;align-items:flex-end;justify-content:space-between;}
+.top-bar-left h1{font-size:20px;font-weight:600;}
+.top-bar-left p{font-size:13px;opacity:0.75;margin-top:2px;}
+.settings-btn{width:40px;height:40px;border:none;background:rgba(255,255,255,0.15);border-radius:50%;color:white;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.settings-btn:active{background:rgba(255,255,255,0.25);}
+
+/* SETTINGS PANEL */
+.settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;display:none;opacity:0;transition:opacity 0.2s;}
+.settings-overlay.open{display:block;opacity:1;}
+.settings-panel{position:fixed;top:0;right:-340px;width:320px;max-width:90vw;height:100vh;background:var(--white);z-index:400;overflow-y:auto;transition:right 0.25s cubic-bezier(.4,0,.2,1);box-shadow:-4px 0 24px rgba(0,0,0,0.15);}
+.settings-panel.open{right:0;}
+.settings-header{background:var(--blue);color:white;padding:54px 20px 16px;display:flex;align-items:center;justify-content:space-between;}
+.settings-header h2{font-size:18px;font-weight:600;}
+.settings-close{width:36px;height:36px;border:none;background:rgba(255,255,255,0.15);border-radius:50%;color:white;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.settings-body{padding:16px;}
+.settings-section{margin-bottom:24px;}
+.settings-section-title{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--gray-border);}
+.setting-row{margin-bottom:14px;}
+.setting-row:last-child{margin-bottom:0;}
+.setting-label{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.setting-label .icon{font-size:16px;}
+.setting-select{width:100%;height:42px;padding:0 12px;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);background:var(--gray-light);color:var(--text);font-size:14px;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+.setting-select:focus{outline:none;border-color:var(--blue);background:white;}
+.setting-hint{font-size:11px;color:var(--text-muted);margin-top:4px;}
+.save-btn{width:100%;height:48px;background:var(--blue);color:white;border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:600;cursor:pointer;margin-top:8px;}
+.save-btn:active{opacity:0.85;}
+.saved-badge{display:none;text-align:center;font-size:13px;color:#166534;font-weight:500;margin-top:10px;padding:8px;background:#dcfce7;border-radius:var(--radius-sm);}
+.saved-badge.visible{display:block;}
+.refresh-btn{width:100%;height:38px;background:white;color:var(--blue);border:1.5px solid var(--blue);border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;}
+.current-printers{background:var(--gray-light);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px;}
+.current-printers p{font-size:12px;color:var(--text-muted);margin-bottom:6px;}
+.current-printer-row{font-size:13px;color:var(--text);padding:4px 0;display:flex;justify-content:space-between;border-bottom:0.5px solid var(--gray-border);}
+.current-printer-row:last-child{border-bottom:none;}
+.current-printer-row .pr-name{color:var(--blue);font-weight:500;}
+
+/* MAIN CONTENT */
 .content{padding:16px;max-width:480px;margin:0 auto;}
 .card{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.07);}
 .card-title{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-.card-title .badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;}
-.badge-optional{background:#f3f4f6;color:#6b7280;}
+.badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;background:#f3f4f6;color:#6b7280;}
 .field{margin-bottom:12px;}.field:last-child{margin-bottom:0;}
 .field label{display:block;font-size:13px;color:var(--text-muted);margin-bottom:6px;font-weight:500;}
 .field label .req-cable{font-size:11px;color:#b45309;font-weight:400;margin-left:4px;}
@@ -32,12 +66,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .clear-btn{width:100%;height:46px;background:var(--red-light);color:var(--red);border:1.5px solid #f5c6c2;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;}
 .clear-btn:active{opacity:0.8;}
 .error{background:var(--red-light);border:1px solid #f5c6c2;border-radius:var(--radius-sm);color:var(--red);font-size:13px;padding:10px 14px;margin-top:10px;display:none;}
-/* PRINTER SELECTOR */
-.printer-section{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.07);}
-.printer-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.printer-row:last-child{margin-bottom:0;}
-.printer-label{font-size:12px;color:var(--text-muted);font-weight:600;width:80px;flex-shrink:0;}
-.printer-select{flex:1;height:36px;padding:0 10px;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);background:var(--gray-light);color:var(--text);font-size:13px;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+
 /* RESULTS */
 .results{display:none;}.results.visible{display:block;}
 .tabs{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-bottom:12px;}
@@ -59,20 +88,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .cable-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
 .cable-badge{background:white;border:1.5px solid var(--blue-border);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:700;color:var(--blue);}
 .notice{background:#fffbeb;border:1.5px solid #fcd34d;border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;color:#92400e;margin-bottom:12px;}
-/* LABEL PREVIEW */
+
+/* LABELS */
 .label-preview-wrap{margin-bottom:12px;}
 .label-preview-title{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
-.small-label{border:2px solid #222;border-radius:4px;padding:8px 10px;display:grid;grid-template-columns:1fr 1fr;gap:0;background:white;font-family:'Arial',sans-serif;min-height:60px;}
-.small-label .col{display:flex;flex-direction:column;gap:3px;}
-.small-label .lrow{font-size:11px;color:#111;line-height:1.3;}
+.small-label{border:2px solid #222;border-radius:4px;padding:8px 10px;display:grid;grid-template-columns:1fr 1fr;background:white;font-family:'Arial',sans-serif;min-height:60px;}
+.small-label .lrow{font-size:11px;color:#111;line-height:1.5;}
 .small-label .lrow strong{font-weight:700;}
-.big-label{border:3px solid #222;border-radius:4px;padding:12px;background:white;font-family:'Arial',sans-serif;min-height:120px;display:flex;flex-direction:column;justify-content:space-between;margin-top:10px;}
+.big-label{border:3px solid #222;border-radius:4px;padding:12px;background:white;font-family:'Arial',sans-serif;min-height:130px;display:flex;flex-direction:column;justify-content:space-between;margin-top:10px;}
 .big-label .wo-text{font-size:36px;font-weight:900;text-align:center;line-height:1.1;color:#111;}
 .big-label .panel-text{font-size:16px;font-weight:700;text-align:right;color:#111;}
 .label-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:8px;}
-.label-nav button{width:32px;height:32px;border:1.5px solid var(--gray-border);border-radius:50%;background:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.label-nav button{width:32px;height:32px;border:1.5px solid var(--gray-border);border-radius:50%;background:white;font-size:16px;cursor:pointer;}
 .label-nav span{font-size:13px;color:var(--text-muted);font-weight:500;}
 .label-missing{background:#f3f4f6;border:1.5px dashed #d1d5db;border-radius:var(--radius-sm);padding:20px;text-align:center;font-size:13px;color:#9ca3af;}
+
 /* PRINT BUTTONS */
 .print-btn{width:100%;height:46px;margin-top:10px;background:white;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);font-size:15px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
 .print-btn:active{background:var(--gray-light);}
@@ -83,13 +113,96 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 </style>
 </head>
 <body>
-<div class="top-bar">
-  <h1>&#128682; Garage Door Calculator</h1>
-  <p>Tracks &middot; Cables &middot; Drums &middot; Labels</p>
+
+<!-- SETTINGS OVERLAY -->
+<div class="settings-overlay" id="settings-overlay" onclick="closeSettings()"></div>
+
+<!-- SETTINGS PANEL -->
+<div class="settings-panel" id="settings-panel">
+  <div class="settings-header">
+    <h2>&#9881;&#65039; Settings</h2>
+    <button class="settings-close" onclick="closeSettings()">&#10005;</button>
+  </div>
+  <div class="settings-body">
+
+    <!-- Current printers summary -->
+    <div class="settings-section">
+      <div class="settings-section-title">Current Printer Selection</div>
+      <div class="current-printers">
+        <p>Saved printers:</p>
+        <div class="current-printer-row"><span>Tracks</span><span class="pr-name" id="cur-tracks">&mdash;</span></div>
+        <div class="current-printer-row"><span>Cables</span><span class="pr-name" id="cur-cables">&mdash;</span></div>
+        <div class="current-printer-row"><span>Label Small</span><span class="pr-name" id="cur-small">&mdash;</span></div>
+        <div class="current-printer-row"><span>Label Big</span><span class="pr-name" id="cur-big">&mdash;</span></div>
+      </div>
+      <button class="refresh-btn" onclick="refreshPrinters()">&#8635; Refresh printer list</button>
+    </div>
+
+    <!-- Printer selectors -->
+    <div class="settings-section">
+      <div class="settings-section-title">&#128424; Assign Printers</div>
+
+      <div class="setting-row">
+        <div class="setting-label"><span class="icon">&#128220;</span> Tracks printer</div>
+        <select class="setting-select" id="cfg-tracks"></select>
+        <div class="setting-hint">Used when printing track measurements</div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-label"><span class="icon">&#128279;</span> Cables printer</div>
+        <select class="setting-select" id="cfg-cables"></select>
+        <div class="setting-hint">Used when printing cable calculations</div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-label"><span class="icon">&#127991;</span> Small label printer</div>
+        <select class="setting-select" id="cfg-small"></select>
+        <div class="setting-hint">4&quot; &times; 1&quot; labels &mdash; default: ZDesigner GX420d</div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-label"><span class="icon">&#127991;</span> Big label printer</div>
+        <select class="setting-select" id="cfg-big"></select>
+        <div class="setting-hint">3&quot; &times; 6&quot; labels &mdash; default: Westinghouse WHTP203e</div>
+      </div>
+
+      <button class="save-btn" onclick="saveSettings()">Save Settings</button>
+      <div class="saved-badge" id="saved-badge">&#10003; Settings saved!</div>
+    </div>
+
+    <!-- Custom options management -->
+    <div class="settings-section">
+      <div class="settings-section-title">&#127775; Custom Options</div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.6;">
+        To add custom Glass or Frame Color options, use the <strong>"+ Add new..."</strong> option in the Label Information dropdowns on the main screen. Custom options are saved automatically.
+      </div>
+    </div>
+
+    <!-- App info -->
+    <div class="settings-section">
+      <div class="settings-section-title">About</div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.8;">
+        <div>&#128682; Garage Door Calculator</div>
+        <div>Tracks &middot; Cables &middot; Drums &middot; Labels</div>
+        <div style="margin-top:8px;font-size:11px;opacity:0.7;">Printer preferences are saved locally and persist between sessions.</div>
+      </div>
+    </div>
+
+  </div>
 </div>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-bar-left">
+    <h1>&#128682; Garage Door Calculator</h1>
+    <p>Tracks &middot; Cables &middot; Drums &middot; Labels</p>
+  </div>
+  <button class="settings-btn" onclick="openSettings()">&#9881;</button>
+</div>
+
 <div class="content">
 
-  <!-- SECTION 1: DOOR INFORMATION -->
+  <!-- DOOR INFORMATION -->
   <div class="card">
     <div class="card-title">Door Information</div>
     <div class="field-row">
@@ -123,18 +236,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <button class="clear-btn" onclick="clearAll()">Clear</button>
   </div>
 
-  <!-- SECTION 2: LABEL INFORMATION (OPTIONAL) -->
+  <!-- LABEL INFORMATION -->
   <div class="card">
-    <div class="card-title">
-      Label Information
-      <span class="badge badge-optional">Optional</span>
+    <div class="card-title">Label Information <span class="badge">Optional</span></div>
+    <div class="field-row">
+      <div class="field"><label>W/O #</label><input type="text" id="wo" placeholder="e.g. 721"></div>
+      <div class="field"><label>Mark</label><input type="text" id="mark" placeholder="e.g. A"></div>
     </div>
     <div class="field-row">
-      <div class="field"><label>W/O #</label><input type="text" id="wo" placeholder="e.g. 721" inputmode="text"></div>
-      <div class="field"><label>Mark</label><input type="text" id="mark" placeholder="e.g. A" inputmode="text"></div>
-    </div>
-    <div class="field-row">
-      <div class="field"><label>Lites</label><input type="text" id="lites" placeholder="e.g. 2" inputmode="text"></div>
+      <div class="field"><label>Lites</label><input type="text" id="lites" placeholder="e.g. 2"></div>
       <div class="field"><label>Glass</label>
         <select id="glass">
           <option value="">Select...</option>
@@ -150,8 +260,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
         </select>
       </div>
     </div>
-    <div class="field">
-      <label>Frame Color</label>
+    <div class="field"><label>Frame Color</label>
       <select id="frame">
         <option value="">Select...</option>
         <option>Black</option>
@@ -165,27 +274,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     </div>
   </div>
 
-  <!-- SECTION 3: PRINTER SELECTION -->
-  <div class="printer-section">
-    <div class="card-title" style="margin-bottom:12px">&#128424; Printer Selection <span class="badge badge-optional">saved</span></div>
-    <div class="printer-row">
-      <span class="printer-label">Tracks</span>
-      <select class="printer-select" id="printer-tracks" onchange="savePrinters()"><option value="">Loading...</option></select>
-    </div>
-    <div class="printer-row">
-      <span class="printer-label">Cables</span>
-      <select class="printer-select" id="printer-cables" onchange="savePrinters()"><option value="">Loading...</option></select>
-    </div>
-    <div class="printer-row">
-      <span class="printer-label">Label Small</span>
-      <select class="printer-select" id="printer-small" onchange="savePrinters()"><option value="">Loading...</option></select>
-    </div>
-    <div class="printer-row">
-      <span class="printer-label">Label Big</span>
-      <select class="printer-select" id="printer-big" onchange="savePrinters()"><option value="">Loading...</option></select>
-    </div>
-  </div>
-
   <!-- RESULTS -->
   <div class="results" id="results">
     <div class="tabs">
@@ -195,7 +283,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       <div class="tab" onclick="showTab(3)">Labels</div>
     </div>
 
-    <!-- TRACKS TAB -->
+    <!-- TRACKS -->
     <div class="page active" id="page-0">
       <div class="card"><div class="card-title">Track Measurements</div>
         <div class="result-row"><span class="rlabel">Vertical (L &amp; R)</span><span class="rvalue big" id="r-vertical">&mdash;</span></div>
@@ -208,7 +296,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       <button class="print-btn" onclick="printPage(0)">&#128424; Print Tracks</button>
     </div>
 
-    <!-- CABLES TAB -->
+    <!-- CABLES -->
     <div class="page" id="page-1">
       <div class="notice" id="weight-notice" style="display:none">&#9888;&#65039; Enter door weight to calculate cables.</div>
       <div id="cable-results">
@@ -226,7 +314,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       </div>
     </div>
 
-    <!-- SPRINGS TAB -->
+    <!-- SPRINGS -->
     <div class="page" id="page-2">
       <div class="card"><div class="springs-msg">
         <div style="font-size:36px;margin-bottom:12px">&#128297;</div>
@@ -235,20 +323,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       </div></div>
     </div>
 
-    <!-- LABELS TAB -->
+    <!-- LABELS -->
     <div class="page" id="page-3">
       <div id="label-missing" class="label-missing">Fill in Label Information above to preview labels.</div>
       <div id="label-content" style="display:none">
         <div class="label-preview-wrap">
-          <div class="label-preview-title">Small Label (4" &times; 1") &mdash; GX420d</div>
+          <div class="label-preview-title">&#127991; Small Label (4" &times; 1") &mdash; GX420d</div>
           <div class="small-label" id="small-label-preview">
-            <div class="col" id="sl-left"></div>
-            <div class="col" id="sl-right"></div>
+            <div id="sl-left"></div>
+            <div id="sl-right"></div>
           </div>
         </div>
         <div class="label-preview-wrap">
-          <div class="label-preview-title">Big Label (3" &times; 6") &mdash; Westinghouse WHTP203e</div>
-          <div class="big-label" id="big-label-preview">
+          <div class="label-preview-title">&#127991; Big Label (3" &times; 6") &mdash; Westinghouse WHTP203e</div>
+          <div class="big-label">
             <div class="wo-text" id="bl-wo">&mdash;</div>
             <div class="panel-text" id="bl-panel">&mdash;</div>
           </div>
@@ -265,7 +353,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 
   <!-- PRINT ALL -->
   <div class="results" id="print-all-wrap" style="margin-top:4px">
-    <button class="print-all-btn" onclick="printAll()">&#128424; Print All</button>
+    <button class="print-all-btn" onclick="printAll()">&#128424;&nbsp; Print All</button>
   </div>
 
 </div>
@@ -273,12 +361,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 <script>
 // ── CONSTANTS ──────────────────────────────────────────────────────────────
 const JB=[{min:0,max:84,j10:4,j12:4,j14:4,j16:null},{min:85,max:96,j10:4,j12:5,j14:5,j16:null},{min:97,max:108,j10:4,j12:5,j14:5,j16:2},{min:109,max:120,j10:4,j12:5,j14:5,j16:4},{min:121,max:132,j10:4,j12:5,j14:5,j16:6},{min:133,max:144,j10:4,j12:6,j14:6,j16:6},{min:145,max:156,j10:4,j12:6,j14:6,j16:8},{min:157,max:168,j10:4,j12:6,j14:8,j16:8},{min:169,max:180,j10:4,j12:6,j14:8,j16:10},{min:181,max:192,j10:4,j12:6,j14:10,j16:10}];
-const GLASS_OPTIONS=['Clear','5/16 GRAY-CLEAR','5/16 BRONZE-CLEAR','5/16 CLEAR-CLEAR','1/4 CLEAR','1/4 GRAY','1/4 BRONZE','OBSCURE'];
-const FRAME_OPTIONS=['Black','White','Bronze','Anodized','Mill','Dark Bronze'];
-const STORAGE_KEY='gdCalcPrinters';
-let currentLabelIdx=0;
-let labelRoles=[];
-let calcData={};
+const GLASS_DEFAULTS=['Clear','5/16 GRAY-CLEAR','5/16 BRONZE-CLEAR','5/16 CLEAR-CLEAR','1/4 CLEAR','1/4 GRAY','1/4 BRONZE','OBSCURE'];
+const FRAME_DEFAULTS=['Black','White','Bronze','Anodized','Mill','Dark Bronze'];
+const PRINTER_KEY='gdPrinters';
+const CUSTOM_KEY='gdCustomOptions';
+const DEFAULT_PRINTERS=['ZDesigner GX420d','Westinghouse WHTP203e','Microsoft Print to PDF','Microsoft XPS Document Writer'];
+let currentLabelIdx=0, labelRoles=[], calcData={};
 
 // ── FRACTIONS ──────────────────────────────────────────────────────────────
 function frac(val){
@@ -296,99 +384,112 @@ function get2x2(p){return 6.5+(p-4)*0.25;}
 const CTYPE={'D400-96':'1/8"','D400-144':'5/32"'};
 function getCT(d){return CTYPE[d]||'3/16"';}
 
-// ── PRINTER MANAGEMENT ─────────────────────────────────────────────────────
+// ── PRINTER STORAGE ────────────────────────────────────────────────────────
+function getSavedPrinters(){
+  try{return JSON.parse(localStorage.getItem(PRINTER_KEY))||{};}catch(e){return{};}
+}
 function getPrinterList(){
-  // Use window.matchMedia to detect if we are on Windows with print support
-  // We populate with generic options + try to get real printers
-  const saved = getSavedPrinters();
-  const defaults = ['ZDesigner GX420d','Westinghouse WHTP203e','Microsoft Print to PDF','Microsoft XPS Document Writer'];
-  // Add saved printers that might not be in defaults
-  const all = [...new Set([...defaults, saved.tracks||'', saved.cables||'', saved.small||'', saved.big||''].filter(Boolean))];
-  return all;
+  const saved=getSavedPrinters();
+  const extra=[saved.tracks,saved.cables,saved.small,saved.big].filter(Boolean);
+  return [...new Set([...DEFAULT_PRINTERS,...extra])];
 }
 
-function getSavedPrinters(){
-  try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{};}catch(e){return{};}
+function populateSettingsPrinters(){
+  const list=getPrinterList();
+  const saved=getSavedPrinters();
+  const map={
+    'cfg-tracks': saved.tracks||'Microsoft Print to PDF',
+    'cfg-cables': saved.cables||'Microsoft Print to PDF',
+    'cfg-small':  saved.small||'ZDesigner GX420d',
+    'cfg-big':    saved.big||'Westinghouse WHTP203e',
+  };
+  Object.entries(map).forEach(([id,val])=>{
+    const sel=document.getElementById(id);
+    sel.innerHTML=list.map(p=>`<option value="${p}" ${p===val?'selected':''}>${p}</option>`).join('');
+    if(val&&!list.includes(val)){
+      sel.innerHTML=`<option value="${val}" selected>${val}</option>`+sel.innerHTML;
+    }
+  });
+  updateCurrentPrintersSummary();
 }
-function savePrinters(){
+
+function updateCurrentPrintersSummary(){
+  const saved=getSavedPrinters();
+  document.getElementById('cur-tracks').textContent=saved.tracks||'Not set';
+  document.getElementById('cur-cables').textContent=saved.cables||'Not set';
+  document.getElementById('cur-small').textContent=saved.small||'ZDesigner GX420d';
+  document.getElementById('cur-big').textContent=saved.big||'Westinghouse WHTP203e';
+}
+
+function saveSettings(){
+  const printers={
+    tracks: document.getElementById('cfg-tracks').value,
+    cables: document.getElementById('cfg-cables').value,
+    small:  document.getElementById('cfg-small').value,
+    big:    document.getElementById('cfg-big').value,
+  };
+  try{localStorage.setItem(PRINTER_KEY,JSON.stringify(printers));}catch(e){}
+  updateCurrentPrintersSummary();
+  const badge=document.getElementById('saved-badge');
+  badge.classList.add('visible');
+  setTimeout(()=>badge.classList.remove('visible'),2500);
+}
+
+function refreshPrinters(){
+  populateSettingsPrinters();
+  const badge=document.getElementById('saved-badge');
+  badge.textContent='✓ Printer list refreshed!';
+  badge.classList.add('visible');
+  setTimeout(()=>{badge.classList.remove('visible');badge.textContent='✓ Settings saved!';},2000);
+}
+
+// ── SETTINGS PANEL ─────────────────────────────────────────────────────────
+function openSettings(){
+  populateSettingsPrinters();
+  document.getElementById('settings-panel').classList.add('open');
+  document.getElementById('settings-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSettings(){
+  document.getElementById('settings-panel').classList.remove('open');
+  document.getElementById('settings-overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// ── GLASS / FRAME CUSTOM OPTIONS ───────────────────────────────────────────
+function loadCustomOptions(){
   try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      tracks: document.getElementById('printer-tracks').value,
-      cables: document.getElementById('printer-cables').value,
-      small:  document.getElementById('printer-small').value,
-      big:    document.getElementById('printer-big').value,
-    }));
+    const d=JSON.parse(localStorage.getItem(CUSTOM_KEY))||{glass:[],frame:[]};
+    const gSel=document.getElementById('glass');
+    const fSel=document.getElementById('frame');
+    d.glass.forEach(v=>{if(![...gSel.options].find(o=>o.value===v)){const o=document.createElement('option');o.value=v;o.textContent=v;gSel.insertBefore(o,gSel.lastElementChild);}});
+    d.frame.forEach(v=>{if(![...fSel.options].find(o=>o.value===v)){const o=document.createElement('option');o.value=v;o.textContent=v;fSel.insertBefore(o,fSel.lastElementChild);}});
+  }catch(e){}
+}
+function saveCustomOptions(){
+  try{
+    const gSel=document.getElementById('glass');
+    const fSel=document.getElementById('frame');
+    const glass=[...gSel.options].map(o=>o.value).filter(v=>v&&v!=='+ Add new...'&&!GLASS_DEFAULTS.includes(v));
+    const frame=[...fSel.options].map(o=>o.value).filter(v=>v&&v!=='+ Add new...'&&!FRAME_DEFAULTS.includes(v));
+    localStorage.setItem(CUSTOM_KEY,JSON.stringify({glass,frame}));
   }catch(e){}
 }
 
-function populatePrinters(){
-  const printers = getPrinterList();
-  const saved = getSavedPrinters();
-  const ids = ['printer-tracks','printer-cables','printer-small','printer-big'];
-  const savedVals = [saved.tracks, saved.cables, saved.small||'ZDesigner GX420d', saved.big||'Westinghouse WHTP203e'];
-  ids.forEach((id,i)=>{
-    const sel = document.getElementById(id);
-    sel.innerHTML = printers.map(p=>`<option value="${p}" ${p===savedVals[i]?'selected':''}>${p}</option>`).join('');
-    // If saved value not in list, add it
-    if(savedVals[i] && !printers.includes(savedVals[i])){
-      sel.innerHTML = `<option value="${savedVals[i]}" selected>${savedVals[i]}</option>` + sel.innerHTML;
-    }
-  });
-}
-
-// Handle dynamic glass/frame additions
 document.getElementById('glass').addEventListener('change',function(){
   if(this.value==='+ Add new...'){
     const v=prompt('Enter glass type:');
-    if(v&&v.trim()){
-      const opt=document.createElement('option');
-      opt.value=v.trim();opt.textContent=v.trim();
-      this.insertBefore(opt,this.lastElementChild);
-      this.value=v.trim();
-      saveGlassFrame();
-    } else {this.value='';}
-  } else {saveGlassFrame();updateLabels();}
+    if(v&&v.trim()){const o=document.createElement('option');o.value=v.trim();o.textContent=v.trim();this.insertBefore(o,this.lastElementChild);this.value=v.trim();saveCustomOptions();}
+    else this.value='';
+  } else {saveCustomOptions();updateLabels();}
 });
 document.getElementById('frame').addEventListener('change',function(){
   if(this.value==='+ Add new...'){
     const v=prompt('Enter frame color:');
-    if(v&&v.trim()){
-      const opt=document.createElement('option');
-      opt.value=v.trim();opt.textContent=v.trim();
-      this.insertBefore(opt,this.lastElementChild);
-      this.value=v.trim();
-      saveGlassFrame();
-    } else {this.value='';}
-  } else {saveGlassFrame();updateLabels();}
+    if(v&&v.trim()){const o=document.createElement('option');o.value=v.trim();o.textContent=v.trim();this.insertBefore(o,this.lastElementChild);this.value=v.trim();saveCustomOptions();}
+    else this.value='';
+  } else {saveCustomOptions();updateLabels();}
 });
-
-function saveGlassFrame(){
-  try{
-    const existing=JSON.parse(localStorage.getItem('gdCustomOptions'))||{glass:[],frame:[]};
-    const glassOpts=[...document.getElementById('glass').options].map(o=>o.value).filter(v=>v&&v!=='+ Add new...'&&!GLASS_OPTIONS.includes(v));
-    const frameOpts=[...document.getElementById('frame').options].map(o=>o.value).filter(v=>v&&v!=='+ Add new...'&&!FRAME_OPTIONS.includes(v));
-    localStorage.setItem('gdCustomOptions',JSON.stringify({glass:glassOpts,frame:frameOpts}));
-  }catch(e){}
-}
-function loadCustomOptions(){
-  try{
-    const d=JSON.parse(localStorage.getItem('gdCustomOptions'))||{glass:[],frame:[]};
-    const gSel=document.getElementById('glass');
-    const fSel=document.getElementById('frame');
-    d.glass.forEach(v=>{
-      if(![...gSel.options].find(o=>o.value===v)){
-        const opt=document.createElement('option');opt.value=v;opt.textContent=v;
-        gSel.insertBefore(opt,gSel.lastElementChild);
-      }
-    });
-    d.frame.forEach(v=>{
-      if(![...fSel.options].find(o=>o.value===v)){
-        const opt=document.createElement('option');opt.value=v;opt.textContent=v;
-        fSel.insertBefore(opt,fSel.lastElementChild);
-      }
-    });
-  }catch(e){}
-}
 
 // ── LISTENERS ──────────────────────────────────────────────────────────────
 function setupListeners(){
@@ -411,8 +512,7 @@ function calculate(){
   const wt=parseFloat(document.getElementById('weight').value);
   const hasWeight=!isNaN(wt)&&wt>0;
 
-  if(!isNaN(height)&&height>0) document.getElementById('panel-hint').textContent='→ '+getPanels(height)+' sections';
-  else document.getElementById('panel-hint').textContent='';
+  document.getElementById('panel-hint').textContent=(!isNaN(height)&&height>0)?'→ '+getPanels(height)+' sections':'';
 
   if(!width||!height||!tt||!lt){document.getElementById('results').classList.remove('visible');document.getElementById('print-all-wrap').classList.remove('visible');return;}
   if(lt==='highlift'&&!hl)return;
@@ -428,18 +528,14 @@ function calculate(){
   const jb=getJB(vert);
   const tlbl={'3-15R':'3" 15R','2-12R':'2" 12R','3-LHR':'3" LHR','2-LHR':'2" LHR'};
   const llbl={standard:'Standard Lift',highlift:'High Lift ('+hl+'")',lhr:'Low Headroom'};
-
-  calcData={width,height,tt,lt,hl,wt,hasWeight,panels,x2,vert,horiz,jb,tlbl,llbl};
+  calcData={width,height,tt,lt,hl,wt,hasWeight,panels,vert,horiz};
 
   document.getElementById('r-vertical').textContent=frac(vert);
   document.getElementById('r-horizontal').textContent=frac(horiz);
-  document.getElementById('r-2x2').textContent=frac(x2)+' projection';
+  document.getElementById('r-2x2').textContent=get2x2(panels).toFixed(2).replace(/.?0+$/,'')+'" projection';
   document.getElementById('r-panels').textContent=panels+' sections';
   document.getElementById('r-config').textContent=tlbl[tt]+' · '+llbl[lt];
-  document.getElementById('jb-grid').innerHTML=['J-10','J-12','J-14','J-16'].map((t,i)=>{
-    const q=[jb.j10,jb.j12,jb.j14,jb.j16][i];
-    return'<div class="jb-box"><div class="jb-type">'+t+'</div>'+(q!==null?'<div class="jb-qty">'+q+'</div>':'<div class="jb-na">—</div>')+'</div>';
-  }).join('');
+  document.getElementById('jb-grid').innerHTML=['J-10','J-12','J-14','J-16'].map((t,i)=>{const q=[jb.j10,jb.j12,jb.j14,jb.j16][i];return'<div class="jb-box"><div class="jb-type">'+t+'</div>'+(q!==null?'<div class="jb-qty">'+q+'</div>':'<div class="jb-na">—</div>')+'</div>';}).join('');
 
   const notice=document.getElementById('weight-notice');
   const cableDiv=document.getElementById('cable-results');
@@ -473,50 +569,24 @@ function updateLabels(){
   const lites=document.getElementById('lites').value.trim();
   const glass=document.getElementById('glass').value;
   const frame=document.getElementById('frame').value;
-  const panels=calcData.panels||getPanels(parseFloat(document.getElementById('height').value)||0);
+  const panels=calcData.panels||getPanels(parseFloat(document.getElementById('height').value)||0)||4;
   const width=document.getElementById('width').value;
   const height=document.getElementById('height').value;
   const hasLabel=wo||mark||lites||glass||frame;
-
   document.getElementById('label-missing').style.display=hasLabel?'none':'block';
   document.getElementById('label-content').style.display=hasLabel?'block':'none';
   if(!hasLabel)return;
-
-  // Build roles array
-  if(panels>=2){
-    labelRoles=['Top',...Array.from({length:panels-2},(_,i)=>'Center '+(i+1)),'Bottom'];
-  } else {
-    labelRoles=['Top'];
-  }
+  if(panels>=2){labelRoles=['Top',...Array.from({length:panels-2},(_,i)=>'Center '+(i+1)),'Bottom'];}
+  else{labelRoles=['Top'];}
   currentLabelIdx=Math.min(currentLabelIdx,labelRoles.length-1);
-  renderLabel(wo,mark,lites,glass,frame,panels,width,height);
-}
-
-function renderLabel(wo,mark,lites,glass,frame,panels,width,height){
   const role=labelRoles[currentLabelIdx]||'';
-  const idx=currentLabelIdx+1;
   const size=width&&height?width+' X '+height:'';
-
-  // Small label
-  document.getElementById('sl-left').innerHTML=
-    '<div class="lrow"><strong>W/O: '+(wo||'&mdash;')+'</strong></div>'+
-    '<div class="lrow">Mark: '+(mark||'&mdash;')+'</div>'+
-    '<div class="lrow">Panels: '+(panels||'&mdash;')+'</div>'+
-    '<div class="lrow">Size: '+(size||'&mdash;')+'</div>';
-  document.getElementById('sl-right').innerHTML=
-    '<div class="lrow">Lites: '+(lites||'&mdash;')+'</div>'+
-    '<div class="lrow">Glass: '+(glass||'&mdash;')+'</div>'+
-    '<div class="lrow">Frame: '+(frame||'&mdash;')+'</div>'+
-    '<div class="lrow">Panel: '+role+'</div>';
-
-  // Big label
+  document.getElementById('sl-left').innerHTML='<div class="lrow"><strong>W/O: '+(wo||'—')+'</strong></div><div class="lrow">Mark: '+(mark||'—')+'</div><div class="lrow">Panels: '+(panels||'—')+'</div><div class="lrow">Size: '+(size||'—')+'</div>';
+  document.getElementById('sl-right').innerHTML='<div class="lrow">Lites: '+(lites||'—')+'</div><div class="lrow">Glass: '+(glass||'—')+'</div><div class="lrow">Frame: '+(frame||'—')+'</div><div class="lrow">Panel: '+role+'</div>';
   document.getElementById('bl-wo').textContent='W/O: '+(wo||'—');
-  document.getElementById('bl-panel').textContent=role+' ('+idx+'/'+panels+')';
-
-  // Nav
-  document.getElementById('label-nav-text').textContent=idx+' / '+labelRoles.length;
+  document.getElementById('bl-panel').textContent=role+' ('+(currentLabelIdx+1)+'/'+panels+')';
+  document.getElementById('label-nav-text').textContent=(currentLabelIdx+1)+' / '+labelRoles.length;
 }
-
 function prevLabel(){currentLabelIdx=Math.max(0,currentLabelIdx-1);updateLabels();}
 function nextLabel(){currentLabelIdx=Math.min(labelRoles.length-1,currentLabelIdx+1);updateLabels();}
 
@@ -528,31 +598,19 @@ function showTab(n){
 
 // ── CLEAR ──────────────────────────────────────────────────────────────────
 function clearAll(){
-  // Clear door info
-  ['width','height','highlift','weight'].forEach(id=>document.getElementById(id).value='');
+  ['width','height','highlift','weight','wo','mark','lites'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('track-type').value='';
   document.getElementById('lift-type').value='';
-  document.getElementById('hl-field').classList.remove('visible');
-  document.getElementById('panel-hint').textContent='';
-  // Clear label info
-  ['wo','mark','lites'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('glass').value='';
   document.getElementById('frame').value='';
-  // Hide results
+  document.getElementById('hl-field').classList.remove('visible');
+  document.getElementById('panel-hint').textContent='';
   document.getElementById('results').classList.remove('visible');
   document.getElementById('print-all-wrap').classList.remove('visible');
-  calcData={};labelRoles=[];currentLabelIdx=0;
-  showTab(0);
-  // Printers are NOT cleared
+  calcData={};labelRoles=[];currentLabelIdx=0;showTab(0);
 }
 
-// ── PRINT HELPERS ──────────────────────────────────────────────────────────
-function buildPrintHeader(title,info){
-  return '<!DOCTYPE html><html><head><title>'+title+'</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:-apple-system,Arial,sans-serif;padding:24px;color:#222;max-width:600px;margin:0 auto}h1{font-size:20px;margin-bottom:4px}p{font-size:13px;color:#666;margin-bottom:20px}.btn-row{display:flex;gap:12px;margin-top:24px}.btn-print{padding:12px 28px;font-size:15px;cursor:pointer;border:none;border-radius:8px;background:#1a4f8a;color:white;font-weight:600}.btn-back{padding:12px 28px;font-size:15px;cursor:pointer;border:1.5px solid #ccc;border-radius:8px;background:#f4f5f7;color:#111}@media print{.btn-row{display:none}}</style></head><body><h1>'+title+'</h1><p>'+info+'</p><hr style="margin-bottom:20px;border:none;border-top:1px solid #ddd">';
-}
-function buildPrintFooter(){
-  return '<div class="btn-row"><button class="btn-print" onclick="window.print()">&#128424; Print</button><button class="btn-back" onclick="window.close()">← Back</button></div></body></html>';
-}
+// ── PRINT ──────────────────────────────────────────────────────────────────
 function getInfo(){
   const w=document.getElementById('width').value,h=document.getElementById('height').value;
   const ts=document.getElementById('track-type'),ls=document.getElementById('lift-type');
@@ -560,21 +618,22 @@ function getInfo(){
   const hl=document.getElementById('highlift').value,wt=document.getElementById('weight').value;
   return 'Width: '+w+'" | Height: '+h+'" | '+tt+' | '+lt+(hl?' | HL: '+hl+'"':'')+(wt?' | Weight: '+wt+' lbs':'');
 }
+function printWrap(title,info,content){
+  const win=window.open('','_blank');
+  win.document.write('<!DOCTYPE html><html><head><title>'+title+'</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:-apple-system,Arial,sans-serif;padding:24px;color:#222;max-width:600px;margin:0 auto}h1{font-size:20px;margin-bottom:4px}p{font-size:13px;color:#666;margin-bottom:20px}.btns{display:flex;gap:12px;margin-top:24px}.bp{padding:12px 28px;font-size:15px;cursor:pointer;border:none;border-radius:8px;background:#1a4f8a;color:white;font-weight:600}.bb{padding:12px 28px;font-size:15px;cursor:pointer;border:1.5px solid #ccc;border-radius:8px;background:#f4f5f7;color:#111}@media print{.btns{display:none}}</style></head><body><h1>'+title+'</h1><p>'+info+'</p><hr style="margin-bottom:20px;border:none;border-top:1px solid #ddd">'+content+'<div class="btns"><button class="bp" onclick="window.print()">🖸 Print</button><button class="bb" onclick="window.close()">← Back</button></div></body></html>');
+  win.document.close();
+}
 
 function printPage(pi){
   const info=getInfo();
-  let content='',title='';
   if(pi===0){
-    title='Garage Door — TRACKS';
-    const jbs=['J-10','J-12','J-14','J-16'].map((t,i)=>{const box=document.getElementById('jb-grid').children[i];const q=box.querySelector('.jb-qty')?box.querySelector('.jb-qty').textContent:'—';return'<div style="border:1px solid #ddd;border-radius:6px;padding:12px;text-align:center"><div style="font-size:12px;color:#666;margin-bottom:6px">'+t+'</div><div style="font-size:26px;font-weight:bold">'+q+'</div></div>';}).join('');
-    content='<table style="width:100%;border-collapse:collapse;margin-bottom:20px"><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold;width:50%">Vertical (L & R)</td><td style="padding:10px;border:1px solid #ddd;font-size:22px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-vertical').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Horizontal (L & R)</td><td style="padding:10px;border:1px solid #ddd;font-size:22px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-horizontal').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">2x2 projection</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-2x2').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Sections</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-panels').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Configuration</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-config').textContent+'</td></tr></table><h3 style="margin-bottom:10px;font-size:13px;color:#666;text-transform:uppercase">Jamb Brackets — per side</h3><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">'+jbs+'</div>';
-  } else if(pi===1){
-    title='Garage Door — CABLES';
-    content='<table style="width:100%;border-collapse:collapse"><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold;width:50%">Selected drum</td><td style="padding:10px;border:1px solid #ddd;font-size:20px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-drum').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Quantity</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-drum-qty').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">End bearing plate</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-ebf').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Total capacity</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-capacity').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Floor to shaft center</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-ftsc').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Cable type</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-cable-type').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Cable length (L & R)</td><td style="padding:10px;border:1px solid #ddd;font-size:26px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-cable').textContent+'</td></tr></table>';
+    const jbs=['J-10','J-12','J-14','J-16'].map((t,i)=>{const box=document.getElementById('jb-grid').children[i];const q=box.querySelector('.jb-qty')?box.querySelector('.jb-qty').textContent:'—';return'<div style="border:1px solid #ddd;border-radius:6px;padding:12px;text-align:center"><div style="font-size:12px;color:#666;margin-bottom:6px">'+t+'</div><div style="font-size:24px;font-weight:bold">'+q+'</div></div>';}).join('');
+    const c='<table style="width:100%;border-collapse:collapse;margin-bottom:20px"><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold;width:50%">Vertical (L & R)</td><td style="padding:10px;border:1px solid #ddd;font-size:22px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-vertical').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Horizontal (L & R)</td><td style="padding:10px;border:1px solid #ddd;font-size:22px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-horizontal').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">2x2 projection</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-2x2').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Sections</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-panels').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Configuration</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-config').textContent+'</td></tr></table><h3 style="font-size:13px;color:#666;text-transform:uppercase;margin-bottom:10px">Jamb Brackets</h3><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">'+jbs+'</div>';
+    printWrap('Garage Door — TRACKS',info,c);
+  } else {
+    const c='<table style="width:100%;border-collapse:collapse"><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold;width:50%">Selected drum</td><td style="padding:10px;border:1px solid #ddd;font-size:20px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-drum').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Quantity</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-drum-qty').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">End bearing plate</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-ebf').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Total capacity</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-capacity').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Floor to shaft center</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-ftsc').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Cable type</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-cable-type').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Cable length</td><td style="padding:10px;border:1px solid #ddd;font-size:26px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-cable').textContent+'</td></tr></table>';
+    printWrap('Garage Door — CABLES',info,c);
   }
-  const win=window.open('','_blank');
-  win.document.write(buildPrintHeader(title,info)+content+buildPrintFooter());
-  win.document.close();
 }
 
 function printLabels(){
@@ -587,55 +646,31 @@ function printLabels(){
   const width=document.getElementById('width').value;
   const height=document.getElementById('height').value;
   const size=width&&height?width+' X '+height:'';
-
-  let smallLabels='',bigLabels='';
+  let smallH='',bigH='';
   labelRoles.forEach((role,i)=>{
-    smallLabels+=`<div style="width:4in;height:1in;border:2px solid #222;padding:6px 10px;display:grid;grid-template-columns:1fr 1fr;font-family:Arial,sans-serif;font-size:9pt;page-break-after:always;box-sizing:border-box;">
-      <div>
-        <div><strong>W/O: ${wo||'—'}</strong></div>
-        <div>Mark: ${mark||'—'}</div>
-        <div>Panels: ${panels}</div>
-        <div>Size: ${size||'—'}</div>
-      </div>
-      <div>
-        <div>Lites: ${lites||'—'}</div>
-        <div>Glass: ${glass||'—'}</div>
-        <div>Frame: ${frame||'—'}</div>
-        <div>Panel: ${role}</div>
-      </div>
-    </div>`;
-    bigLabels+=`<div style="width:3in;height:6in;border:3px solid #222;padding:16px;font-family:Arial,sans-serif;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always;box-sizing:border-box;">
-      <div style="font-size:52pt;font-weight:900;text-align:center;line-height:1.1;">W/O: ${wo||'—'}</div>
-      <div style="font-size:22pt;font-weight:700;text-align:right;">${role} (${i+1}/${panels})</div>
-    </div>`;
+    smallH+=`<div style="width:4in;height:1in;border:2px solid #222;padding:6px 10px;display:grid;grid-template-columns:1fr 1fr;font-family:Arial,sans-serif;font-size:9pt;page-break-after:always;box-sizing:border-box;"><div><div><strong>W/O: ${wo||'—'}</strong></div><div>Mark: ${mark||'—'}</div><div>Panels: ${panels}</div><div>Size: ${size||'—'}</div></div><div><div>Lites: ${lites||'—'}</div><div>Glass: ${glass||'—'}</div><div>Frame: ${frame||'—'}</div><div>Panel: ${role}</div></div></div>`;
+    bigH+=`<div style="width:3in;height:6in;border:3px solid #222;padding:16px;font-family:Arial,sans-serif;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always;box-sizing:border-box;"><div style="font-size:52pt;font-weight:900;text-align:center;line-height:1.1;">W/O: ${wo||'—'}</div><div style="font-size:20pt;font-weight:700;text-align:right;">${role} (${i+1}/${panels})</div></div>`;
   });
-
-  const winSmall=window.open('','_blank');
-  winSmall.document.write('<!DOCTYPE html><html><head><title>Small Labels</title><style>@page{size:4in 1in;margin:0}body{margin:0}@media print{.btn-row{display:none}}</style></head><body>'+smallLabels+'<div class="btn-row" style="padding:20px;display:flex;gap:12px"><button onclick="window.print()" style="padding:10px 24px;background:#1a4f8a;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer">&#128424; Print Small Labels</button><button onclick="window.close()" style="padding:10px 24px;border:1px solid #ccc;border-radius:6px;font-size:14px;cursor:pointer">← Back</button></div></body></html>');
-  winSmall.document.close();
-
+  const wS=window.open('','_blank');
+  wS.document.write('<!DOCTYPE html><html><head><title>Small Labels</title><style>@page{size:4in 1in;margin:0}body{margin:0}@media print{.nb{display:none}}</style></head><body>'+smallH+'<div class="nb" style="padding:20px;display:flex;gap:12px"><button onclick="window.print()" style="padding:10px 20px;background:#1a4f8a;color:white;border:none;border-radius:6px;cursor:pointer">&#128424; Print Small Labels</button><button onclick="window.close()" style="padding:10px 20px;border:1px solid #ccc;border-radius:6px;cursor:pointer">← Back</button></div></body></html>');
+  wS.document.close();
   setTimeout(()=>{
-    const winBig=window.open('','_blank');
-    winBig.document.write('<!DOCTYPE html><html><head><title>Big Labels</title><style>@page{size:3in 6in;margin:0}body{margin:0}@media print{.btn-row{display:none}}</style></head><body>'+bigLabels+'<div class="btn-row" style="padding:20px;display:flex;gap:12px"><button onclick="window.print()" style="padding:10px 24px;background:#1a4f8a;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer">&#128424; Print Big Labels</button><button onclick="window.close()" style="padding:10px 24px;border:1px solid #ccc;border-radius:6px;font-size:14px;cursor:pointer">← Back</button></div></body></html>');
-    winBig.document.close();
-  },500);
+    const wB=window.open('','_blank');
+    wB.document.write('<!DOCTYPE html><html><head><title>Big Labels</title><style>@page{size:3in 6in;margin:0}body{margin:0}@media print{.nb{display:none}}</style></head><body>'+bigH+'<div class="nb" style="padding:20px;display:flex;gap:12px"><button onclick="window.print()" style="padding:10px 20px;background:#1a4f8a;color:white;border:none;border-radius:6px;cursor:pointer">&#128424; Print Big Labels</button><button onclick="window.close()" style="padding:10px 20px;border:1px solid #ccc;border-radius:6px;cursor:pointer">← Back</button></div></body></html>');
+    wB.document.close();
+  },400);
 }
 
 function printAll(){
   printPage(0);
-  setTimeout(()=>printPage(1),600);
-  setTimeout(()=>{
-    const wo=document.getElementById('wo').value.trim();
-    if(wo||document.getElementById('mark').value.trim()){
-      printLabels();
-    }
-  },1200);
+  setTimeout(()=>printPage(1),500);
+  setTimeout(()=>{if(document.getElementById('wo').value.trim()||document.getElementById('mark').value.trim())printLabels();},1000);
 }
 
 // ── INIT ───────────────────────────────────────────────────────────────────
-populatePrinters();
 loadCustomOptions();
 setupListeners();
+updateCurrentPrintersSummary();
 </script>
 </body>
 </html>
