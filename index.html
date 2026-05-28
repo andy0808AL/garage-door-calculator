@@ -35,7 +35,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .status-dot.unset{background:#fcd34d;}
 .save-confirm{background:#dcfce7;border:1px solid #86efac;border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:#166534;text-align:center;margin-top:12px;display:none;}
 .save-confirm.show{display:block;}
-.add-printer-btn{width:100%;height:38px;background:var(--gray-light);color:var(--text-muted);border:1.5px dashed var(--gray-border);border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;margin-top:8px;}
+.add-printer-btn{width:100%;height:38px;background:var(--gray-light);color:var(--text-muted);border:1.5px dashed var(--gray-border);border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;margin-top:8px;}.rot-btn{height:36px;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);background:var(--gray-light);color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;}.rot-btn.active{background:var(--blue);color:white;border-color:var(--blue);}
 .content{padding:16px;max-width:480px;margin:0 auto;}
 .card{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.07);}
 .card-title{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
@@ -132,7 +132,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
         <select id="cfg-big" onchange="savePrinters()"></select>
         <div class="printer-status"><div class="status-dot" id="dot-big"></div><span id="lbl-big">—</span></div>
       </div>
-      <button class="add-printer-btn" onclick="addPrinter()">&#43; Add printer manually</button>
+      <div class="printer-item" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--gray-border);"><label>&#128260; Big Label Rotation</label><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px;"><button class="rot-btn" onclick="setRotation(0)" id="rot-0">0°</button><button class="rot-btn" onclick="setRotation(90)" id="rot-90">90°</button><button class="rot-btn" onclick="setRotation(180)" id="rot-180">180°</button><button class="rot-btn" onclick="setRotation(270)" id="rot-270">270°</button></div><div class="printer-status" style="margin-top:6px;"><div class="status-dot" id="dot-rotation"></div><span id="lbl-rotation">Loading...</span></div></div><button class="add-printer-btn" onclick="addPrinter()">&#43; Add printer manually</button>
       <div class="save-confirm" id="save-confirm">&#10003; Printer settings saved</div>
     </div>
     <div class="settings-section">
@@ -323,7 +323,7 @@ function renderSettings(){
     return`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-border);font-size:13px;"><span>${g}</span>${isDef?'<span style="font-size:11px;color:#9ca3af">default</span>':`<button onclick="removeGlass('${g}')" style="border:none;background:none;color:var(--red);font-size:20px;cursor:pointer;line-height:1;padding:0 4px;">&times;</button>`}</div>`;
   }).join('');
   // Frame list
-  const allFrame=[...DEF_FRAME,...(load().extraFrame||[])];
+  const allFrame=[...DEF_FRAME,...(load().extraFrame||[])]; const sr=load().bigRotation!==undefined?load().bigRotation:180; setTimeout(()=>updateRotationUI(sr),50);
   document.getElementById('frame-list').innerHTML=allFrame.map(f=>{
     const isDef=DEF_FRAME.includes(f);
     return`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-border);font-size:13px;"><span>${f}</span>${isDef?'<span style="font-size:11px;color:#9ca3af">default</span>':`<button onclick="removeFrame('${f}')" style="border:none;background:none;color:var(--red);font-size:20px;cursor:pointer;line-height:1;padding:0 4px;">&times;</button>`}</div>`;
@@ -544,11 +544,11 @@ const SERVER_URL = 'http://localhost:5000';
 let serverAvailable = false;
 let serverPrinters = [];
 
-async function checkServer() {
+function setRotation(deg){fetch(SERVER_URL+"/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bigRotation:deg})}).then(r=>r.json()).then(()=>{updateRotationUI(deg);toast("✓ Rotation set to "+deg+"°",2000);}).catch(()=>{save({bigRotation:deg});updateRotationUI(deg);});}function updateRotationUI(deg){[0,90,180,270].forEach(d=>{const b=document.getElementById("rot-"+d);if(b)b.classList.toggle("active",d===deg);});const l=document.getElementById("lbl-rotation");const d2=document.getElementById("dot-rotation");if(l)l.textContent=deg+"° current rotation";if(d2)d2.className="status-dot";}async function checkServer() {
   try {
     const r = await fetch(SERVER_URL + '/ping', {signal: AbortSignal.timeout(1500)});
     const d = await r.json();
-    serverAvailable = d.status === 'ok';
+    serverAvailable = d.status === 'ok'; if(d.bigRotation !== undefined) updateRotationUI(d.bigRotation);
     if(d.printers && d.printers.length > 0) {
       serverPrinters = d.printers;
       mergeServerPrinters(d.printers);
