@@ -79,7 +79,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .small-label .lrow strong{font-weight:700;}
 /* BIG LABEL - fills entire space with W/O */
 .big-label-wrap{border:3px solid #222;border-radius:3px;background:white;font-family:Arial,sans-serif;padding:8px;position:relative;aspect-ratio:1/2;margin-top:0;display:flex;flex-direction:column;justify-content:space-between;min-height:180px;}
-.big-label-wo{font-size:clamp(28px,10vw,52px);font-weight:900;color:#111;line-height:1;text-align:center;flex:1;display:flex;align-items:center;justify-content:center;word-break:break-all;}
+.big-label-wo{font-size:clamp(22px,7vw,46px);font-weight:900;color:#111;line-height:1;text-align:center;flex:1;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;}
 .big-label-panel{font-size:15px;font-weight:700;text-align:right;color:#111;padding-top:4px;}
 .label-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin:10px 0;}
 .label-nav button{width:34px;height:34px;border:1.5px solid var(--gray-border);border-radius:50%;background:white;font-size:16px;cursor:pointer;}
@@ -545,7 +545,7 @@ function buildBigLabelsHTML(wo,panels){
     // At 96dpi: 3in=288px, 6in=576px. Font ~200px to fill width for short W/O numbers
     body+=`<div style="width:3in;height:6in;border:3px solid #222;padding:12px 10px 10px;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always;overflow:hidden;">
       <div style="flex:1;display:flex;align-items:center;justify-content:center;">
-        <div style="font-size:clamp(40px,18vw,140px);font-weight:900;text-align:center;line-height:1;word-break:break-all;width:100%;">W/O: ${wo||'—'}</div>
+        <div style="font-size:clamp(40px,18vw,140px);font-weight:900;text-align:center;line-height:1;white-space:nowrap;max-width:100%;font-size:min(18vw,130px);">W/O: ${wo||'—'}</div>
       </div>
       <div style="font-size:22pt;font-weight:700;text-align:right;">${role} (${i+1}/${panels})</div>
     </div>`;
