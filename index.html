@@ -416,8 +416,14 @@ function renderBigLabelPreview(){
   const wo=document.getElementById('wo').value.trim(),deg=curRotation;
   const role=(labelRoles&&labelRoles[curLabel])||'',panels=CD.panels||4;
   const woText='W/O: '+(wo||'\u2014'),panelText=role+' ('+(curLabel+1)+'/'+panels+')';
-  const landscape=deg===90||deg===270,flip=deg===180||deg===270;
-  const pAlign=(flip&&!landscape)||deg===270?'left':'right';
+  // Preview shows what will actually print
+  // Server applies rotation THEN hard-flips 180 in GDI
+  // So net visual rotation = deg + 180 (mod 360)
+  // To show correct preview, we display at (deg + 180) % 360
+  const netDeg = (deg + 180) % 360;
+  const landscape = netDeg===90 || netDeg===270;
+  const flip = netDeg===180 || netDeg===270;
+  const pAlign = flip || netDeg===270 ? 'left' : 'right';
   let html;
   if(landscape){
     html='<div class="big-label-wrap" style="aspect-ratio:2/1;min-height:110px;max-height:160px;">'+
