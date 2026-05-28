@@ -57,8 +57,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .print-btn{width:100%;height:46px;margin-top:12px;background:white;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);font-size:15px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
 .print-btn:active{background:var(--gray-light);}
 </style></head><body>
-<div class="top-bar"><h1>&#128682; Garage Door Calculator</h1><p>Tracks &middot; Cables &middot; Drums &middot; Jamb Brackets</p></div>
-<div class="content">
+<div class="top-bar"><h1>&#128682; Garage Door Calculator</h1><p>Tracks &middot; Cables &middot; Drums &middot; Jamb Brackets</p><div id="server-status" style="font-size:11px;margin-top:3px;opacity:0.9;">Checking print server...</div></div>
+<div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;color:white;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:500;z-index:999;display:none;white-space:nowrap;"></div><div class="content">
 <div class="card">
 <div class="card-title">Door Information</div>
 <div class="field-row">
@@ -246,4 +246,151 @@ function printPage(pi){
 
 // Init
 setupListeners();
+
+// ── SERVER INTEGRATION ──────────────────────────────────────────────────────
+const SERVER = 'http://localhost:5000';
+let serverOK = false;
+let curRotation = 0;
+
+function checkServer(){
+  fetch(SERVER+'/ping',{signal:AbortSignal.timeout(2000)})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      serverOK = true;
+      curRotation = d.bigRotation !== undefined ? d.bigRotation : 0;
+      var el = document.getElementById('server-status');
+      if(el) el.textContent = '\uD83D\uDFE2 Print server connected';
+    })
+    .catch(function(){
+      serverOK = false;
+      var el = document.getElementById('server-status');
+      if(el) el.textContent = '\uD83D\uDD34 Print server offline';
+    });
+}
+
+function getTracksData(){
+  var grid = document.getElementById('jb-grid');
+  var jb = ['J-10','J-12','J-14','J-16'].map(function(t,i){
+    var box = grid ? grid.children[i] : null;
+    var qEl = box ? box.querySelector('.jb-qty') : null;
+    return {label:t, qty: qEl ? qEl.textContent : '--'};
+  });
+  return {
+    vertical: document.getElementById('r-vertical').textContent,
+    horizontal: document.getElementById('r-horizontal').textContent,
+    projection: document.getElementById('r-2x2').textContent,
+    sections: document.getElementById('r-panels').textContent,
+    config: document.getElementById('r-config').textContent,
+    jb: jb
+  };
+}
+
+function getCablesData(){
+  return {
+    drum: document.getElementById('r-drum').textContent,
+    qty: document.getElementById('r-drum-qty').textContent,
+    ebf: document.getElementById('r-ebf').textContent,
+    capacity: document.getElementById('r-capacity').textContent,
+    ftsc: document.getElementById('r-ftsc').textContent,
+    cableType: document.getElementById('r-cable-type').textContent,
+    cable: document.getElementById('r-cable').textContent
+  };
+}
+
+function getLabelsData(){
+  var s = loadSettings ? loadSettings() : {};
+  var wo = document.getElementById('wo') ? document.getElementById('wo').value.trim() : '';
+  var mark = document.getElementById('mark') ? document.getElementById('mark').value.trim() : '';
+  var lites = document.getElementById('lites') ? document.getElementById('lites').value.trim() : '';
+  var glass = document.getElementById('glass') ? document.getElementById('glass').value : '';
+  var frame = document.getElementById('frame') ? document.getElementById('frame').value : '';
+  return {wo:wo, mark:mark, lites:lites, glass:glass, frame:frame};
+}
+
+function getInfo(){
+  var w = document.getElementById('width').value;
+  var h = document.getElementById('height').value;
+  var ts = document.getElementById('track-type');
+  var ls = document.getElementById('lift-type');
+  var tt = ts.options[ts.selectedIndex] ? ts.options[ts.selectedIndex].text : '';
+  var lt = ls.options[ls.selectedIndex] ? ls.options[ls.selectedIndex].text : '';
+  var hl = document.getElementById('highlift').value;
+  var wt = document.getElementById('weight').value;
+  return 'Width: '+w+'" | Height: '+h+'" | '+tt+' | '+lt+(hl?' | HL: '+hl+'"':'')+(wt?' | Weight: '+wt+' lbs':'');
+}
+
+function serverPrint(endpoint, payload){
+  return fetch(SERVER+endpoint, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(15000)
+  }).then(function(r){return r.json();});
+}
+
+function doPrintTracks(){
+  if(serverOK){
+    showToast('Printing Tracks...');
+    serverPrint('/print/tracks',{printer:getSetting('pTracks'),data:getTracksData(),info:getInfo()})
+      .then(function(d){showToast(d.status==='ok'?'\u2713 Tracks printed':'\u2717 '+d.error,3000);})
+      .catch(function(e){showToast('Error: '+e.message,3000);});
+  } else {
+    showToast('Print server offline',2000);
+  }
+}
+
+function doPrintCables(){
+  if(serverOK){
+    showToast('Printing Cables...');
+    serverPrint('/print/cables',{printer:getSetting('pCables'),data:getCablesData(),info:getInfo()})
+      .then(function(d){showToast(d.status==='ok'?'\u2713 Cables printed':'\u2717 '+d.error,3000);})
+      .catch(function(e){showToast('Error: '+e.message,3000);});
+  } else {
+    showToast('Print server offline',2000);
+  }
+}
+
+function doPrintLabels(){
+  var ld = getLabelsData();
+  if(!serverOK){showToast('Print server offline',2000);return;}
+  var s = tryLoadSettings();
+  var panels = window._CD ? window._CD.panels : 4;
+  var roles = window._labelRoles || ['Top'];
+  var width = document.getElementById('width').value;
+  var height = document.getElementById('height').value;
+  var size = width && height ? width+' X '+height : '';
+  showToast('Printing Labels...',4000);
+  serverPrint('/print/labels',{
+    wo:ld.wo, mark:ld.mark, lites:ld.lites, glass:ld.glass, frame:ld.frame,
+    panels:panels, size:size, roles:roles,
+    printerSmall:s.pSmall||'', printerBig:s.pBig||'',
+    printSmall:true, printBig:true, bigRotation:curRotation
+  }).then(function(d){showToast(d.status==='ok'?'\u2713 Labels: '+d.printed.length+' jobs':'\u2717 '+d.error,3000);})
+    .catch(function(e){showToast('Error: '+e.message,3000);});
+}
+
+function doPrintAll(){
+  if(!serverOK){showToast('Print server offline',2000);return;}
+  showToast('Printing all...',5000);
+  doPrintTracks();
+  setTimeout(doPrintCables,700);
+  var ld=getLabelsData();
+  if(ld.wo||ld.mark) setTimeout(doPrintLabels,1400);
+}
+
+function getSetting(key){
+  try{return JSON.parse(localStorage.getItem('gdCalc_v4')||'{}')[key]||'';}catch(e){return'';}
+}
+function tryLoadSettings(){
+  try{return JSON.parse(localStorage.getItem('gdCalc_v4')||'{}')||{};}catch(e){return{};}
+}
+function showToast(msg,ms){
+  var t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;color:white;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:500;z-index:999;white-space:nowrap;';document.body.appendChild(t);}
+  t.textContent=msg;t.style.display='block';
+  clearTimeout(t._timer);t._timer=setTimeout(function(){t.style.display='none';},ms||2500);
+}
+
+checkServer();
+setInterval(checkServer, 15000);
 </script></body></html>
