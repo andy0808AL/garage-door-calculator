@@ -338,10 +338,10 @@ function renderSettings(){
     document.getElementById(c.lbl).textContent=cur||'Not set';
   });
   updateRotUI(curRotation);
-  var allG=DEF_GLASS.concat(s.extraGlass||[]);
-  var allF=DEF_FRAME.concat(s.extraFrame||[]);
-  document.getElementById('glass-list').innerHTML=allG.map(function(g){var d=DEF_GLASS.indexOf(g)>=0;return'<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-border);font-size:13px;"><span>'+g+'</span>'+(d?'<span style="font-size:11px;color:#9ca3af">default</span>':'<button onclick="removeGlass(\''+g+'\')" style="border:none;background:none;color:var(--red);font-size:20px;cursor:pointer;">x</button>')+'</div>';}).join('');
-  document.getElementById('frame-list').innerHTML=allF.map(function(f){var d=DEF_FRAME.indexOf(f)>=0;return'<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-border);font-size:13px;"><span>'+f+'</span>'+(d?'<span style="font-size:11px;color:#9ca3af">default</span>':'<button onclick="removeFrame(\''+f+'\')" style="border:none;background:none;color:var(--red);font-size:20px;cursor:pointer;">x</button>')+'</div>';}).join('');
+  var allG=getAllGlass();
+  var allF=getAllFrame();
+  document.getElementById('glass-list').innerHTML=allG.map(function(g){return'<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-border);font-size:13px;"><span>'+g+'</span><button onmousedown="removeAnyGlass(\''+g+'\')" style="border:none;background:none;color:var(--red);font-size:20px;cursor:pointer;line-height:1;">x</button></div>';}).join('');
+  document.getElementById('frame-list').innerHTML=allF.map(function(f){return'<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-border);font-size:13px;"><span>'+f+'</span><button onmousedown="removeAnyFrame(\''+f+'\')" style="border:none;background:none;color:var(--red);font-size:20px;cursor:pointer;line-height:1;">x</button></div>';}).join('');
 }
 function savePrinters(){save({pTracks:document.getElementById('cfg-tracks').value,pCables:document.getElementById('cfg-cables').value,pSmall:document.getElementById('cfg-small').value,pBig:document.getElementById('cfg-big').value});var c=document.getElementById('save-confirm');c.classList.add('show');setTimeout(function(){c.classList.remove('show');},2000);}
 function setRotation(deg){
@@ -355,11 +355,16 @@ function updateRotUI(deg){
   var l=document.getElementById('lbl-rotation');if(l)l.textContent=deg+'deg current';
 }
 function addPrinter(){var v=prompt('Enter printer name:');if(!v||!v.trim())return;var s=load();var ep=(s.extraPrinters||[]);if(ep.indexOf(v.trim())<0)ep.push(v.trim());save({extraPrinters:ep});renderSettings();}
-function addGlass(){var v=prompt('Glass type:');if(!v||!v.trim())return;var s=load();var eg=(s.extraGlass||[]);if(eg.indexOf(v.trim())<0&&DEF_GLASS.indexOf(v.trim())<0)eg.push(v.trim());save({extraGlass:eg});rebuildDropdowns();renderSettings();}
+function addGlass(){var v=prompt('Glass type:');if(!v||!v.trim())return;var all=getAllGlass();if(all.indexOf(v.trim())<0)all.push(v.trim());save({allGlass:all});rebuildDropdowns();renderSettings();}
+
+function getAllGlass(){var s=load();if(s.allGlass!==undefined)return s.allGlass;return DEF_GLASS.slice();}
+function getAllFrame(){var s=load();if(s.allFrame!==undefined)return s.allFrame;return DEF_FRAME.slice();}
+function removeAnyGlass(g){var all=getAllGlass().filter(function(x){return x!==g;});save({allGlass:all,extraGlass:[]});rebuildDropdowns();renderSettings();}
+function removeAnyFrame(f){var all=getAllFrame().filter(function(x){return x!==f;});save({allFrame:all,extraFrame:[]});rebuildDropdowns();renderSettings();}
 function removeGlass(g){var s=load();save({extraGlass:(s.extraGlass||[]).filter(function(x){return x!==g;})});rebuildDropdowns();renderSettings();}
-function addFrame(){var v=prompt('Frame color:');if(!v||!v.trim())return;var s=load();var ef=(s.extraFrame||[]);if(ef.indexOf(v.trim())<0&&DEF_FRAME.indexOf(v.trim())<0)ef.push(v.trim());save({extraFrame:ef});rebuildDropdowns();renderSettings();}
+function addFrame(){var v=prompt('Frame color:');if(!v||!v.trim())return;var all=getAllFrame();if(all.indexOf(v.trim())<0)all.push(v.trim());save({allFrame:all});rebuildDropdowns();renderSettings();}
 function removeFrame(f){var s=load();save({extraFrame:(s.extraFrame||[]).filter(function(x){return x!==f;})});rebuildDropdowns();renderSettings();}
-function rebuildDropdowns(){var s=load();var ag=DEF_GLASS.concat(s.extraGlass||[]);var af=DEF_FRAME.concat(s.extraFrame||[]);var cg=document.getElementById('glass').value;var cf=document.getElementById('frame').value;document.getElementById('glass').innerHTML='<option value="">Select...</option>'+ag.map(function(g){return'<option'+(g===cg?' selected':'')+'>'+g+'</option>';}).join('');document.getElementById('frame').innerHTML='<option value="">Select...</option>'+af.map(function(f){return'<option'+(f===cf?' selected':'')+'>'+f+'</option>';}).join('');}
+function rebuildDropdowns(){var s=load();var ag=getAllGlass();var af=getAllFrame();var cg=document.getElementById('glass').value;var cf=document.getElementById('frame').value;document.getElementById('glass').innerHTML='<option value="">Select...</option>'+ag.map(function(g){return'<option'+(g===cg?' selected':'')+'>'+g+'</option>';}).join('');document.getElementById('frame').innerHTML='<option value="">Select...</option>'+af.map(function(f){return'<option'+(f===cf?' selected':'')+'>'+f+'</option>';}).join('');}
 function frac(val){var w=Math.floor(val),d=val-w;var fs=[[0,''],[0.125,'1/8'],[0.25,'1/4'],[0.375,'3/8'],[0.5,'1/2'],[0.625,'5/8'],[0.75,'3/4'],[0.875,'7/8'],[1,'']];var best=fs[0],bd=999;fs.forEach(function(f){var dd=Math.abs(d-f[0]);if(dd<bd){bd=dd;best=f;}});if(best[0]===1)return(w+1)+'"';if(w===0)return best[1]?best[1]+'"':'0"';return best[1]?w+' '+best[1]+'"':w+'"';}
 function getJB(v){return JB.filter(function(r){return v>=r.min&&v<=r.max;})[0]||JB[JB.length-1];}
 function getPanels(h){if(h<=99.625)return 4;if(h<=123.625)return 5;if(h<=147.625)return 6;if(h<=171.625)return 7;return 8;}
