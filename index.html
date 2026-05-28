@@ -548,12 +548,50 @@ function setRotation(deg){save({bigRotation:deg});window._curRotation=deg;update
   window._curRotation = deg;
   const wrap = document.getElementById('big-label-preview-wrap');
   if(!wrap) return;
-  wrap.style.transition = 'transform 0.3s ease';
-  wrap.style.transform = 'rotate('+deg+'deg)';
-  wrap.style.transformOrigin = 'center center';
-  const is90or270 = deg===90 || deg===270;
-  wrap.style.marginTop = is90or270 ? '80px' : '0';
-  wrap.style.marginBottom = is90or270 ? '80px' : '0';
+  const svg = document.getElementById('bl-wo-svg');
+  const panel = document.getElementById('bl-panel');
+  if(!svg || !panel) return;
+
+  // Remove CSS transform - instead rebuild the container shape
+  wrap.style.transform = '';
+  wrap.style.margin = '0';
+
+  const is90or270 = deg === 90 || deg === 270;
+
+  if(is90or270){
+    // Landscape: wide and short
+    wrap.style.aspectRatio = '2/1';
+    wrap.style.maxHeight = '160px';
+    wrap.style.minHeight = '100px';
+    svg.setAttribute('viewBox', '0 0 500 200');
+    svg.querySelector('text').setAttribute('x', '250');
+    svg.querySelector('text').setAttribute('y', '105');
+    svg.querySelector('text').setAttribute('font-size', '55');
+    svg.querySelector('text').setAttribute('textLength', '480');
+    if(deg === 270){
+      panel.style.textAlign = 'left';
+    } else {
+      panel.style.textAlign = 'right';
+    }
+  } else {
+    // Portrait: tall and narrow (original)
+    wrap.style.aspectRatio = '1/2';
+    wrap.style.maxHeight = '350px';
+    wrap.style.minHeight = '200px';
+    svg.setAttribute('viewBox', '0 0 270 200');
+    svg.querySelector('text').setAttribute('x', '135');
+    svg.querySelector('text').setAttribute('y', '100');
+    svg.querySelector('text').setAttribute('font-size', '55');
+    svg.querySelector('text').setAttribute('textLength', '258');
+    panel.style.textAlign = 'right';
+    if(deg === 180){
+      // Upside down: flip text
+      svg.style.transform = 'rotate(180deg)';
+      panel.style.textAlign = 'left';
+    } else {
+      svg.style.transform = '';
+    }
+  }
 }async function checkServer() {
   try {
     const r = await fetch(SERVER_URL + '/ping', {signal: AbortSignal.timeout(1500)});
