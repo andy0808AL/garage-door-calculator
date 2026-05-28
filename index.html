@@ -444,7 +444,7 @@ function updateLabels(){
   const height=document.getElementById('height').value;
   const hasLabel=wo||mark||lites||glass||frame;
   document.getElementById('label-missing').style.display=hasLabel?'none':'block';
-  document.getElementById('label-content').style.display=hasLabel?'block':'none';
+  document.getElementById('label-content').style.display=hasLabel?'block':'none'; if(hasLabel) setTimeout(()=>applyPreviewRotation(window._curRotation||load().bigRotation||0),50);
   if(!hasLabel)return;
   if(panels>=2){labelRoles=['Top',...Array.from({length:panels-2},(_,i)=>'Center '+(i+1)),'Bottom'];}
   else{labelRoles=['Top'];}
@@ -544,7 +544,17 @@ const SERVER_URL = 'http://localhost:5000';
 let serverAvailable = false;
 let serverPrinters = [];
 
-function setRotation(deg){save({bigRotation:deg});updateRotationUI(deg);applyPreviewRotation(deg);fetch(SERVER_URL+"/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bigRotation:deg})}).then(r=>r.json()).then(()=>{toast("✓ Rotation set to "+deg+"°",2000);}).catch(()=>{});}function updateRotationUI(deg){[0,90,180,270].forEach(d=>{const b=document.getElementById("rot-"+d);if(b)b.classList.toggle("active",d===deg);});const l=document.getElementById("lbl-rotation");const d2=document.getElementById("dot-rotation");if(l)l.textContent=deg+"° current rotation";if(d2)d2.className="status-dot";applyPreviewRotation(deg);}function applyPreviewRotation(deg){const wrap=document.getElementById("big-label-preview-wrap");if(!wrap)return;const is90or270=deg===90||deg===270;if(is90or270){wrap.style.transform="rotate("+deg+"deg)";wrap.style.transformOrigin="center center";wrap.style.width="auto";wrap.style.marginTop="60px";wrap.style.marginBottom="60px";}else{wrap.style.transform="rotate("+deg+"deg)";wrap.style.transformOrigin="center center";wrap.style.marginTop="0";wrap.style.marginBottom="0";}}async function checkServer() {
+function setRotation(deg){save({bigRotation:deg});window._curRotation=deg;updateRotationUI(deg);applyPreviewRotation(deg);fetch(SERVER_URL+"/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bigRotation:deg})}).then(r=>r.json()).then(()=>{toast("✓ Rotation set to "+deg+"°",2000);}).catch(()=>{});}function updateRotationUI(deg){[0,90,180,270].forEach(d=>{const b=document.getElementById("rot-"+d);if(b)b.classList.toggle("active",d===deg);});const l=document.getElementById("lbl-rotation");const d2=document.getElementById("dot-rotation");if(l)l.textContent=deg+"° current rotation";if(d2)d2.className="status-dot";applyPreviewRotation(deg);}function applyPreviewRotation(deg){
+  window._curRotation = deg;
+  const wrap = document.getElementById('big-label-preview-wrap');
+  if(!wrap) return;
+  wrap.style.transition = 'transform 0.3s ease';
+  wrap.style.transform = 'rotate('+deg+'deg)';
+  wrap.style.transformOrigin = 'center center';
+  const is90or270 = deg===90 || deg===270;
+  wrap.style.marginTop = is90or270 ? '80px' : '0';
+  wrap.style.marginBottom = is90or270 ? '80px' : '0';
+}async function checkServer() {
   try {
     const r = await fetch(SERVER_URL + '/ping', {signal: AbortSignal.timeout(1500)});
     const d = await r.json();
