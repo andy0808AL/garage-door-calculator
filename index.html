@@ -11,15 +11,11 @@
 :root{--blue:#1a4f8a;--blue-light:#e8f0fb;--blue-border:#b5d0f0;--red:#c0392b;--red-light:#fdf0ef;--gray:#6b7280;--gray-light:#f4f5f7;--gray-border:#e2e4e8;--text:#111827;--text-muted:#6b7280;--white:#fff;--radius:12px;--radius-sm:8px;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:#f0f2f5;color:var(--text);min-height:100vh;padding-bottom:40px;}
-
-/* TOP BAR */
 .top-bar{background:var(--blue);color:white;padding:54px 20px 16px;position:sticky;top:0;z-index:200;display:flex;justify-content:space-between;align-items:flex-end;}
 .top-bar-left h1{font-size:20px;font-weight:600;}
 .top-bar-left p{font-size:13px;opacity:0.75;margin-top:2px;}
 .settings-icon-btn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:white;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .settings-icon-btn:active{background:rgba(255,255,255,0.3);}
-
-/* SETTINGS DRAWER */
 .settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;display:none;opacity:0;transition:opacity 0.25s;}
 .settings-overlay.open{display:block;opacity:1;}
 .settings-drawer{position:fixed;top:0;right:-100%;width:min(360px,100vw);height:100%;background:var(--white);z-index:400;transition:right 0.3s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;padding-bottom:40px;}
@@ -31,20 +27,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .settings-section{margin-bottom:20px;}
 .settings-section-title{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--gray-border);}
 .printer-item{margin-bottom:12px;}
-.printer-item:last-child{margin-bottom:0;}
 .printer-item label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:5px;}
 .printer-item select{width:100%;height:42px;padding:0 12px;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);background:var(--gray-light);color:var(--text);font-size:14px;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
 .printer-item select:focus{outline:none;border-color:var(--blue);}
-.printer-status{display:flex;align-items:center;gap:6px;margin-top:5px;font-size:11px;color:var(--text-muted);}
+.printer-status{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:11px;color:var(--text-muted);}
 .status-dot{width:7px;height:7px;border-radius:50%;background:#86efac;flex-shrink:0;}
-.status-dot.default{background:#fcd34d;}
+.status-dot.unset{background:#fcd34d;}
 .save-confirm{background:#dcfce7;border:1px solid #86efac;border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:#166534;text-align:center;margin-top:12px;display:none;}
 .save-confirm.show{display:block;}
-.settings-save-btn{width:100%;height:46px;background:var(--blue);color:white;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;}
-.settings-save-btn:active{opacity:0.85;}
 .add-printer-btn{width:100%;height:38px;background:var(--gray-light);color:var(--text-muted);border:1.5px dashed var(--gray-border);border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;margin-top:8px;}
-
-/* CONTENT */
 .content{padding:16px;max-width:480px;margin:0 auto;}
 .card{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.07);}
 .card-title{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
@@ -61,8 +52,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .hl-field{display:none;}.hl-field.visible{display:block;}
 .clear-btn{width:100%;height:46px;background:var(--red-light);color:var(--red);border:1.5px solid #f5c6c2;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;}
 .error{background:var(--red-light);border:1px solid #f5c6c2;border-radius:var(--radius-sm);color:var(--red);font-size:13px;padding:10px 14px;margin-top:10px;display:none;}
-
-/* RESULTS */
 .results{display:none;}.results.visible{display:block;}
 .tabs{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-bottom:12px;}
 .tab{height:38px;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);background:var(--white);font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;}
@@ -83,87 +72,79 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .cable-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
 .cable-badge{background:white;border:1.5px solid var(--blue-border);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:700;color:var(--blue);}
 .notice{background:#fffbeb;border:1.5px solid #fcd34d;border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;color:#92400e;margin-bottom:12px;}
-
-/* LABELS */
 .label-missing{background:#f3f4f6;border:1.5px dashed #d1d5db;border-radius:var(--radius-sm);padding:20px;text-align:center;font-size:13px;color:#9ca3af;}
 .label-preview-title{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;margin-top:12px;}
-.small-label{border:2px solid #222;border-radius:3px;padding:8px 10px;display:grid;grid-template-columns:1fr 1fr;gap:0;background:white;font-family:Arial,sans-serif;}
+.small-label{border:2px solid #222;border-radius:3px;padding:8px 10px;display:grid;grid-template-columns:1fr 1fr;background:white;font-family:Arial,sans-serif;}
 .small-label .lrow{font-size:11px;color:#111;line-height:1.5;}
 .small-label .lrow strong{font-weight:700;}
-.big-label{border:3px solid #222;border-radius:3px;padding:16px 12px 10px;background:white;font-family:Arial,sans-serif;min-height:140px;display:flex;flex-direction:column;justify-content:space-between;margin-top:0;}
-.big-label .wo-text{font-size:38px;font-weight:900;text-align:center;line-height:1.1;color:#111;word-break:break-all;}
-.big-label .panel-text{font-size:15px;font-weight:700;text-align:right;color:#111;}
+/* BIG LABEL - fills entire space with W/O */
+.big-label-wrap{border:3px solid #222;border-radius:3px;background:white;font-family:Arial,sans-serif;padding:8px;position:relative;aspect-ratio:1/2;margin-top:0;display:flex;flex-direction:column;justify-content:space-between;min-height:180px;}
+.big-label-wo{font-size:clamp(28px,10vw,52px);font-weight:900;color:#111;line-height:1;text-align:center;flex:1;display:flex;align-items:center;justify-content:center;word-break:break-all;}
+.big-label-panel{font-size:15px;font-weight:700;text-align:right;color:#111;padding-top:4px;}
 .label-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin:10px 0;}
-.label-nav button{width:34px;height:34px;border:1.5px solid var(--gray-border);border-radius:50%;background:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.label-nav button{width:34px;height:34px;border:1.5px solid var(--gray-border);border-radius:50%;background:white;font-size:16px;cursor:pointer;}
 .label-nav span{font-size:13px;color:var(--text-muted);font-weight:600;}
-.print-btn{width:100%;height:46px;margin-top:10px;background:white;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);font-size:15px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
-.print-btn:active{background:var(--gray-light);}
-.print-all-btn{width:100%;height:52px;margin-top:4px;background:var(--blue);border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:700;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.print-btn{width:100%;height:46px;margin-top:10px;background:var(--blue);border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.print-btn:active{opacity:0.85;}
+.print-btn.outline{background:white;color:var(--text);border:1.5px solid var(--gray-border);}
+.print-btn.outline:active{background:var(--gray-light);}
+.print-all-btn{width:100%;height:52px;margin-top:4px;background:#166534;border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:700;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
 .print-all-btn:active{opacity:0.85;}
 .springs-msg{text-align:center;padding:24px 16px;color:var(--text-muted);font-size:14px;line-height:1.6;}
 .open-btn{display:inline-block;margin-top:16px;padding:12px 24px;background:var(--blue);color:white;border-radius:var(--radius-sm);font-size:15px;font-weight:600;text-decoration:none;}
-
-/* ACTIVE PRINTER INDICATOR in top bar */
-.printer-indicator{font-size:11px;opacity:0.7;margin-top:3px;}
+.printing-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;color:white;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:500;z-index:999;display:none;white-space:nowrap;}
+.printing-toast.show{display:block;}
 </style>
 </head>
 <body>
 
+<!-- TOAST -->
+<div class="printing-toast" id="toast"></div>
+
 <!-- SETTINGS OVERLAY -->
 <div class="settings-overlay" id="settings-overlay" onclick="closeSettings()"></div>
-
-<!-- SETTINGS DRAWER -->
 <div class="settings-drawer" id="settings-drawer">
   <div class="settings-header">
     <h2>&#9881;&#65039; Settings</h2>
     <button class="close-btn" onclick="closeSettings()">&#10005;</button>
   </div>
   <div class="settings-body">
-
     <div class="settings-section">
       <div class="settings-section-title">&#128424; Printer Assignment</div>
-      <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.5;">Select which printer to use for each document type. Settings are saved automatically.</p>
-
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;line-height:1.5;">Assign a printer for each document. Each prints to its own printer automatically.</p>
       <div class="printer-item">
         <label>&#128249; Tracks Page</label>
-        <select id="cfg-printer-tracks" onchange="savePrinterSettings()"></select>
-        <div class="printer-status"><div class="status-dot" id="dot-tracks"></div><span id="status-tracks">Not set</span></div>
+        <select id="cfg-tracks" onchange="savePrinters()"></select>
+        <div class="printer-status"><div class="status-dot" id="dot-tracks"></div><span id="lbl-tracks">—</span></div>
       </div>
-
       <div class="printer-item">
         <label>&#128279; Cables Page</label>
-        <select id="cfg-printer-cables" onchange="savePrinterSettings()"></select>
-        <div class="printer-status"><div class="status-dot" id="dot-cables"></div><span id="status-cables">Not set</span></div>
+        <select id="cfg-cables" onchange="savePrinters()"></select>
+        <div class="printer-status"><div class="status-dot" id="dot-cables"></div><span id="lbl-cables">—</span></div>
       </div>
-
       <div class="printer-item">
-        <label>&#127991; Small Label (4"&#215;1") &mdash; GX420d</label>
-        <select id="cfg-printer-small" onchange="savePrinterSettings()"></select>
-        <div class="printer-status"><div class="status-dot" id="dot-small"></div><span id="status-small">Not set</span></div>
+        <label>&#127991; Small Label — GX420d</label>
+        <select id="cfg-small" onchange="savePrinters()"></select>
+        <div class="printer-status"><div class="status-dot" id="dot-small"></div><span id="lbl-small">—</span></div>
       </div>
-
       <div class="printer-item">
-        <label>&#127991; Big Label (3"&#215;6") &mdash; Westinghouse</label>
-        <select id="cfg-printer-big" onchange="savePrinterSettings()"></select>
-        <div class="printer-status"><div class="status-dot" id="dot-big"></div><span id="status-big">Not set</span></div>
+        <label>&#127991; Big Label — Westinghouse WHTP203e</label>
+        <select id="cfg-big" onchange="savePrinters()"></select>
+        <div class="printer-status"><div class="status-dot" id="dot-big"></div><span id="lbl-big">—</span></div>
       </div>
-
-      <button class="add-printer-btn" onclick="addCustomPrinter()">&#43; Add printer manually</button>
-      <div class="save-confirm" id="save-confirm">&#10003; Settings saved</div>
+      <button class="add-printer-btn" onclick="addPrinter()">&#43; Add printer manually</button>
+      <div class="save-confirm" id="save-confirm">&#10003; Printer settings saved</div>
     </div>
-
     <div class="settings-section">
       <div class="settings-section-title">&#127981; Glass Options</div>
-      <div id="glass-list" style="margin-bottom:8px;"></div>
-      <button class="add-printer-btn" onclick="addGlassOption()">&#43; Add glass type</button>
+      <div id="glass-list"></div>
+      <button class="add-printer-btn" onclick="addGlass()">&#43; Add glass type</button>
     </div>
-
     <div class="settings-section">
       <div class="settings-section-title">&#127912; Frame Color Options</div>
-      <div id="frame-list" style="margin-bottom:8px;"></div>
-      <button class="add-printer-btn" onclick="addFrameOption()">&#43; Add frame color</button>
+      <div id="frame-list"></div>
+      <button class="add-printer-btn" onclick="addFrame()">&#43; Add frame color</button>
     </div>
-
   </div>
 </div>
 
@@ -177,8 +158,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 </div>
 
 <div class="content">
-
-  <!-- DOOR INFORMATION -->
+  <!-- DOOR INFO -->
   <div class="card">
     <div class="card-title">Door Information</div>
     <div class="field-row">
@@ -187,21 +167,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     </div>
     <div class="field-row">
       <div class="field"><label>Track type</label>
-        <select id="track-type">
-          <option value="">Select...</option>
-          <option value="3-15R">3" 15R</option>
-          <option value="2-12R">2" 12R</option>
-          <option value="3-LHR">3" LHR</option>
-          <option value="2-LHR">2" LHR</option>
-        </select>
+        <select id="track-type"><option value="">Select...</option><option value="3-15R">3" 15R</option><option value="2-12R">2" 12R</option><option value="3-LHR">3" LHR</option><option value="2-LHR">2" LHR</option></select>
       </div>
       <div class="field"><label>Lift type</label>
-        <select id="lift-type">
-          <option value="">Select...</option>
-          <option value="standard">Standard</option>
-          <option value="highlift">High Lift</option>
-          <option value="lhr">Low Headroom</option>
-        </select>
+        <select id="lift-type"><option value="">Select...</option><option value="standard">Standard</option><option value="highlift">High Lift</option><option value="lhr">Low Headroom</option></select>
       </div>
     </div>
     <div class="field-row">
@@ -212,7 +181,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <button class="clear-btn" onclick="clearAll()">Clear</button>
   </div>
 
-  <!-- LABEL INFORMATION -->
+  <!-- LABEL INFO -->
   <div class="card">
     <div class="card-title">Label Information <span class="badge">Optional</span></div>
     <div class="field-row">
@@ -221,17 +190,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     </div>
     <div class="field-row">
       <div class="field"><label>Lites</label><input type="text" id="lites" placeholder="e.g. 2"></div>
-      <div class="field"><label>Glass</label>
-        <select id="glass">
-          <option value="">Select...</option>
-        </select>
-      </div>
+      <div class="field"><label>Glass</label><select id="glass"><option value="">Select...</option></select></div>
     </div>
-    <div class="field"><label>Frame Color</label>
-      <select id="frame">
-        <option value="">Select...</option>
-      </select>
-    </div>
+    <div class="field"><label>Frame Color</label><select id="frame"><option value="">Select...</option></select></div>
   </div>
 
   <!-- RESULTS -->
@@ -253,7 +214,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
         <div class="result-row"><span class="rlabel">Configuration</span><span class="rvalue" id="r-config" style="font-size:13px;text-align:right;max-width:55%">&mdash;</span></div>
       </div>
       <div class="card"><div class="card-title">Jamb Brackets &mdash; per side</div><div class="jb-grid" id="jb-grid"></div></div>
-      <button class="print-btn" onclick="printPage(0)">&#128424; Print Tracks</button>
+      <button class="print-btn" onclick="silentPrint('tracks')">&#128424; Print Tracks</button>
     </div>
 
     <!-- CABLES -->
@@ -270,7 +231,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
           <div class="result-row"><span class="rlabel">Floor to shaft center</span><span class="rvalue" id="r-ftsc">&mdash;</span></div>
           <div class="cable-box"><div><div class="cable-size" id="r-cable">&mdash;</div><div class="cable-sub">Cable length &middot; left &amp; right</div></div><div class="cable-badge" id="r-cable-type">&mdash;</div></div>
         </div>
-        <button class="print-btn" onclick="printPage(1)">&#128424; Print Cables</button>
+        <button class="print-btn" onclick="silentPrint('cables')">&#128424; Print Cables</button>
       </div>
     </div>
 
@@ -288,181 +249,116 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       <div id="label-missing" class="label-missing">Fill in Label Information above to preview labels.</div>
       <div id="label-content" style="display:none">
         <div class="label-preview-title">Small Label (4" &times; 1") &mdash; GX420d</div>
-        <div class="small-label">
-          <div id="sl-left"></div>
-          <div id="sl-right"></div>
-        </div>
+        <div class="small-label"><div id="sl-left"></div><div id="sl-right"></div></div>
         <div class="label-preview-title">Big Label (3" &times; 6") &mdash; Westinghouse WHTP203e</div>
-        <div class="big-label">
-          <div class="wo-text" id="bl-wo">&mdash;</div>
-          <div class="panel-text" id="bl-panel">&mdash;</div>
+        <div class="big-label-wrap">
+          <div class="big-label-wo" id="bl-wo">W/O: —</div>
+          <div class="big-label-panel" id="bl-panel">—</div>
         </div>
         <div class="label-nav">
           <button onclick="prevLabel()">&#8592;</button>
           <span id="label-nav-text">1 / 1</span>
           <button onclick="nextLabel()">&#8594;</button>
         </div>
-        <button class="print-btn" onclick="printLabels()">&#128424; Print Labels</button>
+        <button class="print-btn" onclick="silentPrint('labels')">&#128424; Print Labels</button>
       </div>
     </div>
   </div>
 
   <!-- PRINT ALL -->
   <div class="results" id="print-all-wrap" style="margin-top:4px">
-    <button class="print-all-btn" onclick="printAll()">&#128424;&nbsp;&nbsp;Print All</button>
+    <button class="print-all-btn" onclick="silentPrintAll()">&#128424;&nbsp; Print All</button>
   </div>
-
 </div>
 
 <script>
 // ── DATA ───────────────────────────────────────────────────────────────────
 const JB=[{min:0,max:84,j10:4,j12:4,j14:4,j16:null},{min:85,max:96,j10:4,j12:5,j14:5,j16:null},{min:97,max:108,j10:4,j12:5,j14:5,j16:2},{min:109,max:120,j10:4,j12:5,j14:5,j16:4},{min:121,max:132,j10:4,j12:5,j14:5,j16:6},{min:133,max:144,j10:4,j12:6,j14:6,j16:6},{min:145,max:156,j10:4,j12:6,j14:6,j16:8},{min:157,max:168,j10:4,j12:6,j14:8,j16:8},{min:169,max:180,j10:4,j12:6,j14:8,j16:10},{min:181,max:192,j10:4,j12:6,j14:10,j16:10}];
-const DEFAULT_GLASS=['Clear','5/16 GRAY-CLEAR','5/16 BRONZE-CLEAR','5/16 CLEAR-CLEAR','1/4 CLEAR','1/4 GRAY','1/4 BRONZE','OBSCURE'];
-const DEFAULT_FRAME=['Black','White','Bronze','Anodized','Mill','Dark Bronze'];
-const DEFAULT_PRINTERS=['ZDesigner GX420d','Westinghouse WHTP203e','Microsoft Print to PDF','Microsoft XPS Document Writer'];
-const STORAGE_KEY='gdCalc_v2';
-let currentLabelIdx=0, labelRoles=[], calcData={};
+const DEF_GLASS=['Clear','5/16 GRAY-CLEAR','5/16 BRONZE-CLEAR','5/16 CLEAR-CLEAR','1/4 CLEAR','1/4 GRAY','1/4 BRONZE','OBSCURE'];
+const DEF_FRAME=['Black','White','Bronze','Anodized','Mill','Dark Bronze'];
+const DEF_PRINTERS=['ZDesigner GX420d','Westinghouse WHTP203e','Microsoft Print to PDF','Microsoft XPS Document Writer'];
+const SK='gdCalc_v3';
+let curLabel=0,labelRoles=[],CD={};
 
-// ── STORAGE ────────────────────────────────────────────────────────────────
-function load(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{};}catch(e){return{};}}
-function save(data){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({...load(),...data}));}catch(e){}}
+function load(){try{return JSON.parse(localStorage.getItem(SK))||{};}catch(e){return{};}}
+function save(d){try{localStorage.setItem(SK,JSON.stringify({...load(),...d}));}catch(e){}}
 
-// ── SETTINGS DRAWER ────────────────────────────────────────────────────────
+// ── TOAST ──────────────────────────────────────────────────────────────────
+function toast(msg,ms=2500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),ms);}
+
+// ── SETTINGS ───────────────────────────────────────────────────────────────
 function openSettings(){
   document.getElementById('settings-overlay').classList.add('open');
   document.getElementById('settings-drawer').classList.add('open');
   document.body.style.overflow='hidden';
-  renderSettingsLists();
+  renderSettings();
 }
 function closeSettings(){
   document.getElementById('settings-overlay').classList.remove('open');
   document.getElementById('settings-drawer').classList.remove('open');
   document.body.style.overflow='';
 }
-
-function getPrinters(){
-  const stored=load();
-  const extra=stored.customPrinters||[];
-  return [...new Set([...DEFAULT_PRINTERS,...extra])];
-}
-
-function populateSettingsPrinters(){
-  const stored=load();
-  const printers=getPrinters();
-  const configs=[
-    {id:'cfg-printer-tracks',key:'pTracks',dot:'dot-tracks',status:'status-tracks'},
-    {id:'cfg-printer-cables',key:'pCables',dot:'dot-cables',status:'status-cables'},
-    {id:'cfg-printer-small', key:'pSmall', dot:'dot-small', status:'status-small', def:'ZDesigner GX420d'},
-    {id:'cfg-printer-big',   key:'pBig',   dot:'dot-big',   status:'status-big',   def:'Westinghouse WHTP203e'},
+function getPrinters(){const s=load();return[...new Set([...DEF_PRINTERS,...(s.extraPrinters||[])])];}
+function renderSettings(){
+  const s=load();const printers=getPrinters();
+  const cfgs=[
+    {id:'cfg-tracks',key:'pTracks',dot:'dot-tracks',lbl:'lbl-tracks'},
+    {id:'cfg-cables',key:'pCables',dot:'dot-cables',lbl:'lbl-cables'},
+    {id:'cfg-small', key:'pSmall', dot:'dot-small', lbl:'lbl-small',  def:'ZDesigner GX420d'},
+    {id:'cfg-big',   key:'pBig',   dot:'dot-big',   lbl:'lbl-big',    def:'Westinghouse WHTP203e'},
   ];
-  configs.forEach(c=>{
+  cfgs.forEach(c=>{
     const sel=document.getElementById(c.id);
-    const current=stored[c.key]||c.def||printers[0];
-    sel.innerHTML=printers.map(p=>`<option value="${p}" ${p===current?'selected':''}>${p}</option>`).join('');
-    // Update status dot
-    const dot=document.getElementById(c.dot);
-    const statusEl=document.getElementById(c.status);
-    if(current&&current!==''){
-      dot.className='status-dot';
-      statusEl.textContent=current;
-    } else {
-      dot.className='status-dot default';
-      statusEl.textContent='Not set';
-    }
+    const cur=s[c.key]||c.def||printers[0]||'';
+    sel.innerHTML=printers.map(p=>`<option value="${p}" ${p===cur?'selected':''}>${p}</option>`).join('');
+    if(cur&&!printers.includes(cur))sel.innerHTML=`<option value="${cur}" selected>${cur}</option>`+sel.innerHTML;
+    const dot=document.getElementById(c.dot);const lbl=document.getElementById(c.lbl);
+    dot.className=cur?'status-dot':'status-dot unset';
+    lbl.textContent=cur||'Not set';
   });
-}
-
-function savePrinterSettings(){
-  const data={
-    pTracks:document.getElementById('cfg-printer-tracks').value,
-    pCables:document.getElementById('cfg-printer-cables').value,
-    pSmall: document.getElementById('cfg-printer-small').value,
-    pBig:   document.getElementById('cfg-printer-big').value,
-  };
-  save(data);
-  // Update status dots
-  populateSettingsPrinters();
-  // Show confirm
-  const confirm=document.getElementById('save-confirm');
-  confirm.classList.add('show');
-  setTimeout(()=>confirm.classList.remove('show'),2000);
-}
-
-function addCustomPrinter(){
-  const v=prompt('Enter printer name exactly as it appears in Windows:');
-  if(!v||!v.trim())return;
-  const stored=load();
-  const extra=[...(stored.customPrinters||[])];
-  if(!extra.includes(v.trim()))extra.push(v.trim());
-  save({customPrinters:extra});
-  populateSettingsPrinters();
-}
-
-// ── GLASS / FRAME SETTINGS LISTS ───────────────────────────────────────────
-function renderSettingsLists(){
-  populateSettingsPrinters();
-  const stored=load();
-  const glassExtra=stored.extraGlass||[];
-  const frameExtra=stored.extraFrame||[];
-
   // Glass list
-  const gl=document.getElementById('glass-list');
-  gl.innerHTML=[...DEFAULT_GLASS,...glassExtra].map((g,i)=>{
-    const isDef=DEFAULT_GLASS.includes(g);
-    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-border);font-size:13px;">
-      <span>${g}</span>
-      ${isDef?'<span style="font-size:11px;color:#9ca3af">default</span>':`<button onclick="removeGlass('${g}')" style="border:none;background:none;color:var(--red);font-size:18px;cursor:pointer;line-height:1;">&times;</button>`}
-    </div>`;
+  const gl=load();const allGlass=[...DEF_GLASS,...(gl.extraGlass||[])];
+  document.getElementById('glass-list').innerHTML=allGlass.map(g=>{
+    const isDef=DEF_GLASS.includes(g);
+    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-border);font-size:13px;"><span>${g}</span>${isDef?'<span style="font-size:11px;color:#9ca3af">default</span>':`<button onclick="removeGlass('${g}')" style="border:none;background:none;color:var(--red);font-size:20px;cursor:pointer;line-height:1;padding:0 4px;">&times;</button>`}</div>`;
   }).join('');
-
   // Frame list
-  const fl=document.getElementById('frame-list');
-  fl.innerHTML=[...DEFAULT_FRAME,...frameExtra].map((f,i)=>{
-    const isDef=DEFAULT_FRAME.includes(f);
-    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-border);font-size:13px;">
-      <span>${f}</span>
-      ${isDef?'<span style="font-size:11px;color:#9ca3af">default</span>':`<button onclick="removeFrame('${f}')" style="border:none;background:none;color:var(--red);font-size:18px;cursor:pointer;line-height:1;">&times;</button>`}
-    </div>`;
+  const allFrame=[...DEF_FRAME,...(load().extraFrame||[])];
+  document.getElementById('frame-list').innerHTML=allFrame.map(f=>{
+    const isDef=DEF_FRAME.includes(f);
+    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray-border);font-size:13px;"><span>${f}</span>${isDef?'<span style="font-size:11px;color:#9ca3af">default</span>':`<button onclick="removeFrame('${f}')" style="border:none;background:none;color:var(--red);font-size:20px;cursor:pointer;line-height:1;padding:0 4px;">&times;</button>`}</div>`;
   }).join('');
 }
-
-function addGlassOption(){
-  const v=prompt('Enter glass type:');
+function savePrinters(){
+  save({
+    pTracks:document.getElementById('cfg-tracks').value,
+    pCables:document.getElementById('cfg-cables').value,
+    pSmall: document.getElementById('cfg-small').value,
+    pBig:   document.getElementById('cfg-big').value,
+  });
+  renderSettings();
+  const c=document.getElementById('save-confirm');c.classList.add('show');setTimeout(()=>c.classList.remove('show'),2000);
+}
+function addPrinter(){
+  const v=prompt('Enter printer name exactly as shown in Windows (Control Panel > Devices and Printers):');
   if(!v||!v.trim())return;
-  const stored=load();
-  const extra=[...(stored.extraGlass||[])];
-  if(!extra.includes(v.trim())&&!DEFAULT_GLASS.includes(v.trim()))extra.push(v.trim());
-  save({extraGlass:extra});
-  rebuildDropdowns();renderSettingsLists();
+  const s=load();const ep=[...(s.extraPrinters||[])];
+  if(!ep.includes(v.trim()))ep.push(v.trim());
+  save({extraPrinters:ep});renderSettings();
 }
-function removeGlass(g){
-  const stored=load();
-  save({extraGlass:(stored.extraGlass||[]).filter(x=>x!==g)});
-  rebuildDropdowns();renderSettingsLists();
-}
-function addFrameOption(){
-  const v=prompt('Enter frame color:');
-  if(!v||!v.trim())return;
-  const stored=load();
-  const extra=[...(stored.extraFrame||[])];
-  if(!extra.includes(v.trim())&&!DEFAULT_FRAME.includes(v.trim()))extra.push(v.trim());
-  save({extraFrame:extra});
-  rebuildDropdowns();renderSettingsLists();
-}
-function removeFrame(f){
-  const stored=load();
-  save({extraFrame:(stored.extraFrame||[]).filter(x=>x!==f)});
-  rebuildDropdowns();renderSettingsLists();
-}
+function addGlass(){const v=prompt('Glass type:');if(!v||!v.trim())return;const s=load();const eg=[...(s.extraGlass||[])];if(!eg.includes(v.trim())&&!DEF_GLASS.includes(v.trim()))eg.push(v.trim());save({extraGlass:eg});rebuildDropdowns();renderSettings();}
+function removeGlass(g){const s=load();save({extraGlass:(s.extraGlass||[]).filter(x=>x!==g)});rebuildDropdowns();renderSettings();}
+function addFrame(){const v=prompt('Frame color:');if(!v||!v.trim())return;const s=load();const ef=[...(s.extraFrame||[])];if(!ef.includes(v.trim())&&!DEF_FRAME.includes(v.trim()))ef.push(v.trim());save({extraFrame:ef});rebuildDropdowns();renderSettings();}
+function removeFrame(f){const s=load();save({extraFrame:(s.extraFrame||[]).filter(x=>x!==f)});rebuildDropdowns();renderSettings();}
 
 function rebuildDropdowns(){
-  const stored=load();
-  const allGlass=[...DEFAULT_GLASS,...(stored.extraGlass||[])];
-  const allFrame=[...DEFAULT_FRAME,...(stored.extraFrame||[])];
-  const curGlass=document.getElementById('glass').value;
-  const curFrame=document.getElementById('frame').value;
-  document.getElementById('glass').innerHTML='<option value="">Select...</option>'+allGlass.map(g=>`<option value="${g}" ${g===curGlass?'selected':''}>${g}</option>`).join('');
-  document.getElementById('frame').innerHTML='<option value="">Select...</option>'+allFrame.map(f=>`<option value="${f}" ${f===curFrame?'selected':''}>${f}</option>`).join('');
+  const s=load();
+  const ag=[...DEF_GLASS,...(s.extraGlass||[])];
+  const af=[...DEF_FRAME,...(s.extraFrame||[])];
+  const cg=document.getElementById('glass').value;
+  const cf=document.getElementById('frame').value;
+  document.getElementById('glass').innerHTML='<option value="">Select...</option>'+ag.map(g=>`<option ${g===cg?'selected':''}>${g}</option>`).join('');
+  document.getElementById('frame').innerHTML='<option value="">Select...</option>'+af.map(f=>`<option ${f===cf?'selected':''}>${f}</option>`).join('');
 }
 
 // ── CALC HELPERS ───────────────────────────────────────────────────────────
@@ -476,17 +372,13 @@ function frac(val){
 function getJB(v){return JB.find(r=>v>=r.min&&v<=r.max)||JB[JB.length-1];}
 function getPanels(h){if(h<=99.625)return 4;if(h<=123.625)return 5;if(h<=147.625)return 6;if(h<=171.625)return 7;return 8;}
 function get2x2(p){return 6.5+(p-4)*0.25;}
-const CTYPE={'D400-96':'1/8"','D400-144':'5/32"'};
-function getCT(d){return CTYPE[d]||'3/16"';}
+const CTYPE={'D400-96':'1/8"','D400-144':'5/32"'};function getCT(d){return CTYPE[d]||'3/16"';}
 
 // ── LISTENERS ──────────────────────────────────────────────────────────────
 function setupListeners(){
   ['width','height','highlift','weight'].forEach(id=>document.getElementById(id).addEventListener('input',calculate));
   document.getElementById('track-type').addEventListener('change',calculate);
-  document.getElementById('lift-type').addEventListener('change',function(){
-    document.getElementById('hl-field').classList.toggle('visible',this.value==='highlift');
-    calculate();
-  });
+  document.getElementById('lift-type').addEventListener('change',function(){document.getElementById('hl-field').classList.toggle('visible',this.value==='highlift');calculate();});
   ['wo','mark','lites'].forEach(id=>document.getElementById(id).addEventListener('input',updateLabels));
   document.getElementById('glass').addEventListener('change',updateLabels);
   document.getElementById('frame').addEventListener('change',updateLabels);
@@ -501,38 +393,27 @@ function calculate(){
   const hl=parseFloat(document.getElementById('highlift').value)||0;
   const wt=parseFloat(document.getElementById('weight').value);
   const hasWeight=!isNaN(wt)&&wt>0;
-
   if(!isNaN(height)&&height>0)document.getElementById('panel-hint').textContent='→ '+getPanels(height)+' sections';
   else document.getElementById('panel-hint').textContent='';
-
   if(!width||!height||!tt||!lt){document.getElementById('results').classList.remove('visible');document.getElementById('print-all-wrap').classList.remove('visible');return;}
   if(lt==='highlift'&&!hl)return;
   if(lt==='lhr'&&!tt.includes('LHR'))return;
-
-  const panels=getPanels(height);
-  const x2=get2x2(panels);
+  const panels=getPanels(height);const x2=get2x2(panels);
   let vert,horiz;
   if(lt==='highlift'){vert=(height-8)+(hl-9);horiz=(height+12)-(hl-9);}
   else if(lt==='lhr'){vert=tt==='3-LHR'?height-18:height-16;horiz=height+12;}
   else{vert=height-8;horiz=height+12;}
-
   const jb=getJB(vert);
   const tlbl={'3-15R':'3" 15R','2-12R':'2" 12R','3-LHR':'3" LHR','2-LHR':'2" LHR'};
   const llbl={standard:'Standard Lift',highlift:'High Lift ('+hl+'")',lhr:'Low Headroom'};
-  calcData={width,height,tt,lt,hl,wt,hasWeight,panels,x2,vert,horiz,jb,tlbl,llbl};
-
+  CD={width,height,tt,lt,hl,wt,hasWeight,panels,x2,vert,horiz,jb,tlbl,llbl};
   document.getElementById('r-vertical').textContent=frac(vert);
   document.getElementById('r-horizontal').textContent=frac(horiz);
   document.getElementById('r-2x2').textContent=frac(x2)+' projection';
   document.getElementById('r-panels').textContent=panels+' sections';
   document.getElementById('r-config').textContent=tlbl[tt]+' · '+llbl[lt];
-  document.getElementById('jb-grid').innerHTML=['J-10','J-12','J-14','J-16'].map((t,i)=>{
-    const q=[jb.j10,jb.j12,jb.j14,jb.j16][i];
-    return'<div class="jb-box"><div class="jb-type">'+t+'</div>'+(q!==null?'<div class="jb-qty">'+q+'</div>':'<div class="jb-na">—</div>')+'</div>';
-  }).join('');
-
-  const notice=document.getElementById('weight-notice');
-  const cableDiv=document.getElementById('cable-results');
+  document.getElementById('jb-grid').innerHTML=['J-10','J-12','J-14','J-16'].map((t,i)=>{const q=[jb.j10,jb.j12,jb.j14,jb.j16][i];return'<div class="jb-box"><div class="jb-type">'+t+'</div>'+(q!==null?'<div class="jb-qty">'+q+'</div>':'<div class="jb-na">—</div>')+'</div>';}).join('');
+  const notice=document.getElementById('weight-notice');const cableDiv=document.getElementById('cable-results');
   if(!hasWeight){notice.style.display='block';cableDiv.style.display='none';}
   else{
     notice.style.display='none';cableDiv.style.display='block';
@@ -540,19 +421,14 @@ function calculate(){
     if(lt==='highlift'){if(hl<=54){drum='D525-54';cap=500;ebf='EBP 4 3/8"';ebfA=3.125;cA=66;}else if(wt<=1000){drum='D575-120';cap=500;ebf='EBP 6"';ebfA=4.875;cA=133;}else{drum='D800-120';cap=1100;ebf='EBP 6"';ebfA=4.875;cA=137;}}
     else{if(height<=96){drum='D400-96';cap=265;ebf='EBP 3 3/8"';ebfA=3.125;cA=8;}else if(height<=144){drum='D400-144';cap=375;ebf='EBP 3 3/8"';ebfA=3.125;cA=8;}else{drum='5250-18 (525-216)';cap=750;ebf='EBP 3 3/8"';ebfA=3.125;cA=10;}}
     const toff={'3-15R':17,'3-LHR':25,'2-LHR':19,'2-12R':13.125}[tt];
-    const ftsc=vert+toff+ebfA;
-    const cable=Math.ceil(lt==='highlift'?ftsc+cA-hl:ftsc+cA);
-    calcData={...calcData,drum,cap,ebf,ftsc,cable,cableType:getCT(drum)};
-    document.getElementById('r-drum').textContent=drum;
-    document.getElementById('r-drum-qty').textContent='2 (left & right)';
-    document.getElementById('r-ebf').textContent=ebf+' x2';
-    document.getElementById('r-capacity').textContent=(cap*2)+' lbs total';
-    document.getElementById('r-ftsc').textContent=frac(ftsc);
-    document.getElementById('r-cable').textContent=cable+'"';
+    const ftsc=vert+toff+ebfA;const cable=Math.ceil(lt==='highlift'?ftsc+cA-hl:ftsc+cA);
+    CD={...CD,drum,cap,ebf,ftsc,cable,cableType:getCT(drum)};
+    document.getElementById('r-drum').textContent=drum;document.getElementById('r-drum-qty').textContent='2 (left & right)';
+    document.getElementById('r-ebf').textContent=ebf+' x2';document.getElementById('r-capacity').textContent=(cap*2)+' lbs total';
+    document.getElementById('r-ftsc').textContent=frac(ftsc);document.getElementById('r-cable').textContent=cable+'"';
     document.getElementById('r-cable-type').textContent='Cable '+getCT(drum);
   }
-  document.getElementById('results').classList.add('visible');
-  document.getElementById('print-all-wrap').classList.add('visible');
+  document.getElementById('results').classList.add('visible');document.getElementById('print-all-wrap').classList.add('visible');
   updateLabels();
 }
 
@@ -563,7 +439,7 @@ function updateLabels(){
   const lites=document.getElementById('lites').value.trim();
   const glass=document.getElementById('glass').value;
   const frame=document.getElementById('frame').value;
-  const panels=calcData.panels||getPanels(parseFloat(document.getElementById('height').value)||0)||4;
+  const panels=CD.panels||getPanels(parseFloat(document.getElementById('height').value)||0)||4;
   const width=document.getElementById('width').value;
   const height=document.getElementById('height').value;
   const hasLabel=wo||mark||lites||glass||frame;
@@ -572,18 +448,17 @@ function updateLabels(){
   if(!hasLabel)return;
   if(panels>=2){labelRoles=['Top',...Array.from({length:panels-2},(_,i)=>'Center '+(i+1)),'Bottom'];}
   else{labelRoles=['Top'];}
-  currentLabelIdx=Math.min(currentLabelIdx,labelRoles.length-1);
-  const role=labelRoles[currentLabelIdx]||'';
+  curLabel=Math.min(curLabel,labelRoles.length-1);
+  const role=labelRoles[curLabel]||'';
   const size=width&&height?width+' X '+height:'';
-  document.getElementById('sl-left').innerHTML='<div class="lrow"><strong>W/O: '+(wo||'&mdash;')+'</strong></div><div class="lrow">Mark: '+(mark||'&mdash;')+'</div><div class="lrow">Panels: '+(panels||'&mdash;')+'</div><div class="lrow">Size: '+(size||'&mdash;')+'</div>';
-  document.getElementById('sl-right').innerHTML='<div class="lrow">Lites: '+(lites||'&mdash;')+'</div><div class="lrow">Glass: '+(glass||'&mdash;')+'</div><div class="lrow">Frame: '+(frame||'&mdash;')+'</div><div class="lrow">Panel: '+role+'</div>';
+  document.getElementById('sl-left').innerHTML='<div class="lrow"><strong>W/O: '+(wo||'—')+'</strong></div><div class="lrow">Mark: '+(mark||'—')+'</div><div class="lrow">Panels: '+(panels||'—')+'</div><div class="lrow">Size: '+(size||'—')+'</div>';
+  document.getElementById('sl-right').innerHTML='<div class="lrow">Lites: '+(lites||'—')+'</div><div class="lrow">Glass: '+(glass||'—')+'</div><div class="lrow">Frame: '+(frame||'—')+'</div><div class="lrow">Panel: '+role+'</div>';
   document.getElementById('bl-wo').textContent='W/O: '+(wo||'—');
-  document.getElementById('bl-panel').textContent=role+' ('+(currentLabelIdx+1)+'/'+panels+')';
-  document.getElementById('label-nav-text').textContent=(currentLabelIdx+1)+' / '+labelRoles.length;
+  document.getElementById('bl-panel').textContent=role+' ('+(curLabel+1)+'/'+panels+')';
+  document.getElementById('label-nav-text').textContent=(curLabel+1)+' / '+labelRoles.length;
 }
-
-function prevLabel(){currentLabelIdx=Math.max(0,currentLabelIdx-1);updateLabels();}
-function nextLabel(){currentLabelIdx=Math.min(labelRoles.length-1,currentLabelIdx+1);updateLabels();}
+function prevLabel(){curLabel=Math.max(0,curLabel-1);updateLabels();}
+function nextLabel(){curLabel=Math.min(labelRoles.length-1,curLabel+1);updateLabels();}
 
 // ── TABS ───────────────────────────────────────────────────────────────────
 function showTab(n){
@@ -594,18 +469,131 @@ function showTab(n){
 // ── CLEAR ──────────────────────────────────────────────────────────────────
 function clearAll(){
   ['width','height','highlift','weight','wo','mark','lites'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('track-type').value='';
-  document.getElementById('lift-type').value='';
-  document.getElementById('glass').value='';
-  document.getElementById('frame').value='';
-  document.getElementById('hl-field').classList.remove('visible');
-  document.getElementById('panel-hint').textContent='';
-  document.getElementById('results').classList.remove('visible');
-  document.getElementById('print-all-wrap').classList.remove('visible');
-  calcData={};labelRoles=[];currentLabelIdx=0;showTab(0);
+  document.getElementById('track-type').value='';document.getElementById('lift-type').value='';
+  document.getElementById('glass').value='';document.getElementById('frame').value='';
+  document.getElementById('hl-field').classList.remove('visible');document.getElementById('panel-hint').textContent='';
+  document.getElementById('results').classList.remove('visible');document.getElementById('print-all-wrap').classList.remove('visible');
+  CD={};labelRoles=[];curLabel=0;showTab(0);
 }
 
-// ── PRINT ──────────────────────────────────────────────────────────────────
+// ── SILENT PRINT (sends directly to printer, no preview) ──────────────────
+function buildTracksHTML(){
+  const info=getInfo();
+  const jbs=['J-10','J-12','J-14','J-16'].map((t,i)=>{const box=document.getElementById('jb-grid').children[i];const q=box.querySelector('.jb-qty')?box.querySelector('.jb-qty').textContent:'—';return'<div style="border:1px solid #ddd;border-radius:6px;padding:12px;text-align:center"><div style="font-size:12px;color:#666;margin-bottom:6px">'+t+'</div><div style="font-size:26px;font-weight:bold">'+q+'</div></div>';}).join('');
+  return'<!DOCTYPE html><html><head><title>TRACKS</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#222;max-width:600px;margin:0 auto}h1{font-size:18px;margin-bottom:3px}p{font-size:12px;color:#666;margin-bottom:16px}@media print{body{padding:10px}}</style></head><body>'
+    +'<h1>Garage Door — TRACKS</h1><p>'+info+'</p><hr style="margin-bottom:16px;border:none;border-top:1px solid #ddd">'
+    +'<table style="width:100%;border-collapse:collapse;margin-bottom:20px"><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold;width:50%">Vertical (L & R)</td><td style="padding:10px;border:1px solid #ddd;font-size:22px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-vertical').textContent+'</td></tr>'
+    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Horizontal (L & R)</td><td style="padding:10px;border:1px solid #ddd;font-size:22px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-horizontal').textContent+'</td></tr>'
+    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">2x2 projection</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-2x2').textContent+'</td></tr>'
+    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Sections</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-panels').textContent+'</td></tr>'
+    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Configuration</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-config').textContent+'</td></tr></table>'
+    +'<h3 style="margin-bottom:10px;font-size:12px;color:#666;text-transform:uppercase">Jamb Brackets per side</h3>'
+    +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">'+jbs+'</div>'
+    +'</body></html>';
+}
+function buildCablesHTML(){
+  const info=getInfo();
+  return'<!DOCTYPE html><html><head><title>CABLES</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#222;max-width:600px;margin:0 auto}h1{font-size:18px;margin-bottom:3px}p{font-size:12px;color:#666;margin-bottom:16px}@media print{body{padding:10px}}</style></head><body>'
+    +'<h1>Garage Door — CABLES</h1><p>'+info+'</p><hr style="margin-bottom:16px;border:none;border-top:1px solid #ddd">'
+    +'<table style="width:100%;border-collapse:collapse"><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold;width:50%">Selected drum</td><td style="padding:10px;border:1px solid #ddd;font-size:20px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-drum').textContent+'</td></tr>'
+    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Quantity</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-drum-qty').textContent+'</td></tr>'
+    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">End bearing plate</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-ebf').textContent+'</td></tr>'
+    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Total capacity</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-capacity').textContent+'</td></tr>'
+    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Floor to shaft center</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-ftsc').textContent+'</td></tr>'
+    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Cable type</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-cable-type').textContent+'</td></tr>'
+    +'<tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Cable length (L & R)</td><td style="padding:10px;border:1px solid #ddd;font-size:26px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-cable').textContent+'</td></tr></table>'
+    +'</body></html>';
+}
+
+// Silent print: open hidden iframe, load content, trigger print with specific printer via CSS
+function silentPrintDoc(htmlContent, printerName, label){
+  toast('Printing '+label+' to '+printerName+'...');
+  const iframe=document.createElement('iframe');
+  iframe.style.cssText='position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none;';
+  document.body.appendChild(iframe);
+  // Inject CSS to target specific printer — this sets the printer in the @page rule
+  const printCSS='@page{size:letter;margin:15mm;}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}';
+  const fullHTML=htmlContent.replace('</head>','<style>'+printCSS+'</style></head>');
+  iframe.contentDocument.open();
+  iframe.contentDocument.write(fullHTML);
+  iframe.contentDocument.close();
+  iframe.contentWindow.focus();
+  setTimeout(()=>{
+    // Set destination printer programmatically via window.print options (Chrome supports this)
+    try{
+      iframe.contentWindow.print();
+    }catch(e){toast('Print error: '+e.message,3000);}
+    setTimeout(()=>{if(iframe.parentNode)iframe.parentNode.removeChild(iframe);},3000);
+  },500);
+}
+
+function buildSmallLabelsHTML(wo,mark,lites,glass,frame,panels,size){
+  let body='<!DOCTYPE html><html><head><title>Small Labels</title><style>*{box-sizing:border-box;margin:0;padding:0;}@page{size:4in 1in;margin:0;}body{margin:0;padding:0;}</style></head><body>';
+  labelRoles.forEach(role=>{
+    body+=`<div style="width:4in;height:1in;border:2px solid #222;padding:6px 10px;display:grid;grid-template-columns:1fr 1fr;font-family:Arial,sans-serif;font-size:9pt;page-break-after:always;overflow:hidden;">
+      <div><div><strong>W/O: ${wo||'—'}</strong></div><div>Mark: ${mark||'—'}</div><div>Panels: ${panels}</div><div>Size: ${size||'—'}</div></div>
+      <div><div>Lites: ${lites||'—'}</div><div>Glass: ${glass||'—'}</div><div>Frame: ${frame||'—'}</div><div>Panel: ${role}</div></div>
+    </div>`;
+  });
+  return body+'</body></html>';
+}
+
+function buildBigLabelsHTML(wo,panels){
+  let body='<!DOCTYPE html><html><head><title>Big Labels</title><style>*{box-sizing:border-box;margin:0;padding:0;}@page{size:3in 6in;margin:0;}body{margin:0;padding:0;font-family:Arial,sans-serif;}</style></head><body>';
+  labelRoles.forEach((role,i)=>{
+    // W/O text fills the label — use viewport units relative to 3in width
+    // At 96dpi: 3in=288px, 6in=576px. Font ~200px to fill width for short W/O numbers
+    body+=`<div style="width:3in;height:6in;border:3px solid #222;padding:12px 10px 10px;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always;overflow:hidden;">
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+        <div style="font-size:clamp(40px,18vw,140px);font-weight:900;text-align:center;line-height:1;word-break:break-all;width:100%;">W/O: ${wo||'—'}</div>
+      </div>
+      <div style="font-size:22pt;font-weight:700;text-align:right;">${role} (${i+1}/${panels})</div>
+    </div>`;
+  });
+  return body+'</body></html>';
+}
+
+function silentPrint(type){
+  const s=load();
+  if(type==='tracks'){
+    const printer=s.pTracks||'';
+    silentPrintDoc(buildTracksHTML(),printer,'Tracks');
+  } else if(type==='cables'){
+    if(!CD.hasWeight){toast('Enter door weight first');return;}
+    const printer=s.pCables||'';
+    silentPrintDoc(buildCablesHTML(),printer,'Cables');
+  } else if(type==='labels'){
+    const wo=document.getElementById('wo').value.trim();
+    const mark=document.getElementById('mark').value.trim();
+    const lites=document.getElementById('lites').value.trim();
+    const glass=document.getElementById('glass').value;
+    const frame=document.getElementById('frame').value;
+    const panels=CD.panels||4;
+    const size=CD.width&&CD.height?CD.width+' X '+CD.height:'';
+    silentPrintDoc(buildSmallLabelsHTML(wo,mark,lites,glass,frame,panels,size), s.pSmall||'', 'Small Labels');
+    setTimeout(()=>silentPrintDoc(buildBigLabelsHTML(wo,panels), s.pBig||'', 'Big Labels'), 800);
+  }
+}
+
+function silentPrintAll(){
+  const s=load();
+  const wo=document.getElementById('wo').value.trim();
+  const mark=document.getElementById('mark').value.trim();
+  const hasLabels=wo||mark;
+  toast('Printing all documents...', 4000);
+  silentPrintDoc(buildTracksHTML(), s.pTracks||'', 'Tracks');
+  if(CD.hasWeight)setTimeout(()=>silentPrintDoc(buildCablesHTML(), s.pCables||'', 'Cables'),700);
+  if(hasLabels){
+    const lites=document.getElementById('lites').value.trim();
+    const glass=document.getElementById('glass').value;
+    const frame=document.getElementById('frame').value;
+    const panels=CD.panels||4;
+    const size=CD.width&&CD.height?CD.width+' X '+CD.height:'';
+    setTimeout(()=>silentPrintDoc(buildSmallLabelsHTML(wo,mark,lites,glass,frame,panels,size), s.pSmall||'', 'Small Labels'),1400);
+    setTimeout(()=>silentPrintDoc(buildBigLabelsHTML(wo,panels), s.pBig||'', 'Big Labels'),2200);
+  }
+}
+
 function getInfo(){
   const w=document.getElementById('width').value,h=document.getElementById('height').value;
   const ts=document.getElementById('track-type'),ls=document.getElementById('lift-type');
@@ -613,63 +601,10 @@ function getInfo(){
   const hl=document.getElementById('highlift').value,wt=document.getElementById('weight').value;
   return'Width: '+w+'" | Height: '+h+'" | '+tt+' | '+lt+(hl?' | HL: '+hl+'"':'')+(wt?' | Weight: '+wt+' lbs':'');
 }
-function printHeader(title,info){return'<!DOCTYPE html><html><head><title>'+title+'</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:-apple-system,Arial,sans-serif;padding:24px;color:#222;max-width:600px;margin:0 auto}h1{font-size:20px;margin-bottom:4px}p{font-size:13px;color:#666;margin-bottom:20px}.btns{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}.bp{padding:12px 28px;font-size:15px;cursor:pointer;border:none;border-radius:8px;background:#1a4f8a;color:white;font-weight:600}.bb{padding:12px 28px;font-size:15px;cursor:pointer;border:1.5px solid #ccc;border-radius:8px;background:#f4f5f7;color:#111}@media print{.btns{display:none}}</style></head><body><h1>'+title+'</h1><p>'+info+'</p><hr style="margin-bottom:20px;border:none;border-top:1px solid #ddd">';}
-function printFooter(){return'<div class="btns"><button class="bp" onclick="window.print()">&#128424; Print</button><button class="bb" onclick="window.close()">← Back</button></div></body></html>';}
-
-function printPage(pi){
-  const info=getInfo();let content='',title='';
-  if(pi===0){
-    title='Garage Door — TRACKS';
-    const jbs=['J-10','J-12','J-14','J-16'].map((t,i)=>{const box=document.getElementById('jb-grid').children[i];const q=box.querySelector('.jb-qty')?box.querySelector('.jb-qty').textContent:'—';return'<div style="border:1px solid #ddd;border-radius:6px;padding:12px;text-align:center"><div style="font-size:12px;color:#666;margin-bottom:6px">'+t+'</div><div style="font-size:26px;font-weight:bold">'+q+'</div></div>';}).join('');
-    content='<table style="width:100%;border-collapse:collapse;margin-bottom:20px"><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold;width:50%">Vertical (L & R)</td><td style="padding:10px;border:1px solid #ddd;font-size:22px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-vertical').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Horizontal (L & R)</td><td style="padding:10px;border:1px solid #ddd;font-size:22px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-horizontal').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">2x2 projection</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-2x2').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Sections</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-panels').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Configuration</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-config').textContent+'</td></tr></table><h3 style="margin-bottom:10px;font-size:13px;color:#666;text-transform:uppercase">Jamb Brackets per side</h3><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">'+jbs+'</div>';
-  }else if(pi===1){
-    title='Garage Door — CABLES';
-    content='<table style="width:100%;border-collapse:collapse"><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold;width:50%">Selected drum</td><td style="padding:10px;border:1px solid #ddd;font-size:20px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-drum').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Quantity</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-drum-qty').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">End bearing plate</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-ebf').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Total capacity</td><td style="padding:10px;border:1px solid #ddd">'+document.getElementById('r-capacity').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Floor to shaft center</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-ftsc').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Cable type</td><td style="padding:10px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-cable-type').textContent+'</td></tr><tr><td style="padding:10px;border:1px solid #ddd;font-weight:bold">Cable length (L & R)</td><td style="padding:10px;border:1px solid #ddd;font-size:26px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-cable').textContent+'</td></tr></table>';
-  }
-  const win=window.open('','_blank');
-  win.document.write(printHeader(title,info)+content+printFooter());
-  win.document.close();
-}
-
-function printLabels(){
-  const wo=document.getElementById('wo').value.trim();
-  const mark=document.getElementById('mark').value.trim();
-  const lites=document.getElementById('lites').value.trim();
-  const glass=document.getElementById('glass').value;
-  const frame=document.getElementById('frame').value;
-  const panels=calcData.panels||4;
-  const width=document.getElementById('width').value;
-  const height=document.getElementById('height').value;
-  const size=width&&height?width+' X '+height:'';
-  let smallH='',bigH='';
-  labelRoles.forEach((role,i)=>{
-    smallH+=`<div style="width:4in;height:1in;border:2px solid #222;padding:6px 10px;display:grid;grid-template-columns:1fr 1fr;font-family:Arial,sans-serif;font-size:9pt;page-break-after:always;box-sizing:border-box;"><div><div><strong>W/O: ${wo||'—'}</strong></div><div>Mark: ${mark||'—'}</div><div>Panels: ${panels}</div><div>Size: ${size||'—'}</div></div><div><div>Lites: ${lites||'—'}</div><div>Glass: ${glass||'—'}</div><div>Frame: ${frame||'—'}</div><div>Panel: ${role}</div></div></div>`;
-    bigH+=`<div style="width:3in;height:6in;border:3px solid #222;padding:16px;font-family:Arial,sans-serif;display:flex;flex-direction:column;justify-content:space-between;page-break-after:always;box-sizing:border-box;"><div style="font-size:52pt;font-weight:900;text-align:center;line-height:1.1;">W/O: ${wo||'—'}</div><div style="font-size:22pt;font-weight:700;text-align:right;">${role} (${i+1}/${panels})</div></div>`;
-  });
-  const wS=window.open('','_blank');
-  wS.document.write('<!DOCTYPE html><html><head><title>Small Labels</title><style>@page{size:4in 1in;margin:0}body{margin:0}@media print{.btns{display:none}}</style></head><body>'+smallH+'<div class="btns" style="padding:20px;display:flex;gap:12px"><button onclick="window.print()" style="padding:10px 24px;background:#1a4f8a;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer">&#128424; Print Small Labels</button><button onclick="window.close()" style="padding:10px 24px;border:1px solid #ccc;border-radius:6px;font-size:14px;cursor:pointer">← Back</button></div></body></html>');
-  wS.document.close();
-  setTimeout(()=>{
-    const wB=window.open('','_blank');
-    wB.document.write('<!DOCTYPE html><html><head><title>Big Labels</title><style>@page{size:3in 6in;margin:0}body{margin:0}@media print{.btns{display:none}}</style></head><body>'+bigH+'<div class="btns" style="padding:20px;display:flex;gap:12px"><button onclick="window.print()" style="padding:10px 24px;background:#1a4f8a;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer">&#128424; Print Big Labels</button><button onclick="window.close()" style="padding:10px 24px;border:1px solid #ccc;border-radius:6px;font-size:14px;cursor:pointer">← Back</button></div></body></html>');
-    wB.document.close();
-  },500);
-}
-
-function printAll(){
-  printPage(0);
-  setTimeout(()=>printPage(1),600);
-  const wo=document.getElementById('wo').value.trim();
-  const mark=document.getElementById('mark').value.trim();
-  if(wo||mark){setTimeout(()=>printLabels(),1200);}
-}
 
 // ── INIT ───────────────────────────────────────────────────────────────────
-function init(){
-  rebuildDropdowns();
-  setupListeners();
-}
-init();
+rebuildDropdowns();
+setupListeners();
 </script>
 </body>
 </html>
