@@ -290,6 +290,8 @@ function getPanels(h){if(h<=99.625)return 4;if(h<=123.625)return 5;if(h<=147.625
 function get2x2(p){return 6.5+(p-4)*0.25;}
 var CTYPE={'D400-96':'1/8"','D400-144':'5/32"'};
 function getCT(d){return CTYPE[d]||'3/16"';}
+function getTracksData(){var grid=document.getElementById('jb-grid');var jb=['J-10','J-12','J-14','J-16'].map(function(t,i){var box=grid?grid.children[i]:null;var qEl=box?box.querySelector('.jb-qty'):null;return{label:t,qty:qEl?qEl.textContent:'--'};});return{vertical:document.getElementById('r-vertical').textContent,horizontal:document.getElementById('r-horizontal').textContent,projection:document.getElementById('r-2x2').textContent,sections:document.getElementById('r-panels').textContent,config:document.getElementById('r-config').textContent,jb:jb};}
+function getCablesData(){return{drum:document.getElementById('r-drum').textContent,qty:document.getElementById('r-drum-qty').textContent,ebf:document.getElementById('r-ebf').textContent,capacity:document.getElementById('r-capacity').textContent,ftsc:document.getElementById('r-ftsc').textContent,cableType:document.getElementById('r-cable-type').textContent,cable:document.getElementById('r-cable').textContent};}
 function setupListeners(){
   ['width','height','highlift','weight'].forEach(function(id){document.getElementById(id).addEventListener('input',calculate);});
   document.getElementById('track-type').addEventListener('change',calculate);
