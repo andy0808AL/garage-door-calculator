@@ -122,25 +122,36 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 </div>
 <div class="top-bar">
   <div class="top-bar-left" style="display:flex;align-items:center;gap:12px;">
-    <div style="background:white;border-radius:8px;padding:4px 8px;flex-shrink:0;">
-      <svg width="48" height="40" viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
-        <!-- Garage door building -->
-        <polygon points="30,70 60,45 90,70" fill="#C0272D"/>
-        <rect x="30" y="70" width="30" height="25" fill="#1B6BBF"/>
-        <rect x="60" y="70" width="30" height="25" fill="#fff"/>
-        <!-- Flag stripes on right side -->
-        <rect x="60" y="70" width="30" height="4" fill="#C0272D"/>
-        <rect x="60" y="74" width="30" height="4" fill="#fff"/>
-        <rect x="60" y="78" width="30" height="4" fill="#C0272D"/>
-        <rect x="60" y="82" width="30" height="4" fill="#fff"/>
-        <rect x="60" y="86" width="30" height="4" fill="#C0272D"/>
-        <!-- Window panes on left side -->
-        <rect x="33" y="73" width="12" height="8" fill="#7ec8e3" rx="1"/>
-        <rect x="47" y="73" width="12" height="8" fill="#7ec8e3" rx="1"/>
-        <rect x="33" y="83" width="12" height="8" fill="#7ec8e3" rx="1"/>
-        <rect x="47" y="83" width="12" height="8" fill="#7ec8e3" rx="1"/>
-        <!-- Orbit ring -->
-        <ellipse cx="60" cy="90" rx="40" ry="8" fill="none" stroke="#1B2A6B" stroke-width="3"/>
+    <div style="flex-shrink:0;">
+      <svg width="72" height="60" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
+        <!-- Orbit ring bottom -->
+        <ellipse cx="100" cy="130" rx="75" ry="15" fill="none" stroke="#1B2A6B" stroke-width="5" stroke-dasharray="200 50"/>
+        <!-- Building left face (blue garage door) -->
+        <polygon points="25,125 25,60 100,35 100,125" fill="#1565C0"/>
+        <!-- Building right face (flag side) -->
+        <polygon points="100,35 175,60 175,125 100,125" fill="#fff"/>
+        <!-- Red stripes on right face -->
+        <polygon points="100,35 175,60 175,71 100,50" fill="#C0272D"/>
+        <polygon points="100,50 175,71 175,82 100,61" fill="#fff"/>
+        <polygon points="100,61 175,82 175,93 100,72" fill="#C0272D"/>
+        <polygon points="100,72 175,93 175,104 100,83" fill="#fff"/>
+        <polygon points="100,83 175,104 175,115 100,94" fill="#C0272D"/>
+        <polygon points="100,94 175,115 175,125 100,125" fill="#fff"/>
+        <!-- Blue canton on flag -->
+        <polygon points="100,35 140,48 140,71 100,58" fill="#1B2A6B"/>
+        <!-- Window panes on left (garage door) -->
+        <rect x="32" y="68" width="25" height="16" fill="#90CAF9" rx="2" opacity="0.9"/>
+        <rect x="62" y="68" width="25" height="16" fill="#90CAF9" rx="2" opacity="0.9"/>
+        <rect x="32" y="90" width="25" height="16" fill="#90CAF9" rx="2" opacity="0.9"/>
+        <rect x="62" y="90" width="25" height="16" fill="#90CAF9" rx="2" opacity="0.9"/>
+        <rect x="32" y="108" width="25" height="14" fill="#90CAF9" rx="2" opacity="0.9"/>
+        <rect x="62" y="108" width="25" height="14" fill="#90CAF9" rx="2" opacity="0.9"/>
+        <!-- Red center pillar -->
+        <rect x="96" y="35" width="8" height="90" fill="#C0272D"/>
+        <!-- Roof top -->
+        <polygon points="100,10 25,60 175,60" fill="#C0272D"/>
+        <!-- Orbit ring front -->
+        <ellipse cx="100" cy="130" rx="75" ry="15" fill="none" stroke="#1B2A6B" stroke-width="5" stroke-dasharray="60 190" stroke-dashoffset="-130"/>
       </svg>
     </div>
     <div>
