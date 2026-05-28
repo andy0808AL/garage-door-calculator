@@ -88,7 +88,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .print-all-btn:active{opacity:0.85;}
 .springs-msg{text-align:center;padding:24px 16px;color:var(--text-muted);font-size:14px;line-height:1.6;}
 .open-btn{display:inline-block;margin-top:16px;padding:12px 24px;background:var(--blue);color:white;border-radius:var(--radius-sm);font-size:15px;font-weight:600;text-decoration:none;}
-.suggest-list{position:absolute;top:100%;left:0;right:0;background:white;border:1.5px solid var(--blue-border);border-radius:var(--radius-sm);z-index:100;box-shadow:0 4px 12px rgba(0,0,0,0.12);overflow:hidden;}
+.suggest-list{position:absolute;top:100%;left:0;right:0;background:white;border:1.5px solid var(--blue-border);border-radius:var(--radius-sm);z-index:100;box-shadow:0 4px 12px rgba(0,0,0,0.12);overflow:hidden;display:none;}
 .suggest-list div{padding:10px 14px;font-size:15px;cursor:pointer;border-bottom:1px solid var(--gray-border);}
 .suggest-list div:last-child{border-bottom:none;}
 .suggest-list div:hover{background:var(--blue-light);color:var(--blue);}
@@ -167,10 +167,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       <div class="field" style="position:relative;">
     <label>Width (inches)</label>
     <input type="number" id="width" placeholder="e.g. 192" inputmode="decimal" autocomplete="off"
-      onmouseenter="showSuggest('width-suggest')" onfocus="showSuggest('width-suggest')"
-      onblur="setTimeout(function(){hideSuggest('width-suggest')},200)">
-    <div id="width-suggest" class="suggest-list" style="display:none;">
-      <div onclick="setSuggest('width',84)">84"</div>
+      onfocus="showSuggest('width-suggest')" onclick="showSuggest('width-suggest')"
+      onblur="setTimeout(function(){hideSuggest('width-suggest')},200)" oninput="hideSuggest('width-suggest')">
+    <div id="width-suggest" class="suggest-list">
+      <div onmousedown="setSuggest('width',84)">84"</div>
+      <div onmousedown="setSuggest('width',96)">96"</div>
+      <div onmousedown="setSuggest('width',108)">108"</div>
+      <div onmousedown="setSuggest('width',120)">120"</div>
+      <div onmousedown="setSuggest('width',192)">192"</div>
+      <div onmousedown="setSuggest('width',216)">216"</div>
+    </div>
+  </div>
       <div onclick="setSuggest('width',96)">96"</div>
       <div onclick="setSuggest('width',108)">108"</div>
       <div onclick="setSuggest('width',120)">120"</div>
@@ -399,7 +406,7 @@ function restoreForm(){
   calculate();
 }
 
-function showSuggest(id){var el=document.getElementById(id);if(el)el.style.display='block';}
+function showSuggest(id){var el=document.getElementById(id);if(el){el.style.display='block';}}
 function hideSuggest(id){var el=document.getElementById(id);if(el)el.style.display='none';}
 function setSuggest(fieldId,val){
   var el=document.getElementById(fieldId);
