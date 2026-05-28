@@ -462,7 +462,7 @@ function doPrint(type){
   if(type==='tracks'){
     if(serverOK){
       toast('Sending Tracks to '+(s.pTracks||'printer')+'...',2000);
-      fetch(SERVER+'/print/tracks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({html:buildTracksHTML(),printer:s.pTracks||''})})
+      const th=buildTracksHTML(); fetch(SERVER+'/print/tracks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({html:th,printer:s.pTracks||''})})
         .then(r=>r.json()).then(d=>toast(d.status==='ok'?'\u2713 Tracks printed':'\u2717 '+d.error,3000)).catch(e=>toast('Error: '+e.message,3000));
     }else{browserPrint(buildTracksHTML());}
   }else if(type==='cables'){
@@ -486,7 +486,7 @@ function doPrintAll(){
   const s=load(),ld=getLabelData();
   if(serverOK){
     toast('Printing all...',5000);
-    fetch(SERVER+'/print/tracks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({html:buildTracksHTML(),printer:s.pTracks||''})}).catch(()=>{});
+    const tracksHtml=buildTracksHTML(); console.log('tracks html len:',tracksHtml?.length); fetch(SERVER+'/print/tracks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({html:tracksHtml,printer:s.pTracks||''})}).then(r=>r.json()).then(d=>console.log('tracks result:',d)).catch(e=>console.log('tracks error:',e));
     if(CD.hasWeight)setTimeout(()=>fetch(SERVER+'/print/cables',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({html:buildCablesHTML(),printer:s.pCables||''})}).catch(()=>{}),600);
     if(ld.wo||ld.mark){
       setTimeout(()=>fetch(SERVER+'/print/labels',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...ld,printerSmall:s.pSmall||'',printerBig:s.pBig||'',printSmall:true,printBig:true,bigRotation:curRotation})})
