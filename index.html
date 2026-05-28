@@ -251,7 +251,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
         <div class="label-preview-title">Small Label (4" &times; 1") &mdash; GX420d</div>
         <div class="small-label"><div id="sl-left"></div><div id="sl-right"></div></div>
         <div class="label-preview-title">Big Label (3" &times; 6") &mdash; Westinghouse WHTP203e</div>
-        <div class="big-label-wrap">
+        <div class="big-label-wrap" id="big-label-preview-wrap">
           <div class="big-label-wo" id="bl-wo">W/O: —</div>
           <div class="big-label-panel" id="bl-panel">—</div>
         </div>
@@ -544,11 +544,11 @@ const SERVER_URL = 'http://localhost:5000';
 let serverAvailable = false;
 let serverPrinters = [];
 
-function setRotation(deg){fetch(SERVER_URL+"/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bigRotation:deg})}).then(r=>r.json()).then(()=>{updateRotationUI(deg);toast("✓ Rotation set to "+deg+"°",2000);}).catch(()=>{save({bigRotation:deg});updateRotationUI(deg);});}function updateRotationUI(deg){[0,90,180,270].forEach(d=>{const b=document.getElementById("rot-"+d);if(b)b.classList.toggle("active",d===deg);});const l=document.getElementById("lbl-rotation");const d2=document.getElementById("dot-rotation");if(l)l.textContent=deg+"° current rotation";if(d2)d2.className="status-dot";}async function checkServer() {
+function setRotation(deg){save({bigRotation:deg});updateRotationUI(deg);applyPreviewRotation(deg);fetch(SERVER_URL+"/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bigRotation:deg})}).then(r=>r.json()).then(()=>{toast("✓ Rotation set to "+deg+"°",2000);}).catch(()=>{});}function updateRotationUI(deg){[0,90,180,270].forEach(d=>{const b=document.getElementById("rot-"+d);if(b)b.classList.toggle("active",d===deg);});const l=document.getElementById("lbl-rotation");const d2=document.getElementById("dot-rotation");if(l)l.textContent=deg+"° current rotation";if(d2)d2.className="status-dot";applyPreviewRotation(deg);}function applyPreviewRotation(deg){const wrap=document.getElementById("big-label-preview-wrap");if(!wrap)return;const is90or270=deg===90||deg===270;if(is90or270){wrap.style.transform="rotate("+deg+"deg)";wrap.style.transformOrigin="center center";wrap.style.width="auto";wrap.style.marginTop="60px";wrap.style.marginBottom="60px";}else{wrap.style.transform="rotate("+deg+"deg)";wrap.style.transformOrigin="center center";wrap.style.marginTop="0";wrap.style.marginBottom="0";}}async function checkServer() {
   try {
     const r = await fetch(SERVER_URL + '/ping', {signal: AbortSignal.timeout(1500)});
     const d = await r.json();
-    serverAvailable = d.status === 'ok'; if(d.bigRotation !== undefined) updateRotationUI(d.bigRotation);
+    serverAvailable = d.status === 'ok'; if(d.bigRotation !== undefined){updateRotationUI(d.bigRotation);applyPreviewRotation(d.bigRotation);}else{const lr=load().bigRotation||0;applyPreviewRotation(lr);}
     if(d.printers && d.printers.length > 0) {
       serverPrinters = d.printers;
       mergeServerPrinters(d.printers);
@@ -704,6 +704,7 @@ function getInfo(){
 // ── INIT ───────────────────────────────────────────────────────────────────
 rebuildDropdowns();
 setupListeners();
+const initRot=load().bigRotation||0;setTimeout(()=>applyPreviewRotation(initRot),300);
 </script>
 </body>
 </html>
