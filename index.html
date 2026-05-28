@@ -27,10 +27,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .field-row .field{margin-bottom:0;}
 .panel-hint{font-size:12px;color:var(--blue);margin-top:5px;font-weight:500;}
 .hl-field{display:none;}.hl-field.visible{display:block;}
-.btn-row{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:4px;}
-.calc-btn{height:50px;background:var(--blue);color:white;border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:600;cursor:pointer;}
-.calc-btn:active{opacity:0.85;}
-.clear-btn{height:50px;padding:0 20px;background:var(--red-light);color:var(--red);border:1.5px solid #f5c6c2;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;}
+.btn-row{display:grid;grid-template-columns:1fr;gap:10px;margin-top:4px;}
+.clear-btn{height:46px;background:var(--red-light);color:var(--red);border:1.5px solid #f5c6c2;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;width:100%;}
 .clear-btn:active{opacity:0.8;}
 .error{background:var(--red-light);border:1px solid #f5c6c2;border-radius:var(--radius-sm);color:var(--red);font-size:13px;padding:10px 14px;margin-top:10px;display:none;}
 .results{display:none;}.results.visible{display:block;}
@@ -76,7 +74,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 <div class="field"><label>Door weight (lbs) <span class="req-cable">&#8212; for cables</span></label><input type="number" id="weight" placeholder="e.g. 400" inputmode="decimal"></div>
 </div>
 <div class="error" id="error"></div>
-<div class="btn-row"><button class="calc-btn" onclick="calculate()">Calculate</button><button class="clear-btn" onclick="clearAll()">Clear</button></div>
+<div class="btn-row"><button class="clear-btn" onclick="clearAll()">Clear</button></div>
 </div>
 <div class="results" id="results">
 <div class="tabs"><div class="tab active" onclick="showTab(0)">Tracks</div><div class="tab" onclick="showTab(1)">Cables</div><div class="tab" onclick="showTab(2)">Springs</div></div>
@@ -127,11 +125,36 @@ function frac(val){
 }
 const CTYPE={'D400-96':'1/8"','D400-144':'5/32"'};
 function getCT(d){return CTYPE[d]||'3/16"';}
-document.getElementById('lift-type').addEventListener('change',function(){document.getElementById('hl-field').classList.toggle('visible',this.value==='highlift');});
-document.getElementById('height').addEventListener('input',function(){const h=parseFloat(this.value);document.getElementById('panel-hint').textContent=(!isNaN(h)&&h>0)?'→ '+getPanels(h)+' sections':'';});
+
+// Auto-calculate on any input change
+function setupListeners(){
+  ['width','height','highlift','weight'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', calculate);
+  });
+  document.getElementById('track-type').addEventListener('change', function(){
+    const lt = document.getElementById('lift-type').value;
+    calculate();
+  });
+  document.getElementById('lift-type').addEventListener('change', function(){
+    document.getElementById('hl-field').classList.toggle('visible', this.value==='highlift');
+    calculate();
+  });
+  document.getElementById('highlift').addEventListener('input', calculate);
+}
+
 function showErr(msg){const e=document.getElementById('error');e.textContent=msg;e.style.display='block';}
 function clearErr(){document.getElementById('error').style.display='none';}
-function clearAll(){['width','height','highlift','weight'].forEach(id=>document.getElementById(id).value='');document.getElementById('track-type').value='';document.getElementById('lift-type').value='';document.getElementById('panel-hint').textContent='';document.getElementById('hl-field').classList.remove('visible');document.getElementById('results').classList.remove('visible');clearErr();showTab(0);}
+
+function clearAll(){
+  ['width','height','highlift','weight'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('track-type').value='';
+  document.getElementById('lift-type').value='';
+  document.getElementById('panel-hint').textContent='';
+  document.getElementById('hl-field').classList.remove('visible');
+  document.getElementById('results').classList.remove('visible');
+  clearErr();showTab(0);
+}
+
 function calculate(){
   clearErr();
   const width=parseFloat(document.getElementById('width').value);
@@ -141,24 +164,40 @@ function calculate(){
   const hl=parseFloat(document.getElementById('highlift').value)||0;
   const wt=parseFloat(document.getElementById('weight').value);
   const hasWeight=!isNaN(wt)&&wt>0;
-  if(!width||!height||!tt||!lt){showErr('Please fill in width, height, track type and lift type.');return;}
-  if(lt==='highlift'&&!hl){showErr('Please enter the High Lift amount.');return;}
-  if(lt==='lhr'&&!tt.includes('LHR')){showErr('For Low Headroom, select an LHR track type.');return;}
+
+  // Update panel hint always
+  if(!isNaN(height)&&height>0) document.getElementById('panel-hint').textContent='→ '+getPanels(height)+' sections';
+  else document.getElementById('panel-hint').textContent='';
+
+  // Need minimum fields to show results
+  if(!width||!height||!tt||!lt){
+    document.getElementById('results').classList.remove('visible');
+    return;
+  }
+  if(lt==='highlift'&&!hl) return;
+  if(lt==='lhr'&&!tt.includes('LHR')) return;
+
   const panels=getPanels(height);
   const x2=get2x2(panels);
   let vert,horiz;
   if(lt==='highlift'){vert=(height-8)+(hl-9);horiz=(height+12)-(hl-9);}
   else if(lt==='lhr'){vert=tt==='3-LHR'?height-18:height-16;horiz=height+12;}
   else{vert=height-8;horiz=height+12;}
+
   const jb=getJB(vert);
   const tlbl={'3-15R':'3" 15R','2-12R':'2" 12R','3-LHR':'3" LHR','2-LHR':'2" LHR'};
   const llbl={standard:'Standard Lift',highlift:'High Lift ('+hl+'")',lhr:'Low Headroom'};
+
   document.getElementById('r-vertical').textContent=frac(vert);
   document.getElementById('r-horizontal').textContent=frac(horiz);
   document.getElementById('r-2x2').textContent=frac(x2)+' projection';
   document.getElementById('r-panels').textContent=panels+' sections';
   document.getElementById('r-config').textContent=tlbl[tt]+' · '+llbl[lt];
-  document.getElementById('jb-grid').innerHTML=['J-10','J-12','J-14','J-16'].map((t,i)=>{const q=[jb.j10,jb.j12,jb.j14,jb.j16][i];return'<div class="jb-box"><div class="jb-type">'+t+'</div>'+(q!==null?'<div class="jb-qty">'+q+'</div>':'<div class="jb-na">—</div>')+'</div>';}).join('');
+  document.getElementById('jb-grid').innerHTML=['J-10','J-12','J-14','J-16'].map((t,i)=>{
+    const q=[jb.j10,jb.j12,jb.j14,jb.j16][i];
+    return'<div class="jb-box"><div class="jb-type">'+t+'</div>'+(q!==null?'<div class="jb-qty">'+q+'</div>':'<div class="jb-na">—</div>')+'</div>';
+  }).join('');
+
   const notice=document.getElementById('weight-notice');
   const cableDiv=document.getElementById('cable-results');
   if(!hasWeight){notice.style.display='block';cableDiv.style.display='none';}
@@ -179,9 +218,13 @@ function calculate(){
     document.getElementById('r-cable-type').textContent='Cable '+getCT(drum);
   }
   document.getElementById('results').classList.add('visible');
-  showTab(0);
 }
-function showTab(n){document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===n));document.querySelectorAll('.page').forEach((p,i)=>p.classList.toggle('active',i===n));}
+
+function showTab(n){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===n));
+  document.querySelectorAll('.page').forEach((p,i)=>p.classList.toggle('active',i===n));
+}
+
 function printPage(pi){
   const w=document.getElementById('width').value,h=document.getElementById('height').value;
   const ts=document.getElementById('track-type'),ls=document.getElementById('lift-type');
@@ -200,4 +243,7 @@ function printPage(pi){
   win.document.write('<!DOCTYPE html><html><head><title>Garage Door - '+titles[pi]+'</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>body{font-family:-apple-system,Arial,sans-serif;padding:24px;color:#222;max-width:600px;margin:0 auto}h1{font-size:20px;margin-bottom:4px}p{font-size:13px;color:#666;margin-bottom:20px}.btn-row{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;}.btn-print{padding:12px 28px;font-size:15px;cursor:pointer;border:none;border-radius:8px;background:#1a4f8a;color:white;font-weight:600;}.btn-back{padding:12px 28px;font-size:15px;cursor:pointer;border:1.5px solid #e2e4e8;border-radius:8px;background:#f4f5f7;color:#111827;font-weight:600;}@media print{.btn-row{display:none}}</style></head><body><h1>Garage Door — '+titles[pi]+'</h1><p>'+info+'</p><hr style="margin-bottom:20px;border:none;border-top:1px solid #ddd">'+content+'<div class="btn-row"><button class="btn-print" onclick="window.print()">🖸 Print</button><button class="btn-back" onclick="window.close()">← Back</button></div></body></html>');
   win.document.close();
 }
+
+// Init
+setupListeners();
 </script></body></html>
