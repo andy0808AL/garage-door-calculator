@@ -8,24 +8,168 @@
 <meta name="apple-mobile-web-app-title" content="GD Calc">
 <title>Garage Door Calculator</title>
 <style>
-  :root {
-    --blue: #1a4f8a;
-    --blue-light: #e8f0fb;
-    --blue-border: #b5d0f0;
-    --red: #c0392b;
-    --red-light: #fdf0ef;
-    --gray: #6b7280;
-    --gray-light: #f4f5f7;
-    --gray-border: #e2e4e8;
-    --text: #111827;
-    --text-muted: #6b7280;
-    --white: #ffffff;
-    --radius: 12px;
-    --radius-sm: 8px;
-  }
-</style>
-</head>
-<body>
-<h1>GD Calc</h1>
-</body>
-</html>
+:root{--blue:#1a4f8a;--blue-light:#e8f0fb;--blue-border:#b5d0f0;--red:#c0392b;--red-light:#fdf0ef;--gray:#6b7280;--gray-light:#f4f5f7;--gray-border:#e2e4e8;--text:#111827;--text-muted:#6b7280;--white:#ffffff;--radius:12px;--radius-sm:8px;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:#f0f2f5;color:var(--text);min-height:100vh;padding-bottom:env(safe-area-inset-bottom);}
+.top-bar{background:var(--blue);color:white;padding:54px 20px 16px;position:sticky;top:0;z-index:100;}
+.top-bar h1{font-size:20px;font-weight:600;letter-spacing:-0.3px;}
+.top-bar p{font-size:13px;opacity:0.75;margin-top:2px;}
+.content{padding:16px;max-width:480px;margin:0 auto;}
+.card{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.07);}
+.card-title{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:14px;}
+.field{margin-bottom:12px;}.field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:13px;color:var(--text-muted);margin-bottom:6px;font-weight:500;}
+.field input,.field select{width:100%;height:44px;padding:0 14px;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);background:var(--gray-light);color:var(--text);font-size:16px;-webkit-appearance:none;appearance:none;}
+.field input:focus,.field select:focus{outline:none;border-color:var(--blue);background:white;}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.field-row .field{margin-bottom:0;}
+.panel-hint{font-size:12px;color:var(--blue);margin-top:5px;font-weight:500;}
+.hl-field{display:none;}.hl-field.visible{display:block;}
+.btn-row{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:4px;}
+.calc-btn{height:50px;background:var(--blue);color:white;border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:600;cursor:pointer;}
+.calc-btn:active{opacity:0.85;transform:scale(0.99);}
+.clear-btn{height:50px;padding:0 20px;background:var(--red-light);color:var(--red);border:1.5px solid #f5c6c2;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.clear-btn:active{opacity:0.8;}
+.error{background:var(--red-light);border:1px solid #f5c6c2;border-radius:var(--radius-sm);color:var(--red);font-size:13px;padding:10px 14px;margin-top:10px;display:none;}
+.results{display:none;}.results.visible{display:block;}
+.tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px;}
+.tab{height:40px;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);background:var(--white);font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.tab.active{background:var(--blue);color:white;border-color:var(--blue);}
+.page{display:none;}.page.active{display:block;}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--gray-border);font-size:14px;}
+.result-row:last-child{border-bottom:none;}
+.result-row .rlabel{color:var(--text-muted);font-size:13px;}
+.result-row .rvalue{font-weight:600;font-size:15px;}
+.result-row .rvalue.big{font-size:18px;color:var(--blue);}
+.jb-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px;}
+.jb-box{background:var(--gray-light);border:1px solid var(--gray-border);border-radius:var(--radius-sm);padding:10px 6px;text-align:center;}
+.jb-type{font-size:11px;color:var(--text-muted);font-weight:600;margin-bottom:4px;}
+.jb-qty{font-size:24px;font-weight:700;color:var(--text);}
+.jb-na{font-size:20px;color:#ccc;}
+.cable-box{background:var(--blue-light);border:1.5px solid var(--blue-border);border-radius:var(--radius-sm);padding:14px;display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
+.cable-size{font-size:32px;font-weight:700;color:var(--blue);}
+.cable-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.cable-badge{background:white;border:1.5px solid var(--blue-border);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:700;color:var(--blue);}
+.springs-msg{text-align:center;padding:24px 16px;color:var(--text-muted);font-size:14px;line-height:1.6;}
+.springs-icon{font-size:36px;margin-bottom:12px;}
+.open-btn{display:inline-block;margin-top:16px;padding:12px 24px;background:var(--blue);color:white;border-radius:var(--radius-sm);font-size:15px;font-weight:600;text-decoration:none;}
+.print-btn{width:100%;height:46px;margin-top:12px;background:white;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);font-size:15px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.print-btn:active{background:var(--gray-light);}
+</style></head><body>
+<div class="top-bar"><h1>&#128682; Garage Door Calculator</h1><p>Tracks &middot; Cables &middot; Drums &middot; Jamb Brackets</p></div>
+<div class="content">
+<div class="card">
+<div class="card-title">Door Information</div>
+<div class="field-row"><div class="field"><label>Width (inches)</label><input type="number" id="width" placeholder="e.g. 192" inputmode="decimal"></div><div class="field"><label>Height (inches)</label><input type="number" id="height" placeholder="e.g. 96" inputmode="decimal"><div class="panel-hint" id="panel-hint"></div></div></div>
+<div class="field-row"><div class="field"><label>Track type</label><select id="track-type"><option value="">Select...</option><option value="3-15R">3" 15R</option><option value="2-12R">2" 12R</option><option value="3-LHR">3" LHR</option><option value="2-LHR">2" LHR</option></select></div><div class="field"><label>Lift type</label><select id="lift-type"><option value="">Select...</option><option value="standard">Standard</option><option value="highlift">High Lift</option><option value="lhr">Low Headroom</option></select></div></div>
+<div class="field-row"><div class="field hl-field" id="hl-field"><label>High Lift amount (in)</label><input type="number" id="highlift" placeholder="e.g. 24" inputmode="decimal"></div><div class="field"><label>Door weight (lbs)</label><input type="number" id="weight" placeholder="e.g. 400" inputmode="decimal"></div></div>
+<div class="error" id="error"></div>
+<div class="btn-row"><button class="calc-btn" onclick="calculate()">Calculate</button><button class="clear-btn" onclick="clearAll()">Clear</button></div>
+</div>
+<div class="results" id="results">
+<div class="tabs"><div class="tab active" onclick="showTab(0)">Tracks</div><div class="tab" onclick="showTab(1)">Cables</div><div class="tab" onclick="showTab(2)">Springs</div></div>
+<div class="page active" id="page-0">
+<div class="card"><div class="card-title">Track Measurements</div>
+<div class="result-row"><span class="rlabel">Vertical (L &amp; R)</span><span class="rvalue big" id="r-vertical">&mdash;</span></div>
+<div class="result-row"><span class="rlabel">Horizontal (L &amp; R)</span><span class="rvalue big" id="r-horizontal">&mdash;</span></div>
+<div class="result-row"><span class="rlabel">2x2 projection</span><span class="rvalue" id="r-2x2">&mdash;</span></div>
+<div class="result-row"><span class="rlabel">Sections</span><span class="rvalue" id="r-panels">&mdash;</span></div>
+<div class="result-row"><span class="rlabel">Configuration</span><span class="rvalue" id="r-config" style="font-size:13px;text-align:right;max-width:55%">&mdash;</span></div>
+</div>
+<div class="card"><div class="card-title">Jamb Brackets &mdash; per side (L &amp; R)</div><div class="jb-grid" id="jb-grid"></div></div>
+<button class="print-btn" onclick="printPage(0)">&#128424; Print Tracks Page</button>
+</div>
+<div class="page" id="page-1">
+<div class="card"><div class="card-title">Drum &amp; End Bearing Plate</div>
+<div class="result-row"><span class="rlabel">Selected drum</span><span class="rvalue big" id="r-drum">&mdash;</span></div>
+<div class="result-row"><span class="rlabel">Quantity</span><span class="rvalue" id="r-drum-qty">&mdash;</span></div>
+<div class="result-row"><span class="rlabel">End bearing plate</span><span class="rvalue" id="r-ebf">&mdash;</span></div>
+<div class="result-row"><span class="rlabel">Total capacity</span><span class="rvalue" id="r-capacity">&mdash;</span></div>
+</div>
+<div class="card"><div class="card-title">Cable Calculation</div>
+<div class="result-row"><span class="rlabel">Floor to shaft center</span><span class="rvalue" id="r-ftsc">&mdash;</span></div>
+<div class="cable-box"><div><div class="cable-size" id="r-cable">&mdash;</div><div class="cable-sub">Cable length &middot; left &amp; right</div></div><div class="cable-badge" id="r-cable-type">&mdash;</div></div>
+</div>
+<button class="print-btn" onclick="printPage(1)">&#128424; Print Cables Page</button>
+</div>
+<div class="page" id="page-2">
+<div class="card"><div class="springs-msg"><div class="springs-icon">&#128297;</div>Spring calculation coming soon.<br>Use Service Spring to calculate your torsion springs.<br><a class="open-btn" href="https://shop.servicespring.com/custom/torsion" target="_blank">Open Service Spring &#8599;</a></div></div>
+</div>
+</div></div>
+<script>
+const JB=[{min:0,max:84,j10:4,j12:4,j14:4,j16:null},{min:85,max:96,j10:4,j12:5,j14:5,j16:null},{min:97,max:108,j10:4,j12:5,j14:5,j16:2},{min:109,max:120,j10:4,j12:5,j14:5,j16:4},{min:121,max:132,j10:4,j12:5,j14:5,j16:6},{min:133,max:144,j10:4,j12:6,j14:6,j16:6},{min:145,max:156,j10:4,j12:6,j14:6,j16:8},{min:157,max:168,j10:4,j12:6,j14:8,j16:8},{min:169,max:180,j10:4,j12:6,j14:8,j16:10},{min:181,max:192,j10:4,j12:6,j14:10,j16:10}];
+function getJB(v){return JB.find(r=>v>=r.min&&v<=r.max)||JB[JB.length-1];}
+function getPanels(h){if(h<=99.625)return 4;if(h<=123.625)return 5;if(h<=147.625)return 6;if(h<=171.625)return 7;return 8;}
+function get2x2(p){return 6.5+(p-4)*0.25;}
+function frac(val){const w=Math.floor(val),d=val-w;const fs=[[0,''],[0.125,'&#8539;'],[0.25,'&#188;'],[0.375,'&#8540;'],[0.5,'&#189;'],[0.625,'&#8541;'],[0.75,'&#190;'],[0.875,'&#8542;'],[1,'']];let best=fs[0],bd=999;for(const f of fs){const dd=Math.abs(d-f[0]);if(dd<bd){bd=dd;best=f;}}if(best[0]===1)return(w+1)+'"';if(w===0)return best[1]?best[1]+'"':'0"';return best[1]?w+' '+best[1]+'"':w+'"';}
+const CTYPE={'D400-96':'1/8"','D400-144':'5/32"'};
+function getCT(d){return CTYPE[d]||'3/16"';}
+document.getElementById('lift-type').addEventListener('change',function(){document.getElementById('hl-field').classList.toggle('visible',this.value==='highlift');});
+document.getElementById('height').addEventListener('input',function(){const h=parseFloat(this.value);document.getElementById('panel-hint').textContent=(!isNaN(h)&&h>0)?'&#8594; '+getPanels(h)+' sections':'';});
+function showErr(msg){const e=document.getElementById('error');e.textContent=msg;e.style.display='block';}
+function clearErr(){document.getElementById('error').style.display='none';}
+function clearAll(){['width','height','highlift','weight'].forEach(id=>document.getElementById(id).value='');document.getElementById('track-type').value='';document.getElementById('lift-type').value='';document.getElementById('panel-hint').textContent='';document.getElementById('hl-field').classList.remove('visible');document.getElementById('results').classList.remove('visible');clearErr();showTab(0);}
+function calculate(){
+clearErr();
+const width=parseFloat(document.getElementById('width').value);
+const height=parseFloat(document.getElementById('height').value);
+const tt=document.getElementById('track-type').value;
+const lt=document.getElementById('lift-type').value;
+const hl=parseFloat(document.getElementById('highlift').value)||0;
+const wt=parseFloat(document.getElementById('weight').value);
+if(!width||!height||!tt||!lt||!wt){showErr('Please fill in all required fields.');return;}
+if(lt==='highlift'&&!hl){showErr('Please enter the High Lift amount.');return;}
+if(lt==='lhr'&&!tt.includes('LHR')){showErr('For Low Headroom, select an LHR track type.');return;}
+const panels=getPanels(height);const x2=get2x2(panels);
+let vert,horiz;
+if(lt==='highlift'){vert=(height-8)+(hl-9);horiz=(height+12)-(hl-9);}
+else if(lt==='lhr'){vert=tt==='3-LHR'?height-18:height-16;horiz=height+12;}
+else{vert=height+12;horiz=height+12;}
+let drum,cap,ebf,ebfA,cA;
+if(lt==='highlift'){if(hl<=54){drum='D525-54';cap=500;ebf='EBP 4 3/8"';ebfA=3.125;cA=66;}else if(wt<=1000){drum='D575-120';cap=500;ebf='EBP 6"';ebfA=4.875;cA=133;}else{drum='D800-120';cap=1100;ebf='EBP 6"';ebfA=4.875;cA=137;}}
+else{if(height<=96){drum='D400-96';cap=265;ebf='EBP 3 3/8"';ebfA=3.125;cA=8;}else if(height<=144){drum='D400-144';cap=375;ebf='EBP 3 3/8"';ebfA=3.125;cA=8;}else{drum='5250-18 (525-216)';cap=750;ebf='EBP 3 3/8"';ebfA=3.125;cA=10;}}
+const toff={'3-15R':17,'3-LHR':25,'2-LHR':19,'2-12R':13.125}[tt];
+const ftsc=vert+toff+ebfA;
+const craw=lt==='highlift'?ftsc+cA-hl:ftsc+cA;
+const cable=Math.ceil(craw);
+const ct=getCT(drum);
+const jb=getJB(vert);
+const tlbl={'3-15R':'3" 15R','2-12R':'2" 12R','3-LHR':'3" LHR','2-LHR':'2" LHR'};
+const llbl={standard:'Standard Lift',highlift:'High Lift ('+hl+'")',lhr:'Low Headroom'};
+document.getElementById('r-vertical').innerHTML=frac(vert);
+document.getElementById('r-horizontal').innerHTML=frac(horiz);
+document.getElementById('r-2x2').innerHTML=frac(x2)+' projection';
+document.getElementById('r-panels').textContent=panels+' sections';
+document.getElementById('r-config').textContent=tlbl[tt]+' · '+llbl[lt];
+document.getElementById('jb-grid').innerHTML=['J-10','J-12','J-14','J-16'].map((t,i)=>{const q=[jb.j10,jb.j12,jb.j14,jb.j16][i];return'<div class="jb-box"><div class="jb-type">'+t+'</div>'+(q!==null?'<div class="jb-qty">'+q+'</div>':'<div class="jb-na">&mdash;</div>')+'</div>';}).join('');
+document.getElementById('r-drum').textContent=drum;
+document.getElementById('r-drum-qty').textContent='2 (left & right)';
+document.getElementById('r-ebf').textContent=ebf+' x2';
+document.getElementById('r-capacity').textContent=(cap*2)+' lbs total';
+document.getElementById('r-ftsc').innerHTML=frac(ftsc);
+document.getElementById('r-cable').textContent=cable+'"';
+document.getElementById('r-cable-type').textContent='Cable '+ct;
+document.getElementById('results').classList.add('visible');
+showTab(0);
+}
+function showTab(n){document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===n));document.querySelectorAll('.page').forEach((p,i)=>p.classList.toggle('active',i===n));}
+function printPage(pi){
+const w=document.getElementById('width').value,h=document.getElementById('height').value;
+const ts=document.getElementById('track-type'),ls=document.getElementById('lift-type');
+const tt=ts.options[ts.selectedIndex].text,lt=ls.options[ls.selectedIndex].text;
+const hl=document.getElementById('highlift').value,wt=document.getElementById('weight').value;
+const titles=['TRACKS','CABLES','SPRINGS'];
+const info='Width: '+w+'" | Height: '+h+'" | '+tt+' | '+lt+(hl?' | HL: '+hl+'"':'')+' | Weight: '+wt+' lbs';
+let content='';
+if(pi===0){
+const jbs=['J-10','J-12','J-14','J-16'].map((t,i)=>{const box=document.getElementById('jb-grid').children[i];const q=box.querySelector('.jb-qty')?box.querySelector('.jb-qty').textContent:'&mdash;';return'<div style="border:1px solid #ddd;border-radius:6px;padding:12px;text-align:center"><div style="font-size:12px;color:#666;margin-bottom:6px">'+t+'</div><div style="font-size:26px;font-weight:bold">'+q+'</div></div>';}).join('');
+content='<table style="width:100%;border-collapse:collapse;margin-bottom:24px"><tr><td style="padding:12px;border:1px solid #ddd;font-weight:bold;width:50%">Vertical (L &amp; R)</td><td style="padding:12px;border:1px solid #ddd;font-size:22px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-vertical').innerHTML+'</td></tr><tr><td style="padding:12px;border:1px solid #ddd;font-weight:bold">Horizontal (L &amp; R)</td><td style="padding:12px;border:1px solid #ddd;font-size:22px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-horizontal').innerHTML+'</td></tr><tr><td style="padding:12px;border:1px solid #ddd;font-weight:bold">2x2 projection</td><td style="padding:12px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-2x2').innerHTML+'</td></tr><tr><td style="padding:12px;border:1px solid #ddd;font-weight:bold">Sections</td><td style="padding:12px;border:1px solid #ddd">'+document.getElementById('r-panels').textContent+'</td></tr><tr><td style="padding:12px;border:1px solid #ddd;font-weight:bold">Configuration</td><td style="padding:12px;border:1px solid #ddd">'+document.getElementById('r-config').textContent+'</td></tr></table><h3 style="margin-bottom:12px;font-size:14px;color:#666;text-transform:uppercase">Jamb Brackets &mdash; per side</h3><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">'+jbs+'</div>';
+}else if(pi===1){
+content='<table style="width:100%;border-collapse:collapse"><tr><td style="padding:12px;border:1px solid #ddd;font-weight:bold;width:50%">Selected drum</td><td style="padding:12px;border:1px solid #ddd;font-size:22px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-drum').textContent+'</td></tr><tr><td style="padding:12px;border:1px solid #ddd;font-weight:bold">Quantity</td><td style="padding:12px;border:1px solid #ddd">'+document.getElementById('r-drum-qty').textContent+'</td></tr><tr><td style="padding:12px;border:1px solid #ddd;font-weight:bold">End bearing plate</td><td style="padding:12px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-ebf').textContent+'</td></tr><tr><td style="padding:12px;border:1px solid #ddd;font-weight:bold">Total capacity</td><td style="padding:12px;border:1px solid #ddd">'+document.getElementById('r-capacity').textContent+'</td></tr><tr><td style="padding:12px;border:1px solid #ddd;font-weight:bold">Floor to shaft center</td><td style="padding:12px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-ftsc').innerHTML+'</td></tr><tr><td style="padding:12px;border:1px solid #ddd;font-weight:bold">Cable type</td><td style="padding:12px;border:1px solid #ddd;font-size:18px;font-weight:bold">'+document.getElementById('r-cable-type').textContent+'</td></tr><tr><td style="padding:12px;border:1px solid #ddd;font-weight:bold">Cable length (L &amp; R)</td><td style="padding:12px;border:1px solid #ddd;font-size:28px;font-weight:bold;color:#1a4f8a">'+document.getElementById('r-cable').textContent+'</td></tr></table>';
+}
+const win=window.open('','_blank');
+win.document.write('<!DOCTYPE html><html><head><title>Garage Door - '+titles[pi]+'</title><style>body{font-family:-apple-system,Arial,sans-serif;padding:24px;color:#222;max-width:600px;margin:0 auto}h1{font-size:20px;margin-bottom:4px}p{font-size:13px;color:#666;margin-bottom:20px}@media print{button{display:none}}</style></head><body><h1>Garage Door - '+titles[pi]+'</h1><p>'+info+'</p><hr style="margin-bottom:20px;border:none;border-top:1px solid #ddd">'+content+'<br><button onclick="window.print()" style="margin-top:20px;padding:10px 24px;font-size:14px;cursor:pointer;border:1px solid #ccc;border-radius:6px;background:#fff">Print</button></body></html>');
+win.document.close();
+}
+</script></body></html>
