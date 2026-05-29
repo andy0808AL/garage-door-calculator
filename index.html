@@ -481,30 +481,15 @@ function syncDisplayFields(){
     disp.value = m ? (m[v]||v||'') : (v||'');
   });
 }
-var _ok=false;function _en(){_ok=true;document.removeEventListener('click',_en);document.removeEventListener('keydown',_en);}document.addEventListener('click',_en);document.addEventListener('keydown',_en);setTimeout(function(){_ok=true;},2500);var _ok=false;function _en(){_ok=true;document.removeEventListener('click',_en);document.removeEventListener('keydown',_en);}document.addEventListener('click',_en);document.addEventListener('keydown',_en);setTimeout(function(){_ok=true;},2000);var _ok=false;var _hideT={};function _en(){_ok=true;document.removeEventListener('click',_en);document.removeEventListener('keydown',_en);}document.addEventListener('click',_en);document.addEventListener('keydown',_en);setTimeout(function(){_ok=true;},2000);var _ok=false;var _hideT={};
-function _en(){_ok=true;document.removeEventListener('click',_en);document.removeEventListener('keydown',_en);}
-document.addEventListener('click',_en);
-document.addEventListener('keydown',_en);
-setTimeout(function(){_ok=true;},2000);
 var _ok=false;
 function _en(){_ok=true;document.removeEventListener('click',_en);document.removeEventListener('keydown',_en);}
 document.addEventListener('click',_en);
 document.addEventListener('keydown',_en);
 setTimeout(function(){_ok=true;},2000);
 var _hideT={};
-function showSuggest(id){
-  if(!_ok)return;
-  clearTimeout(_hideT[id]);
-  var el=document.getElementById(id);
-  if(el)el.style.display='block';
-}
-function hideSuggest(id){
-  clearTimeout(_hideT[id]);
-  _hideT[id]=setTimeout(function(){
-    var el=document.getElementById(id);
-    if(el)el.style.display='none';
-  },300);
-}
+function showSuggest(id){if(!_ok)return;clearTimeout(_hideT[id]);var el=document.getElementById(id);if(el)el.style.display='block';}
+function hideSuggest(id){clearTimeout(_hideT[id]);_hideT[id]=setTimeout(function(){var el=document.getElementById(id);if(el)el.style.display='none';},300);}
+
   _hideT[id]=setTimeout(function(){var el=document.getElementById(id);if(el)el.style.display='none';},150);
 },200);}
 function setSuggest(fieldId,val){
