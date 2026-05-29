@@ -482,7 +482,7 @@ function syncDisplayFields(){
     disp.value = m ? (m[v]||v||'') : (v||'');
   });
 }
-var _rdy=false;setTimeout(function(){_rdy=true;},1500);function showSuggest(id){if(!_rdy)return;var el=document.getElementById(id);if(el)el.classList.add('open');}function hideSuggest(id){setTimeout(function(){var el=document.getElementById(id);if(el)el.classList.remove('open');},250);},250);}
+var _rdy=false;setTimeout(function(){_rdy=true;},1500);function showSuggest(id){if(!_rdy)return;var el=document.getElementById(id);if(el)el.classList.add('open');}function hideSuggest(id){setTimeout(function(){var el=document.getElementById(id);if(el)el.classList.remove('open');},400);},250);}
 function setSuggest(fieldId,val){
   var el=document.getElementById(fieldId);
   if(el){el.value=val;el.dispatchEvent(new Event('input'));}
@@ -705,7 +705,7 @@ function doPrintAll(){
     setTimeout(function(){toast('Tracks & Cables sent!',2000);},800);
   }
 }
-try{rebuildDropdowns();}catch(e){console.error('rebuildDropdowns:',e);}
+try{rebuildDropdowns();}catch(e){console.error('rebuildDropdowns:',e);}document.addEventListener('click',function(e){if(!e.target.closest('.suggest-list')&&!e.target.closest('[onmouseenter]'))document.querySelectorAll('.suggest-list.open').forEach(function(el){el.classList.remove('open');});});
 try{restoreForm();syncDisplayFields();}catch(e){console.error('restoreForm:',e);}
 try{setupListeners();}catch(e){console.error('setupListeners:',e);}
 try{curRotation=load().bigRotation||0;}catch(e){console.error('curRotation:',e);}
