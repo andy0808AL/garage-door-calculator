@@ -642,18 +642,17 @@ function clearAll(){
 function getInfo(){
   var w=document.getElementById('width').value,h=document.getElementById('height').value;
   var ts=document.getElementById('track-type'),ls=document.getElementById('lift-type');
-  var tt=ts.options[ts.selectedIndex]?ts.options[ts.selectedIndex].text:'';
-  var lt=ls.options[ls.selectedIndex]?ls.options[ls.selectedIndex].text:'';
-  var hl=document.getElementById('highlift').value,wt=document.getElementById('weight').value;
-  return'Width: '+w+'in | Height: '+h+'in | '+tt+' | '+lt+(hl?' | HL: '+hl+'in':'')+(wt?' | Weight: '+wt+' lbs':'');
-}
-function getTracksData(){
-  var grid=document.getElementById('jb-grid');
-  var jb=['J-10','J-12','J-14','J-16'].map(function(t,i){
-    var box=grid?grid.children[i]:null;
-    var qEl=box?box.querySelector('.jb-qty'):null;
-    return{label:t,qty:qEl?qEl.textContent:'--'};
-  });
+  var tt=ts?(ts.options&&ts.selectedIndex>=0?ts.options[ts.selectedIndex].text:ts.value):'';
+  var lt=ls?(ls.options&&ls.selectedIndex>=0?ls.options[ls.selectedIndex].text:ls.value):'';
+  var ttd=document.getElementById('track-type-display');if(ttd&&ttd.value)tt=ttd.value;
+  var ltd=document.getElementById('lift-type-display');if(ltd&&ltd.value)lt=ltd.value;
+  var mk=document.getElementById('mark')?document.getElementById('mark').value:'';
+  var li=document.getElementById('lites')?document.getElementById('lites').value:'';
+  var gl=document.getElementById('glass')?document.getElementById('glass').value:'';
+  var fr=document.getElementById('frame')?document.getElementById('frame').value:'';
+  var wo=document.getElementById('wo')?document.getElementById('wo').value:'';
+  return {width:w,height:h,trackType:tt,liftType:lt,mark:mk,lites:li,glass:gl,frame:fr,wo:wo};
+});
   return{vertical:document.getElementById('r-vertical').textContent,horizontal:document.getElementById('r-horizontal').textContent,projection:document.getElementById('r-2x2').textContent,sections:document.getElementById('r-panels').textContent,config:document.getElementById('r-config').textContent,jb:jb};
 }
 function getCablesData(){
