@@ -482,7 +482,7 @@ function syncDisplayFields(){
     disp.value = m ? (m[v]||v||'') : (v||'');
   });
 }
-var _rdy=false;setTimeout(function(){_rdy=true;},1500);function showSuggest(id){if(!_rdy)return;var el=document.getElementById(id);if(el)el.classList.add('open');}
+var _rdy=false;document.addEventListener('mouseleave',function(){_rdy=true;});document.addEventListener('mouseenter',function(){_rdy=true;});setTimeout(function(){document.querySelectorAll('.suggest-list').forEach(function(e){e.classList.remove('open');});},50);function showSuggest(id){if(!_rdy)return;var el=document.getElementById(id);if(el)el.classList.add('open');}
 function hideSuggest(id){setTimeout(function(){var el=document.getElementById(id);if(el)el.classList.remove('open');},300);}
 function setSuggest(fieldId,val){
   var el=document.getElementById(fieldId);
