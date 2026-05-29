@@ -78,7 +78,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .small-label .lrow{font-size:11px;color:#111;line-height:1.5;}
 .small-label .lrow strong{font-weight:700;}
 .big-label-wrap{border:3px solid #222;border-radius:3px;background:white;padding:8px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;display:none;}
-
+.suggest-list.open{display:block;}
 .big-label-panel{font-size:15px;font-weight:700;color:#111;padding-top:4px;flex-shrink:0;}
 .label-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin:10px 0;}
 .label-nav button{width:34px;height:34px;border:1.5px solid var(--gray-border);border-radius:50%;background:white;font-size:16px;cursor:pointer;}
@@ -89,8 +89,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .print-all-btn:active{opacity:0.85;}
 .springs-msg{text-align:center;padding:24px 16px;color:var(--text-muted);font-size:14px;line-height:1.6;}
 .open-btn{display:inline-block;margin-top:16px;padding:12px 24px;background:var(--blue);color:white;border-radius:var(--radius-sm);font-size:15px;font-weight:600;text-decoration:none;}
-.suggest-list{position:absolute;top:100%;left:0;right:0;background:white;border:1.5px solid var(--blue-border);border-radius:var(--radius-sm);z-index:100;box-shadow:0 4px 12px rgba(0,0,0,0.12);overflow:hidden;display:none;}
-.suggest-list.open{display:block !important;}
+.suggest-list{position:absolute;top:100%;left:0;right:0;background:white;border:1.5px solid var(--blue-border);border-radius:var(--radius-sm);z-index:100;box-shadow:0 4px 12px rgba(0,0,0,0.12);overflow:hidden;}
 .suggest-list div{padding:10px 14px;font-size:15px;cursor:pointer;border-bottom:1px solid var(--gray-border);}
 .suggest-list div:last-child{border-bottom:none;}
 .suggest-list div:hover{background:var(--blue-light);color:var(--blue);}
@@ -171,7 +170,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <input type="number" id="width" placeholder="e.g. 192" inputmode="decimal" autocomplete="off"
       onmouseenter="showSuggest('width-suggest')" onfocus="showSuggest('width-suggest')"
       onblur="setTimeout(function(){hideSuggest('width-suggest')},200)">
-    <div id="width-suggest" class="suggest-list" style="display:none">
+    <div id="width-suggest" class="suggest-list" style="display:none;">
       <div onclick="setSuggest('width',84)">84"</div>
       <div onclick="setSuggest('width',96)">96"</div>
       <div onclick="setSuggest('width',108)">108"</div>
@@ -185,7 +184,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <input type="number" id="height" placeholder="e.g. 96" inputmode="decimal" autocomplete="off"
       onmouseenter="showSuggest('height-suggest')" onfocus="showSuggest('height-suggest')"
       onblur="setTimeout(function(){hideSuggest('height-suggest')},200)">
-    <div id="height-suggest" class="suggest-list" style="display:none">
+    <div id="height-suggest" class="suggest-list" style="display:none;">
       <div onclick="setSuggest('height',84)">84"</div>
       <div onclick="setSuggest('height',96)">96"</div>
       <div onclick="setSuggest('height',108)">108"</div>
@@ -200,7 +199,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <label>Track type</label>
     <input type="text" id="track-type-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
     <input type="hidden" id="track-type" value="">
-    <div id="cs-track" class="suggest-list" style="display:none">
+    <div id="cs-track" class="suggest-list">
       <div onmousedown="setSelect('track-type','3-15R','3&quot; 15R')">3" 15R</div>
       <div onmousedown="setSelect('track-type','2-12R','2&quot; 12R')">2" 12R</div>
       <div onmousedown="setSelect('track-type','3-LHR','3&quot; LHR')">3" LHR</div>
@@ -211,7 +210,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <label>Lift type</label>
     <input type="text" id="lift-type-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
     <input type="hidden" id="lift-type" value="">
-    <div id="cs-lift" class="suggest-list" style="display:none">
+    <div id="cs-lift" class="suggest-list">
       <div onmousedown="setSelect('lift-type','standard','Standard')">Standard</div>
       <div onmousedown="setSelect('lift-type','highlift','High Lift')">High Lift</div>
       <div onmousedown="setSelect('lift-type','lhr','Low Headroom')">Low Headroom</div>
@@ -232,7 +231,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <label>Mark</label>
     <input type="text" id="mark-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
     <input type="hidden" id="mark" value="">
-    <div id="cs-mark" class="suggest-list" style="display:none">
+    <div id="cs-mark" class="suggest-list">
       <div onmousedown="setSelect('mark','A','A',true)">A</div>
       <div onmousedown="setSelect('mark','B','B',true)">B</div>
       <div onmousedown="setSelect('mark','C','C',true)">C</div>
@@ -246,7 +245,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <label>Lites</label>
     <input type="text" id="lites-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
     <input type="hidden" id="lites" value="">
-    <div id="cs-lites" class="suggest-list" style="display:none">
+    <div id="cs-lites" class="suggest-list">
       <div onmousedown="setSelect('lites','1','1',true)">1</div>
       <div onmousedown="setSelect('lites','2','2',true)">2</div>
       <div onmousedown="setSelect('lites','3','3',true)">3</div>
@@ -258,14 +257,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <label>Glass</label>
     <input type="text" id="glass-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
     <input type="hidden" id="glass" value="">
-    <div id="cs-glass" class="suggest-list" style="display:none"></div>
+    <div id="cs-glass" class="suggest-list"></div>
   </div>
     </div>
     <div class="field" style="position:relative;" onmouseenter="buildFrameOptions();showSuggest('cs-frame')" onmouseleave="hideSuggest('cs-frame')">
     <label>Frame Color</label>
     <input type="text" id="frame-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
     <input type="hidden" id="frame" value="">
-    <div id="cs-frame" class="suggest-list" style="display:none"></div>
+    <div id="cs-frame" class="suggest-list"></div>
   </div>
   </div>
   <div class="results" id="results">
@@ -483,7 +482,7 @@ function syncDisplayFields(){
     disp.value = m ? (m[v]||v||'') : (v||'');
   });
 }
-var _rdy=false;document.addEventListener('mouseleave',function(){_rdy=true;});document.addEventListener('mouseenter',function(){_rdy=true;});setTimeout(function(){document.querySelectorAll('.suggest-list').forEach(function(e){e.classList.remove('open');e.style.display='none';});},100);function showSuggest(id){if(!_rdy)return;var el=document.getElementById(id);if(el){el.classList.add('open');el.style.display='block';}}
+var _rdy=false;setTimeout(function(){_rdy=true;},1500);function showSuggest(id){if(!_rdy)return;var el=document.getElementById(id);if(el){el.classList.add('open');el.style.display='block';}}
 function hideSuggest(id){setTimeout(function(){var el=document.getElementById(id);if(el){el.classList.remove('open');el.style.display='none';}},300);}
 function setSuggest(fieldId,val){
   var el=document.getElementById(fieldId);
@@ -642,17 +641,18 @@ function clearAll(){
 function getInfo(){
   var w=document.getElementById('width').value,h=document.getElementById('height').value;
   var ts=document.getElementById('track-type'),ls=document.getElementById('lift-type');
-  var tt=ts?(ts.options&&ts.selectedIndex>=0?ts.options[ts.selectedIndex].text:ts.value):'';
-  var lt=ls?(ls.options&&ls.selectedIndex>=0?ls.options[ls.selectedIndex].text:ls.value):'';
-  var ttd=document.getElementById('track-type-display');if(ttd&&ttd.value)tt=ttd.value;
-  var ltd=document.getElementById('lift-type-display');if(ltd&&ltd.value)lt=ltd.value;
-  var mk=document.getElementById('mark')?document.getElementById('mark').value:'';
-  var li=document.getElementById('lites')?document.getElementById('lites').value:'';
-  var gl=document.getElementById('glass')?document.getElementById('glass').value:'';
-  var fr=document.getElementById('frame')?document.getElementById('frame').value:'';
-  var wo=document.getElementById('wo')?document.getElementById('wo').value:'';
-  return {width:w,height:h,trackType:tt,liftType:lt,mark:mk,lites:li,glass:gl,frame:fr,wo:wo};
-});
+  var tt=ts.options[ts.selectedIndex]?ts.options[ts.selectedIndex].text:'';
+  var lt=ls.options[ls.selectedIndex]?ls.options[ls.selectedIndex].text:'';
+  var hl=document.getElementById('highlift').value,wt=document.getElementById('weight').value;
+  return'Width: '+w+'in | Height: '+h+'in | '+tt+' | '+lt+(hl?' | HL: '+hl+'in':'')+(wt?' | Weight: '+wt+' lbs':'');
+}
+function getTracksData(){
+  var grid=document.getElementById('jb-grid');
+  var jb=['J-10','J-12','J-14','J-16'].map(function(t,i){
+    var box=grid?grid.children[i]:null;
+    var qEl=box?box.querySelector('.jb-qty'):null;
+    return{label:t,qty:qEl?qEl.textContent:'--'};
+  });
   return{vertical:document.getElementById('r-vertical').textContent,horizontal:document.getElementById('r-horizontal').textContent,projection:document.getElementById('r-2x2').textContent,sections:document.getElementById('r-panels').textContent,config:document.getElementById('r-config').textContent,jb:jb};
 }
 function getCablesData(){
@@ -712,23 +712,6 @@ try{setupListeners();}catch(e){console.error('setupListeners:',e);}
 try{curRotation=load().bigRotation||0;}catch(e){console.error('curRotation:',e);}
 try{checkServer();}catch(e){console.error('checkServer:',e);}
 try{setInterval(checkServer,15000);}catch(e){}
-
-// Force all suggest-lists hidden unless they have 'open' class
-function closeAllDropdowns(){
-  document.querySelectorAll('.suggest-list').forEach(function(el){
-    if(!el.classList.contains('open')) el.style.display='none';
-  });
-}
-// Run immediately and after any DOM changes
-closeAllDropdowns();
-var _obs = new MutationObserver(function(){
-  if(!_rdy) closeAllDropdowns();
-});
-_obs.observe(document.body, {childList:true, subtree:true, attributes:false});
-// Stop observing after user moves mouse (they're in control now)
-document.addEventListener('mousemove', function(){
-  _obs.disconnect();
-}, {once:true, passive:true});
 </script>
 </body>
 </html>
