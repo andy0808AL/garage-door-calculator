@@ -481,7 +481,7 @@ function syncDisplayFields(){
     disp.value = m ? (m[v]||v||'') : (v||'');
   });
 }
-var _sx=0,_sy=0,_rdy=false;document.addEventListener('mousemove',function(e){if(!_rdy&&(Math.abs(e.clientX-_sx)>5||Math.abs(e.clientY-_sy)>5)){_rdy=true;}},{passive:true});function showSuggest(id){if(!_rdy)return;var el=document.getElementById(id);if(el)el.style.display='block';}
+var _rdy=false;document.addEventListener('mousemove',function(e){if(!_rdy&&(Math.abs(e.clientX-_sx)>5||Math.abs(e.clientY-_sy)>5)){_rdy=true;}},{passive:true});function showSuggest(id){if(!_rdy)return;var el=document.getElementById(id);if(el)el.style.display='block';}
 function hideSuggest(id){setTimeout(function(){var el=document.getElementById(id);if(el)el.style.display='none';},250);}
 function setSuggest(fieldId,val){
   var el=document.getElementById(fieldId);
