@@ -481,7 +481,18 @@ function syncDisplayFields(){
     disp.value = m ? (m[v]||v||'') : (v||'');
   });
 }
-var _ok=false;document.addEventListener("click",function(){_ok=true;},{once:true});document.addEventListener("keydown",function(){_ok=true;},{once:true});setTimeout(function(){_ok=true;},1500);function showSuggest(id){if(!_ok)return;var el=document.getElementById(id);if(el)el.style.display='block';}function hideSuggest(id){setTimeout(function(){var el=document.getElementById(id);if(el)el.style.display='none';},250);}
+var _startX=-999,_startY=-999,_ok=false;
+window.addEventListener('load',function(){
+  document.addEventListener('mousemove',function(e){
+    if(!_ok && (Math.abs(e.clientX-_startX)>3||Math.abs(e.clientY-_startY)>3)){
+      _ok=true;
+    }
+    _startX=e.clientX;_startY=e.clientY;
+  },{passive:true});
+});
+var _hideT={};
+function showSuggest(id){if(!_ok)return;clearTimeout(_hideT[id]);var el=document.getElementById(id);if(el)el.style.display='block';}
+function hideSuggest(id){clearTimeout(_hideT[id]);_hideT[id]=setTimeout(function(){var el=document.getElementById(id);if(el)el.style.display='none';},250);},250);}
 function hideSuggest(id){var el=document.getElementById(id);if(el)el.style.display='none';}
 function setSuggest(fieldId,val){
   var el=document.getElementById(fieldId);
