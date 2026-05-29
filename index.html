@@ -639,12 +639,9 @@ function clearAll(){
   CD={};labelRoles=[];curLabel=0;showTab(0);save({formData:{}});['track-type','lift-type','mark','lites','glass','frame'].forEach(function(id){var d=document.getElementById(id+'-display');if(d)d.value='';var i=document.getElementById(id);if(i)i.value='';});
 }
 function getInfo(){
-  var w=document.getElementById('width').value,h=document.getElementById('height').value;
-  var ts=document.getElementById('track-type'),ls=document.getElementById('lift-type');
-  var tt=ts.options[ts.selectedIndex]?ts.options[ts.selectedIndex].text:'';
-  var lt=ls.options[ls.selectedIndex]?ls.options[ls.selectedIndex].text:'';
-  var hl=document.getElementById('highlift').value,wt=document.getElementById('weight').value;
-  return'Width: '+w+'in | Height: '+h+'in | '+tt+' | '+lt+(hl?' | HL: '+hl+'in':'')+(wt?' | Weight: '+wt+' lbs':'');
+  function gv(id){var el=document.getElementById(id);return el?el.value:'';}
+  function gd(id){var el=document.getElementById(id+'-display');if(el&&el.value)return el.value;return gv(id);}
+  return {width:gv('width'),height:gv('height'),trackType:gd('track-type'),liftType:gd('lift-type'),mark:gv('mark'),lites:gv('lites'),glass:gv('glass'),frame:gv('frame'),wo:gv('wo')};
 }
 function getTracksData(){
   var grid=document.getElementById('jb-grid');
