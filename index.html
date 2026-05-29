@@ -493,7 +493,7 @@ window.addEventListener('load',function(){
 var _hideT={};
 function showSuggest(id){if(!_ok)return;clearTimeout(_hideT[id]);var el=document.getElementById(id);if(el)el.style.display='block';}
 function hideSuggest(id){clearTimeout(_hideT[id]);_hideT[id]=setTimeout(function(){var el=document.getElementById(id);if(el)el.style.display='none';},250);},250);}
-function hideSuggest(id){var el=document.getElementById(id);if(el)el.style.display='none';}
+
 function setSuggest(fieldId,val){
   var el=document.getElementById(fieldId);
   if(el){el.value=val;el.dispatchEvent(new Event('input'));}
