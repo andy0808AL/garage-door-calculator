@@ -94,6 +94,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .suggest-list div:last-child{border-bottom:none;}
 .suggest-list div:hover{background:var(--blue-light);color:var(--blue);}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;color:white;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:500;z-index:999;display:none;white-space:nowrap;}
+
+@media print {
+  body > *:not(#preview-print-area) { display:none !important; }
+  #preview-print-area { display:block !important; position:static !important; padding:20px; }
+  #preview-overlay { display:none !important; }
+  @page { margin:15mm; }
+}
+#preview-print-area { display:none; }
 </style>
 </head>
 <body>
@@ -365,6 +373,14 @@ function mergeServerPrinters(printers){
   if(newEx.length>0){save({extraPrinters:extra.concat(newEx)});}
 }
 
+
+function printPreview(){
+  var content = document.getElementById('preview-content').innerHTML;
+  var title = document.getElementById('preview-title').textContent;
+  var area = document.getElementById('preview-print-area');
+  area.innerHTML = '<h2 style="font-family:Arial;color:#1B2A6B;margin-bottom:16px;">'+title+'</h2>' + content;
+  window.print();
+}
 function openPreview(type){
   var overlay = document.getElementById('preview-overlay');
   var content = document.getElementById('preview-content');
@@ -774,12 +790,13 @@ try{checkServer();}catch(e){console.error('checkServer:',e);}
 try{setInterval(checkServer,15000);}catch(e){}
 </script>
 
+<div id="preview-print-area"></div>
 <div id="preview-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:1000;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px;">
   <div style="width:100%;max-width:780px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
       <button onclick="closePreview()" style="background:white;color:#1B2A6B;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">&#8592; Back</button>
       <div id="preview-title" style="color:white;font-size:18px;font-weight:700;"></div>
-      <div style="width:80px;"></div>
+      <button onclick="printPreview()" style="background:#C0272D;color:white;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">&#128424; Print</button>
     </div>
     <div id="preview-content" style="background:white;border-radius:12px;padding:24px;overflow-y:auto;max-height:calc(100vh - 120px);"></div>
   </div>
