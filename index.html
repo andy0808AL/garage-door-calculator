@@ -611,7 +611,7 @@ function updateLabels(){
 function renderBigLabelPreview(){
   var container=document.getElementById('big-label-preview');if(!container)return;
   var wo=document.getElementById('wo').value.trim();
-  var deg=curRotation;
+  var deg=0; // preview always upright
   var role=labelRoles[curLabel]||'',panels=CD.panels||4;
   var woText='W/O: '+(wo||'--'),panelText=role+' ('+(curLabel+1)+'/'+panels+')';
   var netDeg=(deg+180)%360;
