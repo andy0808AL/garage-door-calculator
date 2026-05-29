@@ -638,11 +638,7 @@ function clearAll(){
   document.getElementById('results').classList.remove('visible');document.getElementById('print-all-wrap').classList.remove('visible');
   CD={};labelRoles=[];curLabel=0;showTab(0);save({formData:{}});['track-type','lift-type','mark','lites','glass','frame'].forEach(function(id){var d=document.getElementById(id+'-display');if(d)d.value='';var i=document.getElementById(id);if(i)i.value='';});
 }
-function getInfo(){
-  function gv(id){var el=document.getElementById(id);return el?el.value:'';}
-  function gd(id){var el=document.getElementById(id+'-display');if(el&&el.value)return el.value;return gv(id);}
-  return {width:gv('width'),height:gv('height'),trackType:gd('track-type'),liftType:gd('lift-type'),mark:gv('mark'),lites:gv('lites'),glass:gv('glass'),frame:gv('frame'),wo:gv('wo')};
-}
+function getInfo(){function gv(id){var e=document.getElementById(id);return e?e.value:"";}function gd(id){var e=document.getElementById(id+"-display");if(e&&e.value)return e.value;return gv(id);}return{width:gv("width"),height:gv("height"),trackType:gd("track-type"),liftType:gd("lift-type"),mark:gv("mark"),lites:gv("lites"),glass:gv("glass"),frame:gv("frame"),wo:gv("wo")};}
 function getTracksData(){
   var grid=document.getElementById('jb-grid');
   var jb=['J-10','J-12','J-14','J-16'].map(function(t,i){
