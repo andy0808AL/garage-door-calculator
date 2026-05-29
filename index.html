@@ -712,6 +712,23 @@ try{setupListeners();}catch(e){console.error('setupListeners:',e);}
 try{curRotation=load().bigRotation||0;}catch(e){console.error('curRotation:',e);}
 try{checkServer();}catch(e){console.error('checkServer:',e);}
 try{setInterval(checkServer,15000);}catch(e){}
+
+// Force all suggest-lists hidden unless they have 'open' class
+function closeAllDropdowns(){
+  document.querySelectorAll('.suggest-list').forEach(function(el){
+    if(!el.classList.contains('open')) el.style.display='none';
+  });
+}
+// Run immediately and after any DOM changes
+closeAllDropdowns();
+var _obs = new MutationObserver(function(){
+  if(!_rdy) closeAllDropdowns();
+});
+_obs.observe(document.body, {childList:true, subtree:true, attributes:false});
+// Stop observing after user moves mouse (they're in control now)
+document.addEventListener('mousemove', function(){
+  _obs.disconnect();
+}, {once:true, passive:true});
 </script>
 </body>
 </html>
