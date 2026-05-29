@@ -622,8 +622,8 @@ function renderBigLabelPreview(){
     wrapStyle='aspect-ratio:2/1;min-height:110px;max-height:160px;';
     svg='<svg width="100%" style="flex:1;display:block;min-height:0;" viewBox="0 0 500 160" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">'+(flip?'<g transform="rotate(180 250 80)">':'')+'<text x="250" y="82" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="62" textLength="480" lengthAdjust="spacingAndGlyphs">'+woText+'</text>'+(flip?'</g>':'')+'</svg>';
   }else{
-    wrapStyle='aspect-ratio:1/2;min-height:200px;max-height:340px;';
-    svg='<svg width="100%" style="flex:1;display:block;min-height:0;" viewBox="0 0 270 200" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">'+(flip?'<g transform="rotate(180 135 100)">':'')+'<text x="135" y="100" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="55" textLength="258" lengthAdjust="spacingAndGlyphs">'+woText+'</text>'+(flip?'</g>':'')+'</svg>';
+    wrapStyle='min-height:200px;width:100%;display:flex;justify-content:center;';
+    svg='<svg width="100%" style="flex:1;display:block;min-height:0;width:100%;height:auto;" viewBox="0 0 270 200" width="270" height="200" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">'+(flip?'<g transform="rotate(180 135 100)">':'')+'<text x="135" y="100" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="55" textLength="258" lengthAdjust="spacingAndGlyphs">'+woText+'</text>'+(flip?'</g>':'')+'</svg>';
   }
   container.innerHTML='<div class="big-label-wrap" style="'+wrapStyle+'">'+svg+'<div class="big-label-panel" style="text-align:'+pAlign+';">'+panelText+'</div></div>';
 }
