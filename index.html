@@ -164,12 +164,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   <div class="card">
     <div class="card-title">Door Information</div>
     <div class="field-row">
-      <div class="field" style="position:relative;" >
+      <div class="field" style="position:relative;" onmouseenter="showSuggest('width-suggest')" onmouseleave="hideSuggest('width-suggest')">
     <label>Width (inches)</label>
     <input type="number" id="width" placeholder="e.g. 192" inputmode="decimal" autocomplete="off"
-      onmouseenter="showSuggest('width-suggest')" onmouseleave="hideSuggest('width-suggest')" onfocus="showSuggest('width-suggest')"
+      onmouseenter="showSuggest('width-suggest')" onfocus="showSuggest('width-suggest')"
       onblur="setTimeout(function(){hideSuggest('width-suggest')},200)">
-    <div id="width-suggest" data-suggest-id="width-suggest" data-suggest-pre="" class="suggest-list" style="display:none;">
+    <div id="width-suggest" class="suggest-list" style="display:none;">
       <div onclick="setSuggest('width',84)">84"</div>
       <div onclick="setSuggest('width',96)">96"</div>
       <div onclick="setSuggest('width',108)">108"</div>
@@ -178,12 +178,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       <div onclick="setSuggest('width',216)">216"</div>
     </div>
   </div>
-      <div class="field" style="position:relative;" >
+      <div class="field" style="position:relative;" onmouseenter="showSuggest('height-suggest')" onmouseleave="hideSuggest('height-suggest')">
     <label>Height (inches)</label>
     <input type="number" id="height" placeholder="e.g. 96" inputmode="decimal" autocomplete="off"
-      onmouseenter="showSuggest('height-suggest')" onmouseleave="hideSuggest('height-suggest')" onfocus="showSuggest('height-suggest')"
+      onmouseenter="showSuggest('height-suggest')" onfocus="showSuggest('height-suggest')"
       onblur="setTimeout(function(){hideSuggest('height-suggest')},200)">
-    <div id="height-suggest" data-suggest-id="height-suggest" data-suggest-pre="" class="suggest-list" style="display:none;">
+    <div id="height-suggest" class="suggest-list" style="display:none;">
       <div onclick="setSuggest('height',84)">84"</div>
       <div onclick="setSuggest('height',96)">96"</div>
       <div onclick="setSuggest('height',108)">108"</div>
@@ -194,22 +194,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   </div>
     </div>
     <div class="field-row">
-      <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-track')" onmouseleave="hideSuggest('cs-track')" >
+      <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-track')" onmouseleave="hideSuggest('cs-track')">
     <label>Track type</label>
     <input type="text" id="track-type-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
     <input type="hidden" id="track-type" value="">
-    <div id="cs-track" style="display:none" data-suggest-id="cs-track" data-suggest-pre="" class="suggest-list">
+    <div id="cs-track" class="suggest-list">
       <div onmousedown="setSelect('track-type','3-15R','3&quot; 15R')">3" 15R</div>
       <div onmousedown="setSelect('track-type','2-12R','2&quot; 12R')">2" 12R</div>
       <div onmousedown="setSelect('track-type','3-LHR','3&quot; LHR')">3" LHR</div>
       <div onmousedown="setSelect('track-type','2-LHR','2&quot; LHR')">2" LHR</div>
     </div>
   </div>
-      <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-lift')" onmouseleave="hideSuggest('cs-lift')" >
+      <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-lift')" onmouseleave="hideSuggest('cs-lift')">
     <label>Lift type</label>
     <input type="text" id="lift-type-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
     <input type="hidden" id="lift-type" value="">
-    <div id="cs-lift" style="display:none" data-suggest-id="cs-lift" data-suggest-pre="" class="suggest-list">
+    <div id="cs-lift" class="suggest-list">
       <div onmousedown="setSelect('lift-type','standard','Standard')">Standard</div>
       <div onmousedown="setSelect('lift-type','highlift','High Lift')">High Lift</div>
       <div onmousedown="setSelect('lift-type','lhr','Low Headroom')">Low Headroom</div>
@@ -226,11 +226,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <div class="card-title">Label Information <span class="badge">Optional</span></div>
     <div class="field-row">
       <div class="field"><label>W/O #</label><input type="text" id="wo" placeholder="e.g. 721"></div>
-      <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-mark')" onmouseleave="hideSuggest('cs-mark')" >
+      <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-mark')" onmouseleave="hideSuggest('cs-mark')">
     <label>Mark</label>
     <input type="text" id="mark-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
     <input type="hidden" id="mark" value="">
-    <div id="cs-mark" style="display:none" data-suggest-id="cs-mark" data-suggest-pre="" class="suggest-list">
+    <div id="cs-mark" class="suggest-list">
       <div onmousedown="setSelect('mark','A','A',true)">A</div>
       <div onmousedown="setSelect('mark','B','B',true)">B</div>
       <div onmousedown="setSelect('mark','C','C',true)">C</div>
@@ -240,11 +240,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   </div>
     </div>
     <div class="field-row">
-      <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-lites')" onmouseleave="hideSuggest('cs-lites')" >
+      <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-lites')" onmouseleave="hideSuggest('cs-lites')">
     <label>Lites</label>
     <input type="text" id="lites-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
     <input type="hidden" id="lites" value="">
-    <div id="cs-lites" style="display:none" data-suggest-id="cs-lites" data-suggest-pre="" class="suggest-list">
+    <div id="cs-lites" class="suggest-list">
       <div onmousedown="setSelect('lites','1','1',true)">1</div>
       <div onmousedown="setSelect('lites','2','2',true)">2</div>
       <div onmousedown="setSelect('lites','3','3',true)">3</div>
@@ -252,18 +252,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       <div onmousedown="setSelect('lites','5','5',true)">5</div>
     </div>
   </div>
-      <div class="field" style="position:relative;" onmouseenter="buildGlassOptions();showSuggest('cs-glass')" onmouseleave="hideSuggest('cs-glass')" >
+      <div class="field" style="position:relative;" onmouseenter="buildGlassOptions();showSuggest('cs-glass')" onmouseleave="hideSuggest('cs-glass')">
     <label>Glass</label>
     <input type="text" id="glass-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
     <input type="hidden" id="glass" value="">
-    <div id="cs-glass" style="display:none" data-suggest-id="cs-glass" data-suggest-pre="buildGlassOptions();" class="suggest-list"></div>
+    <div id="cs-glass" class="suggest-list"></div>
   </div>
     </div>
-    <div class="field" style="position:relative;" onmouseenter="buildFrameOptions();showSuggest('cs-frame')" onmouseleave="hideSuggest('cs-frame')" >
+    <div class="field" style="position:relative;" onmouseenter="buildFrameOptions();showSuggest('cs-frame')" onmouseleave="hideSuggest('cs-frame')">
     <label>Frame Color</label>
     <input type="text" id="frame-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
     <input type="hidden" id="frame" value="">
-    <div id="cs-frame" style="display:none" data-suggest-id="cs-frame" data-suggest-pre="buildFrameOptions();" class="suggest-list"></div>
+    <div id="cs-frame" class="suggest-list"></div>
   </div>
   </div>
   <div class="results" id="results">
@@ -481,17 +481,8 @@ function syncDisplayFields(){
     disp.value = m ? (m[v]||v||'') : (v||'');
   });
 }
-var _ok=false;
-function _en(){_ok=true;document.removeEventListener('click',_en);document.removeEventListener('keydown',_en);}
-document.addEventListener('click',_en);
-document.addEventListener('keydown',_en);
-setTimeout(function(){_ok=true;},2000);
-var _hideT={};
-function showSuggest(id){if(!_ok)return;clearTimeout(_hideT[id]);var el=document.getElementById(id);if(el)el.style.display='block';}
-function hideSuggest(id){clearTimeout(_hideT[id]);_hideT[id]=setTimeout(function(){var el=document.getElementById(id);if(el)el.style.display='none';},300);}
-
-  _hideT[id]=setTimeout(function(){var el=document.getElementById(id);if(el)el.style.display='none';},150);
-},200);}
+var _ok=false;document.addEventListener("click",function(){_ok=true;},{once:true});document.addEventListener("keydown",function(){_ok=true;},{once:true});setTimeout(function(){_ok=true;},1500);function showSuggest(id){if(!_ok)return;var el=document.getElementById(id);if(el)el.style.display='block';}function hideSuggest(id){setTimeout(function(){var el=document.getElementById(id);if(el)el.style.display='none';},250);}
+function hideSuggest(id){var el=document.getElementById(id);if(el)el.style.display='none';}
 function setSuggest(fieldId,val){
   var el=document.getElementById(fieldId);
   if(el){el.value=val;el.dispatchEvent(new Event('input'));}
@@ -714,7 +705,6 @@ function doPrintAll(){
     setTimeout(function(){toast('Tracks & Cables sent!',2000);},800);
   }
 }
-document.querySelectorAll('.suggest-list').forEach(function(el){el.classList.remove('open');});
 try{rebuildDropdowns();}catch(e){console.error('rebuildDropdowns:',e);}
 try{restoreForm();syncDisplayFields();}catch(e){console.error('restoreForm:',e);}
 try{setupListeners();}catch(e){console.error('setupListeners:',e);}
