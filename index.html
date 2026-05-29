@@ -283,7 +283,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
         <div class="result-row"><span class="rlabel">Configuration</span><span class="rvalue" id="r-config" style="font-size:13px;text-align:right;max-width:55%">--</span></div>
       </div>
       <div class="card"><div class="card-title">Jamb Brackets -- per side</div><div class="jb-grid" id="jb-grid"></div></div>
-      <button class="print-btn" onclick="doPrint('tracks')">&#128424; Print Tracks</button>
+      <div style="display:flex;gap:8px;">
+      <button class="print-btn" style="flex:1;" onclick="doPrint('tracks')">&#128424; Print Tracks</button>
+      <button class="print-btn" style="flex:1;background:var(--blue-dark);" onclick="openPreview('tracks')">&#128065; Preview</button>
+    </div>
     </div>
     <div class="page" id="page-1">
       <div class="notice" id="weight-notice" style="display:none">Enter door weight to calculate cables.</div>
@@ -298,7 +301,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
           <div class="result-row"><span class="rlabel">Floor to shaft center</span><span class="rvalue" id="r-ftsc">--</span></div>
           <div class="cable-box"><div><div class="cable-size" id="r-cable">--</div><div class="cable-sub">Cable length &middot; left &amp; right</div></div><div class="cable-badge" id="r-cable-type">--</div></div>
         </div>
-        <button class="print-btn" onclick="doPrint('cables')">&#128424; Print Cables</button>
+        <div style="display:flex;gap:8px;">
+      <button class="print-btn" style="flex:1;" onclick="doPrint('cables')">&#128424; Print Cables</button>
+      <button class="print-btn" style="flex:1;background:var(--blue-dark);" onclick="openPreview('cables')">&#128065; Preview</button>
+    </div>
       </div>
     </div>
     <div class="page" id="page-2">
@@ -357,6 +363,67 @@ function mergeServerPrinters(printers){
   var s=load();var extra=s.extraPrinters||[];
   var newEx=printers.filter(function(p){return DEF_PRINTERS.indexOf(p)<0&&extra.indexOf(p)<0;});
   if(newEx.length>0){save({extraPrinters:extra.concat(newEx)});}
+}
+
+function openPreview(type){
+  var overlay = document.getElementById('preview-overlay');
+  var content = document.getElementById('preview-content');
+  var title = document.getElementById('preview-title');
+  overlay.style.display='flex';
+  document.body.style.overflow='hidden';
+  if(type==='tracks'){
+    title.textContent='Track Preview';
+    var d=getTracksData();
+    var info=getInfo();
+    content.innerHTML = buildTracksPreviewHTML(d, info);
+  } else if(type==='cables'){
+    title.textContent='Cable Preview';
+    var d=getCablesData();
+    var info=getInfo();
+    content.innerHTML = buildCablesPreviewHTML(d, info);
+  }
+}
+
+function closePreview(){
+  document.getElementById('preview-overlay').style.display='none';
+  document.body.style.overflow='';
+}
+
+function buildTracksPreviewHTML(d, info){
+  var h='<div style="font-family:Arial,sans-serif;">';
+  h+='<div style="text-align:center;margin-bottom:16px;font-size:13px;color:#666;">W/O: '+(info.wo||'-')+' &nbsp;|&nbsp; '+info.width+'" x '+info.height+'" &nbsp;|&nbsp; '+info.trackType+'</div>';
+  h+='<table style="width:100%;border-collapse:collapse;font-size:15px;">';
+  h+='<tr style="background:#1B2A6B;color:white;"><th style="padding:10px;text-align:left;">Measurement</th><th style="padding:10px;text-align:right;">Value</th></tr>';
+  h+='<tr style="background:#f8f9fa;"><td style="padding:10px;">Vertical (L & R)</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.vertical+'"</td></tr>';
+  h+='<tr><td style="padding:10px;">Horizontal (L & R)</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.horizontal+'"</td></tr>';
+  h+='<tr style="background:#f8f9fa;"><td style="padding:10px;">2x2 Projection</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.projection+'"</td></tr>';
+  h+='<tr><td style="padding:10px;">Sections</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.sections+'</td></tr>';
+  h+='<tr style="background:#f8f9fa;"><td style="padding:10px;">Configuration</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.config+'</td></tr>';
+  h+='</table>';
+  if(d.jb && d.jb.length){
+    h+='<div style="margin-top:16px;font-weight:700;font-size:14px;color:#1B2A6B;">JAMB BRACKETS — PER SIDE</div>';
+    h+='<div style="display:flex;gap:12px;margin-top:8px;">';
+    d.jb.forEach(function(j){if(j.qty!==null){h+='<div style="background:#f8f9fa;border-radius:8px;padding:12px 16px;text-align:center;"><div style="font-size:12px;color:#666;">'+j.label+'</div><div style="font-size:22px;font-weight:700;color:#1B2A6B;">'+j.qty+'</div></div>';}});
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+function buildCablesPreviewHTML(d, info){
+  var h='<div style="font-family:Arial,sans-serif;">';
+  h+='<div style="text-align:center;margin-bottom:16px;font-size:13px;color:#666;">W/O: '+(info.wo||'-')+' &nbsp;|&nbsp; '+info.width+'" x '+info.height+'" &nbsp;|&nbsp; Door Weight: '+(info.weight||CD.wt||'-')+' lbs</div>';
+  h+='<table style="width:100%;border-collapse:collapse;font-size:15px;">';
+  h+='<tr style="background:#1B2A6B;color:white;"><th style="padding:10px;text-align:left;">Item</th><th style="padding:10px;text-align:right;">Value</th></tr>';
+  h+='<tr style="background:#f8f9fa;"><td style="padding:10px;">Drum</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.drum+'</td></tr>';
+  h+='<tr><td style="padding:10px;">EBF</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.ebf+'</td></tr>';
+  h+='<tr style="background:#f8f9fa;"><td style="padding:10px;">Capacity (per drum)</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.capacity+' lbs</td></tr>';
+  h+='<tr><td style="padding:10px;">FTSC</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.ftsc+'"</td></tr>';
+  h+='<tr style="background:#f8f9fa;"><td style="padding:10px;">Cable Length</td><td style="padding:10px;text-align:right;font-weight:700;color:#C0272D;font-size:18px;">'+d.cable+'"</td></tr>';
+  h+='<tr><td style="padding:10px;">Cable Type</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.cableType+'</td></tr>';
+  h+='</table>';
+  h+='</div>';
+  return h;
 }
 function openSettings(){document.getElementById('settings-overlay').classList.add('open');document.getElementById('settings-drawer').classList.add('open');document.body.style.overflow='hidden';renderSettings();loadJBSettingsUI();}
 function closeSettings(){document.getElementById('settings-overlay').classList.remove('open');document.getElementById('settings-drawer').classList.remove('open');document.body.style.overflow='';}
@@ -706,5 +773,15 @@ try{curRotation=load().bigRotation||0;}catch(e){console.error('curRotation:',e);
 try{checkServer();}catch(e){console.error('checkServer:',e);}
 try{setInterval(checkServer,15000);}catch(e){}
 </script>
-</body>
+
+<div id="preview-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:1000;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px;">
+  <div style="width:100%;max-width:780px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <button onclick="closePreview()" style="background:white;color:#1B2A6B;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">&#8592; Back</button>
+      <div id="preview-title" style="color:white;font-size:18px;font-weight:700;"></div>
+      <div style="width:80px;"></div>
+    </div>
+    <div id="preview-content" style="background:white;border-radius:12px;padding:24px;overflow-y:auto;max-height:calc(100vh - 120px);"></div>
+  </div>
+</div></body>
 </html>
