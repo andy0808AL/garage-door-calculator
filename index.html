@@ -576,7 +576,7 @@ function calculate(){
     notice.style.display='none';cableDiv.style.display='block';
     var drum,cap,ebf,ebfA,cA;
     if(lt==='highlift'){if(hl<=54){drum='D525-54';cap=500;ebf='EBP 4 3/8in';ebfA=3.125;cA=66;}else if(wt<=1000){drum='D575-120';cap=500;ebf='EBP 6in';ebfA=4.875;cA=133;}else{drum='D800-120';cap=1100;ebf='EBP 6in';ebfA=4.875;cA=137;}}
-    else{if(height<=96){drum='D400-96';cap=265;ebf='EBP 3 3/8in';ebfA=3.125;cA=8;}else if(height<=144){drum='D400-144';cap=375;ebf='EBP 3 3/8in';ebfA=3.125;cA=8;}else{drum='5250-18 (525-216)';cap=750;ebf='EBP 3 3/8in';ebfA=3.125;cA=10;}}
+    else{if(wt<=530){drum='D400-96';cap=265;ebf='EBP 3 3/8in';ebfA=3.125;cA=8;}else if(wt<=750){drum='D400-144';cap=375;ebf='EBP 3 3/8in';ebfA=3.125;cA=8;}else{drum='5250-18 (525-216)';cap=750;ebf='EBP 3 3/8in';ebfA=3.125;cA=10;}}
     var toff={'3-15R':17,'3-LHR':25,'2-LHR':19,'2-12R':13.125}[tt];
     var ftsc=vert+toff+ebfA,cable=Math.ceil(lt==='highlift'?ftsc+cA-hl:ftsc+cA);
     CD.drum=drum;CD.cap=cap;CD.ebf=ebf;CD.ftsc=ftsc;CD.cable=cable;CD.cableType=getCT(drum);
