@@ -341,6 +341,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-nsprings">—</div>
     </div>
     <div>
+      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Length (2.625")</div>
+      <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-length">—</div>
+    </div>
+    <div>
       <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Wire Size</div>
       <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-wire">—</div>
     </div>
@@ -639,6 +643,8 @@ function calcSprings() {
 
   // Update main fields
   document.getElementById('sp-nsprings').textContent = nS;
+  var lenFor2625 = spGetLength(ref,tippt,nS,2.625);
+  if(document.getElementById('sp-length')) document.getElementById('sp-length').textContent = lenFor2625 ? lenFor2625.toFixed(2)+'"' : '—';
   document.getElementById('sp-wire').textContent = wire+'"';
   document.getElementById('sp-tippt').textContent = tippt.toFixed(1);
   document.getElementById('sp-drum').textContent = drum;
@@ -676,8 +682,8 @@ function calcSprings() {
     if(!wireOK){
       cardsHTML += '<div style="font-size:12px;color:#C0272D;margin-top:4px;line-height:1.4">⚠ Wire '+wire+'" below minimum<br/>Min for this ID: '+minW+'"</div>';
     } else {
-      cardsHTML += '<div style="font-size:12px;color:#666;margin-top:2px">'+len.toFixed(2)+'"</div>';
-      cardsHTML += '<div style="font-size:12px;color:#666;">'+wts.toFixed(2)+' lbs</div>';
+      cardsHTML += '<div style="font-size:12px;color:#666;margin-top:2px">'+(len?len.toFixed(2):'N/A')+'"</div>';
+      cardsHTML += '<div style="font-size:12px;color:#666;">'+(wts?wts.toFixed(2):'0.00')+' lbs</div>';
       cardsHTML += '<div style="font-size:11px;margin-top:4px;color:'+(fits?'#28a745':'#dc3545')+'">'+(fits?'✓ fits':'✗ no fit')+' ('+(spaceLeft>=0?'+':'')+spaceLeft.toFixed(1)+'" shaft)</div>';
     }
     cardsHTML += '</div>';
