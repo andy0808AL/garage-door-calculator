@@ -238,8 +238,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <button class="clear-btn" onclick="clearAll()">Clear</button>
   </div>
   <div class="card">
-    <div class="card-title">Label Information <span class="badge">Optional</span></div>
-    <div class="field-row">
+    <div class="card-title" onclick="toggleLabelSection()" style="cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;">Label Information <span style="display:flex;align-items:center;gap:8px"><span class="badge">Optional</span><span id="label-chevron" style="font-size:16px;transition:transform .3s">▶</span></span></div>
+    <div id="label-section-content" style="display:none"><div class="field-row">
       <div class="field"><label>W/O #</label><input type="text" id="wo" placeholder="e.g. 721"></div>
       <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-mark')" onmouseleave="hideSuggest('cs-mark')">
     <label>Mark</label>
@@ -728,6 +728,18 @@ function printSpringPreview(){
   var txt = document.getElementById('spring-preview-content').textContent;
   document.getElementById('spring-print-area').textContent = txt;
   window.print();
+}
+
+function toggleLabelSection(){
+  var content = document.getElementById('label-section-content');
+  var chevron = document.getElementById('label-chevron');
+  if(content.style.display==='none'){
+    content.style.display='';
+    chevron.textContent='▼';
+  } else {
+    content.style.display='none';
+    chevron.textContent='▶';
+  }
 }
 function openSettings(){document.getElementById('settings-overlay').classList.add('open');document.getElementById('settings-drawer').classList.add('open');document.body.style.overflow='hidden';renderSettings();loadJBSettingsUI();}
 function closeSettings(){document.getElementById('settings-overlay').classList.remove('open');document.getElementById('settings-drawer').classList.remove('open');document.body.style.overflow='';}
