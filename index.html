@@ -700,11 +700,13 @@ function openSpringPreview(){
   // Get ID card lengths
   var cards = document.querySelectorAll('#sp-id-cards > div');
   var idLines = '';
-  cards.forEach(function(c){
-    var title = c.querySelector('div:nth-child(1)') ? c.querySelector('div:nth-child(1)').textContent : '';
-    var len   = c.querySelector('div:nth-child(2)') ? c.querySelector('div:nth-child(2)').textContent : '';
-    var wt    = c.querySelector('div:nth-child(3)') ? c.querySelector('div:nth-child(3)').textContent : '';
-    idLines += 'Spring ID: '+title+'\nSpring Length: '+len+'\nWeight: '+wt+'\n\n';
+  cards.forEach(function(c,ci){
+    var title = c.querySelector('div:nth-child(1)') ? c.querySelector('div:nth-child(1)').textContent.trim() : '';
+    var len   = c.querySelector('div:nth-child(2)') ? c.querySelector('div:nth-child(2)').textContent.trim() : '';
+    var wt    = c.querySelector('div:nth-child(3)') ? c.querySelector('div:nth-child(3)').textContent.trim() : '';
+    if(title && len && !len.includes('below') && !len.includes('Min')){
+      idLines += 'Spring ID: '+title+'\nSpring Length: '+len+'\nWeight: '+wt+'\n\n';
+    }
   });
 
   var hlLine = lt.toLowerCase().includes('high') ? '\nHi-Lift: '+hl+'"' : '';
