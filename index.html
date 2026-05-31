@@ -337,7 +337,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px">
     <div>
-      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Muelles</div>
+      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Springs</div>
       <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-nsprings">—</div>
     </div>
     <div>
@@ -359,9 +359,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 </div>
 
 <div style="padding:8px 20px">
-  <div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">LONGITUD POR ID — ELIGE SEGÚN INVENTARIO</div>
+  <div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">LENGTH BY ID — CHOOSE BASED ON INVENTORY</div>
   <div id="sp-id-cards" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px"></div>
-  <div class="result-row"><span class="rlabel">Ciclos estimados</span><span class="rvalue" id="sp-cycles">—</span></div>
+  <div class="result-row"><span class="rlabel">Estimated cycles</span><span class="rvalue" id="sp-cycles">—</span></div>
 </div>
 </div>
 
@@ -639,7 +639,7 @@ function calcSprings() {
   document.getElementById('sp-drum').textContent = drum;
   document.getElementById('sp-multi').textContent = mr.multi.toFixed(6);
   document.getElementById('sp-turns').textContent = mr.turns.toFixed(2);
-  document.getElementById('sp-cycles').textContent = cyc.toLocaleString()+' ciclos';
+  document.getElementById('sp-cycles').textContent = cyc.toLocaleString()+' cycles';
   document.getElementById('sp-lift-display').textContent = lt==='highlift'?'High Lift':'Standard';
   if(lt==='highlift') {
     document.getElementById('sp-hl-box').style.display='';
@@ -663,7 +663,7 @@ function calcSprings() {
     cardsHTML += '<div style="font-size:13px;font-weight:600;color:'+(ok?'#155724':'#333')+'">ID '+id+'"</div>';
     cardsHTML += '<div style="font-size:12px;color:#666;margin-top:2px">'+len.toFixed(2)+'"</div>';
     cardsHTML += '<div style="font-size:12px;color:#666;">'+wts.toFixed(2)+' lbs</div>';
-    cardsHTML += '<div style="font-size:11px;margin-top:4px;color:'+(fits?'#28a745':'#dc3545')+'">'+(fits?'✓ cabe':'✗ no cabe')+' ('+( spaceLeft>=0?'+':'')+spaceLeft.toFixed(1)+'")</div>';
+    cardsHTML += '<div style="font-size:11px;margin-top:4px;color:'+(fits?'#28a745':'#dc3545')+'">'+(fits?'✓ fits':'✗ no fit')+' ('+( spaceLeft>=0?'+':'')+spaceLeft.toFixed(1)+'")</div>';
     cardsHTML += '</div>';
   });
   document.getElementById('sp-id-cards').innerHTML = cardsHTML;
