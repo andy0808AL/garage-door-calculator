@@ -659,13 +659,16 @@ function calcSprings() {
   // Min wire per ID from SSC specs
   var MIN_WIRE_ID = {2.625:0.243, 3.750:0.273, 5.250:0.331};
   var cardsHTML = '';
+  var MIN_ID_WIRE={2.625:0.243,3.750:0.273,5.250:0.331};
   IDS.forEach(function(id){
-    var len = spGetLength(ref,tippt,nS,id);
-    var totalLen = len*nS;
-    var spaceLeft = usable-totalLen;
-    var fits = spaceLeft>=-2;
-    var wts = spWt(wire,id,len);
-    var ok = fits;
+    var minW=MIN_ID_WIRE[id]||0;
+    var wireOK=wire>=minW;
+    var len = wireOK?spGetLength(ref,tippt,nS,id):null;
+    var totalLen = len?len*nS:0;
+    var spaceLeft = len?(usable-totalLen):0;
+    var fits = len?(spaceLeft>=-2):false;
+    var wts = len?spWt(wire,id,len):0;
+    var ok = fits&&wireOK;
     cardsHTML += '<div style="border:' + (ok?'2px solid #28a745':'0.5px solid #dee2e6') + ';border-radius:8px;padding:.6rem .75rem;background:'+(ok?'#f0fff4':'white')+'">';
     cardsHTML += '<div style="font-size:13px;font-weight:600;color:'+(ok?'#155724':'#333')+'">ID '+id+'"</div>';
     cardsHTML += '<div style="font-size:12px;color:#666;margin-top:2px">'+len.toFixed(2)+'"</div>';
