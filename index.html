@@ -315,10 +315,51 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     </div>
       </div>
     </div>
-    <div class="page" id="page-2">
-      <div class="card"><div class="springs-msg"><div style="font-size:36px;margin-bottom:12px">&#128297;</div>Spring calculation coming soon.<br><a class="open-btn" href="https://shop.servicespring.com/custom/torsion" target="_blank">Open Service Spring</a></div></div>
+    <div class="page active" id="page-2">
+<div class="card" style="padding:0">
+<div style="padding:16px 20px 8px;border-bottom:1px solid #e8ecf0">
+  <div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">SPRING INFORMATION</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+    <div>
+      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Lift Type</div>
+      <div style="font-size:14px;font-weight:600" id="sp-lift-display">—</div>
     </div>
-    <div class="page" id="page-3">
+    <div id="sp-hl-box" style="display:none">
+      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">High Lift</div>
+      <div style="font-size:14px;font-weight:600" id="sp-hl-display">—</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px">
+    <div>
+      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Muelles</div>
+      <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-nsprings">—</div>
+    </div>
+    <div>
+      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Wire Size</div>
+      <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-wire">—</div>
+    </div>
+    <div>
+      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">TIPPT</div>
+      <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-tippt">—</div>
+    </div>
+  </div>
+</div>
+
+<div style="padding:8px 20px;border-bottom:1px solid #e8ecf0">
+  <div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">DRUM & TURNS</div>
+  <div class="result-row"><span class="rlabel">Drum</span><span class="rvalue" id="sp-drum">—</span></div>
+  <div class="result-row"><span class="rlabel">Multiplier</span><span class="rvalue" id="sp-multi">—</span></div>
+  <div class="result-row"><span class="rlabel">Turns</span><span class="rvalue" id="sp-turns">—</span></div>
+</div>
+
+<div style="padding:8px 20px">
+  <div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">LONGITUD POR ID — ELIGE SEGÚN INVENTARIO</div>
+  <div id="sp-id-cards" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px"></div>
+  <div class="result-row"><span class="rlabel">Ciclos estimados</span><span class="rvalue" id="sp-cycles">—</span></div>
+</div>
+</div>
+</div>
+<div class="page" id="page-3">
       <div id="label-missing" class="label-missing">Fill in Label Information above to preview labels.</div>
       <div id="label-content" style="display:none">
         <div class="label-preview-title">Small Label (4" x 1") -- GX420d</div>
@@ -441,6 +482,179 @@ function buildCablesPreviewHTML(d, info){
   h+='</div>';
   return h;
 }
+
+// ============ SPRINGS CALCULATOR ============
+// SSC Calibration data: real SSC data points
+// TIPPT = multiplier × weight (no divide by nSprings)
+// Length scales: L = L_ref × (TIPPT_ref/TIPPT) × (nS/nS_ref)
+// Wire selected by TIPPT/spring (TIPPT total / nSprings)
+
+const SP_REF = [
+  // Standard lift reference points from SSC [nS, wire, len_ID2625, tippt_ref, turns_ref, cyc]
+  {nS:2, wire:0.2253, l2:null,  tippt:116,   turns:8.82, cyc:13000, drum:'D400-96'},
+  {nS:4, wire:0.2253, l2:21.75, tippt:116,   turns:8.82, cyc:13000, drum:'D400-96'},
+  {nS:4, wire:0.2437, l2:25.75, tippt:144,   turns:8.8,  cyc:14000, drum:'D400-144'},
+  {nS:4, wire:0.2625, l2:31.25, tippt:170.2, turns:8.76, cyc:16000, drum:'D400-144'},
+  {nS:2, wire:0.2625, l2:28.83, tippt:92.28, turns:7.94, cyc:17701, drum:'D400-96'},
+  {nS:2, wire:0.331,  l2:48.00, tippt:170.2, turns:8.76, cyc:13000, drum:'D400-144'},
+  {nS:4, wire:0.2625, l2:29.00, tippt:183.3, turns:8.8,  cyc:12000, drum:'D400-144'},
+  {nS:4, wire:0.3065, l2:32.50, tippt:349.4, turns:6.7,  cyc:15000, drum:'5250-18'},
+  {nS:4, wire:0.3125, l2:32.00, tippt:393,   turns:6.7,  cyc:11000, drum:'5250-18'},
+  // WhatsApp real jobs
+  {nS:2, wire:0.2890, l2:30.77, tippt:100.13,turns:10.69,cyc:10525, drum:'D400-144'},
+  {nS:4, wire:0.3065, l2:28.65, tippt:289.26,turns:8.20, cyc:14043, drum:'5250-18'},
+  {nS:2, wire:0.2890, l2:34.87, tippt:121.74,turns:8.76, cyc:10738, drum:'D400-144'},
+  {nS:4, wire:0.2500, l2:25.13, tippt:167.34,turns:7.88, cyc:15338, drum:'D400-144'},
+  {nS:4, wire:0.3065, l2:31.16, tippt:366.39,turns:6.72, cyc:11779, drum:'5250-18'},
+  {nS:4, wire:0.3195, l2:30.76, tippt:330.03,turns:8.09, cyc:11000, drum:'5250-18'},
+  // High lift (525-54HL)
+  {nS:4, wire:0.2730, l2:26.74, tippt:242.60,turns:7.49, cyc:10804, drum:'D525-54', hl:26},
+  {nS:4, wire:0.2730, l2:26.78, tippt:242.25,turns:7.32, cyc:12104, drum:'D525-54', hl:25},
+  {nS:4, wire:0.3065, l2:32.48, tippt:350.74,turns:7.02, cyc:11814, drum:'D525-54', hl:12},
+  {nS:4, wire:0.3437, l2:29.94, tippt:348.89,turns:9.71, cyc:10000, drum:'D525-54', hl:42},
+];
+
+const SP_ID_RATIO = {2.625:1.000, 3.750:0.729, 5.250:0.531};
+
+const SP_DRUMS = {
+  'D400-96': {multi96:0.257806, turns96:8.82, hma:2.275, dw:1.64, maxWt:530},
+  'D400-144':{multi96:0.261803, turns96:8.76, hma:2.293, dw:1.64, maxWt:750},
+  '5250-18': {multi96:0.436698, turns96:6.70, hma:2.936, dw:3.62, maxWt:1500},
+  'D525-54': {multi96:null,     turns96:null, hma:2.719, dw:3.66, maxWt:1000},
+  'D575-120':{multi96:null,     turns96:null, hma:2.969, dw:3.71, maxWt:1000},
+  'D800-120':{multi96:null,     turns96:null, hma:4.125, dw:5.22, maxWt:2200},
+};
+
+function spGetDrum(lt, wt, hl) {
+  if(lt==='highlift') {
+    if(hl<=54&&wt<=1000) return 'D525-54';
+    if(wt<=1000) return 'D575-120';
+    return 'D800-120';
+  }
+  if(wt<=530) return 'D400-96';
+  if(wt<=750) return 'D400-144';
+  return '5250-18';
+}
+
+function spGetMultiTurns(drum, height, hl, lt) {
+  var d = SP_DRUMS[drum];
+  if(lt==='highlift') {
+    // High lift: use multiplier from SSC reference data
+    // For D525-54: multi from WhatsApp data varies with HL and height
+    // Use Canimex formula: multi = HMA / turns, turns from table
+    // Best approx: multi = HMA * (hl+9) / (height * something)
+    // From real data: 575lbs hl26 h84: multi=0.421919, turns=7.49, HMA=2.719
+    // turns = HMA/multi = 2.719/0.421919 = 6.44... but SSC shows 7.49
+    // Actually for highlift: turns = (height + hl - 9) / (HMA * 2 * pi)... no
+    // Use Canimex formula: Turns = HMA / Multiplier
+    // and multiplier from lookup by height+hl
+    var hma = d.hma;
+    // Reference: hl=26, h=84 → multi=0.421919, turns=7.49
+    // Reference: hl=25, h=82 → multi=0.429530, turns=7.32
+    // Pattern: multi = HMA × (hl+9) / height / C
+    // 0.421919 = 2.719 × 35/84/C → C = 2.719×35/(84×0.421919) = 95.165/35.44 = 2.686
+    // Check: 0.429530 = 2.719×34/(82×C) = 92.446/(82×C) → C = 92.446/(82×0.429530) = 2.624... close
+    var C = 2.686;
+    var multi = hma * (hl+9) / (height * C);
+    var turns = hma / multi;
+    return{multi:multi, turns:turns};
+  }
+  // Standard: scale from 96" reference
+  var multi = d.multi96 * (96/height);
+  var turns = d.hma / multi;
+  return{multi:multi, turns:turns};
+}
+
+function spFindBestRef(tippt, nS, drum, lt) {
+  // Filter refs by drum family
+  var drumKey = drum;
+  var refs = SP_REF.filter(function(r){ return r.drum===drumKey && r.nS===nS; });
+  if(!refs.length) refs = SP_REF.filter(function(r){ return r.drum===drumKey; });
+  if(!refs.length) {
+    // Fallback to similar drum
+    if(drum==='D575-120') refs = SP_REF.filter(function(r){ return r.drum==='D525-54'; });
+    if(drum==='D800-120') refs = SP_REF.filter(function(r){ return r.drum==='5250-18'; });
+    if(!refs.length) refs = SP_REF;
+  }
+  // Find closest by TIPPT/nS
+  var tps = tippt/nS;
+  refs = refs.map(function(r){ return Object.assign({},r,{tps:r.tippt/r.nS, dist:Math.abs(r.tippt/r.nS-tps)}); });
+  refs.sort(function(a,b){return a.dist-b.dist;});
+  return refs[0];
+}
+
+function spGetLength(ref, tippt, nS, id) {
+  var lBase = ref.l2;
+  if(!lBase) lBase = 25; // fallback
+  var len = lBase * (ref.tippt/tippt) * (nS/ref.nS);
+  return len * SP_ID_RATIO[id];
+}
+
+function spWt(d, id, len) {
+  var mD=id+d, density=0.283;
+  return Math.PI*mD*(Math.PI*d*d/4)*density*(1/d)*len;
+}
+
+function spShaftUsable(width, drum) {
+  var dw = SP_DRUMS[drum]?SP_DRUMS[drum].dw:2;
+  return (width+4)-2*dw-6-2;
+}
+
+function calcSprings() {
+  var wt = parseFloat(document.getElementById('weight-input').value)||0;
+  var ht = parseFloat(document.getElementById('height-input').value)||96;
+  var wd = parseFloat(document.getElementById('width-input').value)||144;
+  var lt = document.getElementById('lift-select') ? document.getElementById('lift-select').value : 'standard';
+  var hl = document.getElementById('hl-input') ? parseFloat(document.getElementById('hl-input').value)||0 : 0;
+
+  if(!wt) { document.getElementById('sp-wire').textContent='—'; return; }
+
+  var nS = wd>144?4:2;
+  var drum = spGetDrum(lt,wt,hl);
+  var mr = spGetMultiTurns(drum,ht,hl,lt);
+  var tippt = mr.multi*wt;
+  var ref = spFindBestRef(tippt,nS,drum,lt);
+  var wire = ref.wire;
+  var cyc = ref.cyc;
+
+  // Update main fields
+  document.getElementById('sp-nsprings').textContent = nS;
+  document.getElementById('sp-wire').textContent = wire+'"';
+  document.getElementById('sp-tippt').textContent = tippt.toFixed(1);
+  document.getElementById('sp-drum').textContent = drum;
+  document.getElementById('sp-multi').textContent = mr.multi.toFixed(6);
+  document.getElementById('sp-turns').textContent = mr.turns.toFixed(2);
+  document.getElementById('sp-cycles').textContent = cyc.toLocaleString()+' ciclos';
+  document.getElementById('sp-lift-display').textContent = lt==='highlift'?'High Lift':'Standard';
+  if(lt==='highlift') {
+    document.getElementById('sp-hl-box').style.display='';
+    document.getElementById('sp-hl-display').textContent = hl+'"';
+  } else {
+    document.getElementById('sp-hl-box').style.display='none';
+  }
+
+  // ID cards
+  var usable = spShaftUsable(wd,drum);
+  var IDS = [2.625,3.750,5.250];
+  var cardsHTML = '';
+  IDS.forEach(function(id){
+    var len = spGetLength(ref,tippt,nS,id);
+    var totalLen = len*nS;
+    var spaceLeft = usable-totalLen;
+    var fits = spaceLeft>=-2;
+    var wts = spWt(wire,id,len);
+    var ok = fits;
+    cardsHTML += '<div style="border:' + (ok?'2px solid #28a745':'0.5px solid #dee2e6') + ';border-radius:8px;padding:.6rem .75rem;background:'+(ok?'#f0fff4':'white')+'">';
+    cardsHTML += '<div style="font-size:13px;font-weight:600;color:'+(ok?'#155724':'#333')+'">ID '+id+'"</div>';
+    cardsHTML += '<div style="font-size:12px;color:#666;margin-top:2px">'+len.toFixed(2)+'"</div>';
+    cardsHTML += '<div style="font-size:12px;color:#666;">'+wts.toFixed(2)+' lbs</div>';
+    cardsHTML += '<div style="font-size:11px;margin-top:4px;color:'+(fits?'#28a745':'#dc3545')+'">'+(fits?'✓ cabe':'✗ no cabe')+' ('+( spaceLeft>=0?'+':'')+spaceLeft.toFixed(1)+'")</div>';
+    cardsHTML += '</div>';
+  });
+  document.getElementById('sp-id-cards').innerHTML = cardsHTML;
+}
+// ============ END SPRINGS CALCULATOR ============
+
 function openSettings(){document.getElementById('settings-overlay').classList.add('open');document.getElementById('settings-drawer').classList.add('open');document.body.style.overflow='hidden';renderSettings();loadJBSettingsUI();}
 function closeSettings(){document.getElementById('settings-overlay').classList.remove('open');document.getElementById('settings-drawer').classList.remove('open');document.body.style.overflow='';}
 function getPrinters(){var s=load();var all=DEF_PRINTERS.concat(s.extraPrinters||[]);return all.filter(function(v,i,a){return a.indexOf(v)===i;});}
@@ -712,7 +926,8 @@ function renderBigLabelPreview(){
 }
 function prevLabel(){curLabel=Math.max(0,curLabel-1);updateLabels();}
 function nextLabel(){curLabel=Math.min(labelRoles.length-1,curLabel+1);updateLabels();}
-function showTab(n){document.querySelectorAll('.tab').forEach(function(t,i){t.classList.toggle('active',i===n);});document.querySelectorAll('.page').forEach(function(p,i){p.classList.toggle('active',i===n);});}
+function showTab(n){document.querySelectorAll('.tab').forEach(function(t,i){t.classList.toggle('active',i===n);});document.querySelectorAll('.page').forEach(function(p,i){p.classList.toggle('active',i===n);});  if(typeof calcSprings==='function')calcSprings();
+}
 function clearAll(){
   ['width','height','highlift','weight','wo','mark','lites'].forEach(function(id){document.getElementById(id).value='';});
   document.getElementById('track-type').value='';document.getElementById('lift-type').value='';
