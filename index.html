@@ -601,11 +601,11 @@ function spShaftUsable(width, drum) {
 }
 
 function calcSprings() {
-  var wt = parseFloat(document.getElementById('weight-input').value)||0;
-  var ht = parseFloat(document.getElementById('height-input').value)||96;
-  var wd = parseFloat(document.getElementById('width-input').value)||144;
-  var lt = document.getElementById('lift-select') ? document.getElementById('lift-select').value : 'standard';
-  var hl = document.getElementById('hl-input') ? parseFloat(document.getElementById('hl-input').value)||0 : 0;
+  var wt = parseFloat(document.getElementById('weight').value)||0;
+  var ht = parseFloat(document.getElementById('height').value)||96;
+  var wd = parseFloat(document.getElementById('width').value)||144;
+  var lt = document.getElementById('lift-type') ? document.getElementById('lift-type').value : 'standard';
+  var hl = document.getElementById('highlift') ? parseFloat(document.getElementById('highlift').value)||0 : 0;
 
   if(!wt) { document.getElementById('sp-wire').textContent='—'; return; }
 
