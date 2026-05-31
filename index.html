@@ -576,20 +576,23 @@ function spGetMultiTurns(drum, height, hl, lt) {
 }
 
 function spFindBestRef(tippt, nS, drum, lt) {
-  // Filter refs by drum family
   var drumKey = drum;
+  // Try exact drum + exact nS match first
   var refs = SP_REF.filter(function(r){ return r.drum===drumKey && r.nS===nS; });
+  // Fall back to same drum any nS
   if(!refs.length) refs = SP_REF.filter(function(r){ return r.drum===drumKey; });
+  // Fall back to similar drum
   if(!refs.length) {
-    // Fallback to similar drum
     if(drum==='D575-120') refs = SP_REF.filter(function(r){ return r.drum==='D525-54'; });
     if(drum==='D800-120') refs = SP_REF.filter(function(r){ return r.drum==='5250-18'; });
     if(!refs.length) refs = SP_REF;
   }
-  // Find closest by TIPPT/nS
-  var tps = tippt/nS;
-  refs = refs.map(function(r){ return Object.assign({},r,{tps:r.tippt/r.nS, dist:Math.abs(r.tippt/r.nS-tps)}); });
-  refs.sort(function(a,b){return a.dist-b.dist;});
+  // Find closest by TIPPT/spring ratio
+  var tps = tippt / nS;
+  refs = refs.map(function(r){
+    return Object.assign({}, r, {tps: r.tippt/r.nS, dist: Math.abs(r.tippt/r.nS - tps)});
+  });
+  refs.sort(function(a,b){ return a.dist - b.dist; });
   return refs[0];
 }
 
@@ -625,7 +628,7 @@ function calcSprings() {
   var tippt = mr.multi*wt;
   var ref = spFindBestRef(tippt,nS,drum,lt);
   var wire = ref.wire;
-  var cyc = ref.cyc;
+  var cyc = ref.cyc; // Direct from SSC reference - no artificial scaling
 
   // Update main fields
   document.getElementById('sp-nsprings').textContent = nS;
