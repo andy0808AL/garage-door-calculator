@@ -102,6 +102,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   @page { margin:15mm; }
 }
 #preview-print-area { display:none; }
+
+@media print {
+  body > *:not(#spring-print-area) { display:none !important; }
+  #spring-print-area { display:block !important; }
+  #spring-preview-overlay { display:none !important; }
+}
 </style>
 </head>
 <body>
@@ -359,6 +365,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 </div>
 </div>
 </div>
+<button class="print-btn" style="margin-top:8px" onclick="openSpringPreview()">&#128065; Preview / Print Springs</button>
 <div class="page" id="page-3">
       <div id="label-missing" class="label-missing">Fill in Label Information above to preview labels.</div>
       <div id="label-content" style="display:none">
@@ -655,6 +662,70 @@ function calcSprings() {
 }
 // ============ END SPRINGS CALCULATOR ============
 
+
+function openSpringPreview(){
+  var wo = document.getElementById('wo').value || '—';
+  var width = document.getElementById('width').value || '—';
+  var height = document.getElementById('height').value || '—';
+  var weight = document.getElementById('weight').value || '—';
+  var lt = document.getElementById('lift-type-display').value || 'Standard';
+  var hl = document.getElementById('highlift').value || '';
+
+  var nS = document.getElementById('sp-nsprings').textContent || '—';
+  var wire = document.getElementById('sp-wire').textContent || '—';
+  var tippt = document.getElementById('sp-tippt').textContent || '—';
+  var drum = document.getElementById('sp-drum').textContent || '—';
+  var multi = document.getElementById('sp-multi').textContent || '—';
+  var turns = document.getElementById('sp-turns').textContent || '—';
+  var cycles = document.getElementById('sp-cycles').textContent || '—';
+
+  // Get ID card lengths
+  var cards = document.querySelectorAll('#sp-id-cards > div');
+  var idLines = '';
+  cards.forEach(function(c){
+    var title = c.querySelector('div:nth-child(1)') ? c.querySelector('div:nth-child(1)').textContent : '';
+    var len   = c.querySelector('div:nth-child(2)') ? c.querySelector('div:nth-child(2)').textContent : '';
+    var wt    = c.querySelector('div:nth-child(3)') ? c.querySelector('div:nth-child(3)').textContent : '';
+    idLines += 'Spring ID: '+title+'\nSpring Length: '+len+'\nWeight: '+wt+'\n\n';
+  });
+
+  var hlLine = lt.toLowerCase().includes('high') ? '\nHi-Lift: '+hl+'"' : '';
+
+  var txt = 'Spring Engineering\n';
+  txt += '===============\n';
+  txt += 'W/O: '+wo+'\n';
+  txt += 'Assembly: Single \n';
+  txt += 'Springs: '+nS+' \n';
+  txt += 'Cycles: 10,000 \n';
+  txt += 'Lift Type: '+lt+' \n';
+  txt += 'Radius: 15 \n';
+  txt += 'Drum: CANIMEX/TF '+drum+' \n';
+  txt += 'Width: '+width+'" \n';
+  txt += 'Height: '+height+'" \n';
+  txt += 'Weight: '+weight+' lb'+hlLine+'\n';
+  txt += '------ Results ------\n';
+  txt += 'Wire Size: '+wire+'\n';
+  txt += idLines;
+  txt += 'Turns: '+turns+'\n';
+  txt += 'TIPPT: '+tippt+'\n';
+  txt += 'Multiplier: '+multi+'\n';
+  txt += 'Cycles: '+cycles;
+
+  document.getElementById('spring-preview-content').textContent = txt;
+  document.getElementById('spring-preview-overlay').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+
+function closeSpringPreview(){
+  document.getElementById('spring-preview-overlay').style.display='none';
+  document.body.style.overflow='';
+}
+
+function printSpringPreview(){
+  var txt = document.getElementById('spring-preview-content').textContent;
+  document.getElementById('spring-print-area').textContent = txt;
+  window.print();
+}
 function openSettings(){document.getElementById('settings-overlay').classList.add('open');document.getElementById('settings-drawer').classList.add('open');document.body.style.overflow='hidden';renderSettings();loadJBSettingsUI();}
 function closeSettings(){document.getElementById('settings-overlay').classList.remove('open');document.getElementById('settings-drawer').classList.remove('open');document.body.style.overflow='';}
 function getPrinters(){var s=load();var all=DEF_PRINTERS.concat(s.extraPrinters||[]);return all.filter(function(v,i,a){return a.indexOf(v)===i;});}
@@ -1015,5 +1086,17 @@ try{setInterval(checkServer,15000);}catch(e){}
     </div>
     <div id="preview-content" style="background:white;border-radius:12px;padding:24px;overflow-y:auto;max-height:calc(100vh - 120px);"></div>
   </div>
-</div></body>
+</div>
+<div id="spring-preview-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:2000;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px;overflow-y:auto;">
+  <div style="width:100%;max-width:480px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <button onclick="closeSpringPreview()" style="background:white;color:#1B2A6B;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">&#8592; Back</button>
+      <div style="color:white;font-size:16px;font-weight:700;">Spring Engineering</div>
+      <button onclick="printSpringPreview()" style="background:#C0272D;color:white;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">&#128424; Print</button>
+    </div>
+    <div id="spring-preview-content" style="background:white;border-radius:12px;padding:20px;font-family:monospace;font-size:13px;white-space:pre-wrap;line-height:1.6;"></div>
+  </div>
+</div>
+<div id="spring-print-area" style="display:none;font-family:monospace;font-size:13px;white-space:pre-wrap;padding:20px;"></div>
+</body>
 </html>
