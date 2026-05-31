@@ -678,6 +678,21 @@ function calcSprings() {
   });
   document.getElementById('sp-id-cards').innerHTML = cardsHTML;
 }
+
+// PATCH: Add Spring ID label to cards
+var _origCalcSprings = calcSprings;
+calcSprings = function(){
+  _origCalcSprings();
+  setTimeout(function(){
+    var cards = document.querySelectorAll('#sp-id-cards > div');
+    cards.forEach(function(card){
+      var title = card.querySelector('div:first-child');
+      if(title && /^[\d\.]+"$/.test(title.textContent.trim())){
+        title.textContent = 'Spring ID: ' + title.textContent;
+      }
+    });
+  }, 50);
+};
 // ============ END SPRINGS CALCULATOR ============
 
 
@@ -728,7 +743,7 @@ function openSpringPreview(){
   txt += '------ Results ------\n';
   txt += 'Wire Size: '+wire+'\n';
   txt += idLines;
-  txt += 'Turns: '+turns+'\n';
+  txt += 'Turns: '+turns+'\nCycles: '+cycles+'\n';
   txt += 'TIPPT: '+tippt+'\n';
   txt += 'Multiplier: '+multi+'\n';
   txt += 'Cycles: '+cycles;
