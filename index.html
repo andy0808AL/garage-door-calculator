@@ -926,7 +926,7 @@ function renderBigLabelPreview(){
 }
 function prevLabel(){curLabel=Math.max(0,curLabel-1);updateLabels();}
 function nextLabel(){curLabel=Math.min(labelRoles.length-1,curLabel+1);updateLabels();}
-function showTab(n){document.querySelectorAll('.tab').forEach(function(t,i){t.classList.toggle('active',i===n);});document.querySelectorAll('.page').forEach(function(p,i){p.classList.toggle('active',i===n);});  if(typeof calcSprings==='function')calcSprings();
+function showTab(n){if(n===2&&typeof calcSprings==='function'){setTimeout(calcSprings,50);}document.querySelectorAll('.tab').forEach(function(t,i){t.classList.toggle('active',i===n);});document.querySelectorAll('.page').forEach(function(p,i){p.classList.toggle('active',i===n);});  if(typeof calcSprings==='function')calcSprings();
 }
 function clearAll(){
   ['width','height','highlift','weight','wo','mark','lites'].forEach(function(id){document.getElementById(id).value='';});
