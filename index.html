@@ -656,6 +656,8 @@ function calcSprings() {
   // ID cards
   var usable = spShaftUsable(wd,drum);
   var IDS = [2.625,3.750,5.250];
+  // Min wire per ID from SSC specs
+  var MIN_WIRE_ID = {2.625:0.243, 3.750:0.273, 5.250:0.331};
   var cardsHTML = '';
   IDS.forEach(function(id){
     var len = spGetLength(ref,tippt,nS,id);
