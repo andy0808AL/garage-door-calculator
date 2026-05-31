@@ -108,6 +108,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   #spring-print-area { display:block !important; }
   #spring-preview-overlay { display:none !important; }
 }
+.card + .card { margin-top: 12px; }
 </style>
 </head>
 <body>
@@ -212,7 +213,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-track')" onmouseleave="hideSuggest('cs-track')">
     <label>Track type</label>
     <input type="text" id="track-type-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
-    <input type="hidden" id="track-type" value="">
+    <input type="hidden" id="track-type" value="3-15R">
     <div id="cs-track" class="suggest-list">
       <div onmousedown="setSelect('track-type','3-15R','3&quot; 15R')">3" 15R</div>
       <div onmousedown="setSelect('track-type','2-12R','2&quot; 12R')">2" 12R</div>
@@ -223,7 +224,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-lift')" onmouseleave="hideSuggest('cs-lift')">
     <label>Lift type</label>
     <input type="text" id="lift-type-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
-    <input type="hidden" id="lift-type" value="">
+    <input type="hidden" id="lift-type" value="standard">
     <div id="cs-lift" class="suggest-list">
       <div onmousedown="setSelect('lift-type','standard','Standard')">Standard</div>
       <div onmousedown="setSelect('lift-type','highlift','High Lift')">High Lift</div>
