@@ -478,7 +478,7 @@ function buildTracksPreviewHTML(d, info){
   h+='<tr style="background:#f8f9fa;"><td style="padding:10px;">Configuration</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.config+'</td></tr>';
   h+='</table>';
   if(d.jb && d.jb.length){
-    h+='<div style="margin-top:16px;font-weight:700;font-size:14px;color:#1B2A6B;">JAMB BRACKETS — PER SIDE</div>';
+    h+='<div style="margin-top:16px;font-weight:700;font-size:14px;color:#1B2A6B;">JAMB BRACKETS -- PER SIDE</div>';
     h+='<div style="display:flex;gap:12px;margin-top:8px;">';
     d.jb.forEach(function(j){if(j.qty!==null){h+='<div style="background:#f8f9fa;border-radius:8px;padding:12px 16px;text-align:center;"><div style="font-size:12px;color:#666;">'+j.label+'</div><div style="font-size:22px;font-weight:700;color:#1B2A6B;">'+j.qty+'</div></div>';}});
     h+='</div>';
@@ -635,7 +635,7 @@ function calcSprings() {
   var lt = document.getElementById('lift-type') ? document.getElementById('lift-type').value : 'standard';
   var hl = document.getElementById('highlift') ? parseFloat(document.getElementById('highlift').value)||0 : 0;
 
-  if(!wt) { spSet('sp-wire','—'; return; }
+  if(!wt) { spSet('sp-wire','--'; return; }
 
   var nS = wd>144?4:2;
   var drum = spGetDrum(lt,wt,hl);
@@ -655,15 +655,15 @@ function calcSprings() {
   spSet('sp-wire-label',ref.wire+'" (auto)';
   spSet('sp-id-label','Showing all IDs';
   var lenFor2625 = spGetLength(ref,tippt,nS,2.625);
-  spSet('sp-length-result', lenFor2625 ? lenFor2625.toFixed(2)+'"' : '—');
-  if(document.getElementById('sp-length')) spSet('sp-length',lenFor2625 ? lenFor2625.toFixed(2)+'"' : '—';
+  spSet('sp-length-result', lenFor2625 ? lenFor2625.toFixed(2)+'"' : '--');
+  if(document.getElementById('sp-length')) spSet('sp-length',lenFor2625 ? lenFor2625.toFixed(2)+'"' : '--';
   spSet('sp-wire',wire+'"';
   spSet('sp-tippt',tippt.toFixed(1);
   spSet('sp-drum',drum;
   spSet('sp-multi',mr.multi.toFixed(6);
   spSet('sp-turns',mr.turns.toFixed(2);
   var lenFor2625 = spGetLength(ref,tippt,nS,2.625);
-  spSet('sp-length',lenFor2625 ? lenFor2625.toFixed(2)+'"' : '—';
+  spSet('sp-length',lenFor2625 ? lenFor2625.toFixed(2)+'"' : '--';
   spSet('sp-cycles',cyc.toLocaleString()+' cycles';
   spSet('sp-lift-display',lt==='highlift'?'High Lift':'Standard';
   if(lt==='highlift') {
@@ -723,20 +723,20 @@ calcSprings = function(){
 
 
 function openSpringPreview(){
-  var wo = document.getElementById('wo').value || '—';
-  var width = document.getElementById('width').value || '—';
-  var height = document.getElementById('height').value || '—';
-  var weight = document.getElementById('weight').value || '—';
+  var wo = document.getElementById('wo').value || '--';
+  var width = document.getElementById('width').value || '--';
+  var height = document.getElementById('height').value || '--';
+  var weight = document.getElementById('weight').value || '--';
   var lt = document.getElementById('lift-type-display').value || 'Standard';
   var hl = document.getElementById('highlift').value || '';
 
-  var nS = document.getElementById('sp-nsprings').textContent || '—';
-  var wire = document.getElementById('sp-wire').textContent || '—';
-  var tippt = document.getElementById('sp-tippt').textContent || '—';
-  var drum = document.getElementById('sp-drum').textContent || '—';
-  var multi = document.getElementById('sp-multi').textContent || '—';
-  var turns = document.getElementById('sp-turns').textContent || '—';
-  var cycles = document.getElementById('sp-cycles').textContent || '—';
+  var nS = document.getElementById('sp-nsprings').textContent || '--';
+  var wire = document.getElementById('sp-wire').textContent || '--';
+  var tippt = document.getElementById('sp-tippt').textContent || '--';
+  var drum = document.getElementById('sp-drum').textContent || '--';
+  var multi = document.getElementById('sp-multi').textContent || '--';
+  var turns = document.getElementById('sp-turns').textContent || '--';
+  var cycles = document.getElementById('sp-cycles').textContent || '--';
 
   // Get ID card lengths
   var cards = document.querySelectorAll('#sp-id-cards > div');
