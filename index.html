@@ -340,15 +340,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px">
     <div>
       <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Springs</div>
-      <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-nsprings">—</div>
+      <select id="sp-qty-override" onchange="calcSprings()" style="width:100%;padding:5px 6px;border:1.5px solid #1B2A6B;border-radius:7px;font-size:15px;font-weight:700;color:#1B2A6B;background:white"><option value="">Auto</option><option value="1">1</option><option value="2">2</option><option value="4">4</option></select><div style="font-size:11px;color:#8a9bb0;margin-top:2px" id="sp-nsprings">—</div>
     </div>
     <div>
-      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Length (2.625")</div>
-      <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-length">—</div>
+      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Spring ID</div>
+      <select id="sp-id-override" onchange="calcSprings()" style="width:100%;padding:5px 6px;border:1.5px solid #1B2A6B;border-radius:7px;font-size:15px;font-weight:700;color:#1B2A6B;background:white"><option value="">All IDs</option><option value="2.625">2.625"</option><option value="3.750">3.750"</option><option value="5.250">5.250"</option></select><div style="font-size:11px;color:#8a9bb0;margin-top:2px" id="sp-length">—</div>
     </div>
     <div>
       <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Wire Size</div>
-      <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-wire">—</div>
+      <select id="sp-wire-override" onchange="calcSprings()" style="width:100%;padding:5px 6px;border:1.5px solid #1B2A6B;border-radius:7px;font-size:15px;font-weight:700;color:#1B2A6B;background:white"><option value="">Auto</option><option value="0.2253">0.2253"</option><option value="0.2437">0.2437"</option><option value="0.250">0.250"</option><option value="0.2625">0.2625"</option><option value="0.273">0.273"</option><option value="0.283">0.283"</option><option value="0.289">0.289"</option><option value="0.295">0.295"</option><option value="0.306">0.306"</option><option value="0.3065">0.3065"</option><option value="0.3125">0.3125"</option><option value="0.319">0.319"</option><option value="0.331">0.331"</option><option value="0.343">0.343"</option><option value="0.362">0.362"</option></select><div style="font-size:11px;color:#8a9bb0;margin-top:2px" id="sp-wire">—</div>
     </div>
     <div>
       <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">TIPPT</div>
@@ -645,7 +645,10 @@ function calcSprings() {
   // Wire min validation will be applied per ID in the cards
 
   // Update main fields
-  document.getElementById('sp-nsprings').textContent = nS;
+  document.getElementById('sp-nsprings').textContent = nS+' (auto)';
+  // Sync wire label
+  document.getElementById('sp-wire').textContent = wire+'"';
+  document.getElementById('sp-length').textContent = 'ID: all';
   document.getElementById('sp-nsprings-label').textContent = nS+' springs (auto)';
   document.getElementById('sp-wire-label').textContent = ref.wire+'" (auto)';
   document.getElementById('sp-id-label').textContent = 'Showing all IDs';
