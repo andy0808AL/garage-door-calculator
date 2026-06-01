@@ -364,50 +364,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   <div class="result-row"><span class="rlabel">Turns</span><span class="rvalue" id="sp-turns">—</span></div>
 </div>
 
-<div style="padding:12px 20px;border-bottom:1px solid #e8ecf0">
-  <div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">ADJUST</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-    <div>
-      <div style="font-size:11px;color:#8a9bb0;margin-bottom:3px">Wire Size</div>
-      <select id="sp-wire-override" onchange="calcSprings()" style="width:100%;padding:4px 6px;border:1px solid #dee2e6;border-radius:6px;font-size:13px;background:white">
-        <option value="">Auto</option>
-        <option value="0.2253">0.2253"</option>
-        <option value="0.2437">0.2437"</option>
-        <option value="0.250">0.250"</option>
-        <option value="0.2625">0.2625"</option>
-        <option value="0.273">0.273"</option>
-        <option value="0.283">0.283"</option>
-        <option value="0.289">0.289"</option>
-        <option value="0.295">0.295"</option>
-        <option value="0.306">0.306"</option>
-        <option value="0.3065">0.3065"</option>
-        <option value="0.3125">0.3125"</option>
-        <option value="0.319">0.319"</option>
-        <option value="0.331">0.331"</option>
-        <option value="0.343">0.343"</option>
-        <option value="0.362">0.362"</option>
-      </select>
-    </div>
-    <div>
-      <div style="font-size:11px;color:#8a9bb0;margin-bottom:3px">Spring ID</div>
-      <select id="sp-id-override" onchange="calcSprings()" style="width:100%;padding:4px 6px;border:1px solid #dee2e6;border-radius:6px;font-size:13px;background:white">
-        <option value="">Auto</option>
-        <option value="2.625">2.625"</option>
-        <option value="3.750">3.750"</option>
-        <option value="5.250">5.250"</option>
-      </select>
-    </div>
-    <div>
-      <div style="font-size:11px;color:#8a9bb0;margin-bottom:3px">Spring Qty</div>
-      <select id="sp-qty-override" onchange="calcSprings()" style="width:100%;padding:4px 6px;border:1px solid #dee2e6;border-radius:6px;font-size:13px;background:white">
-        <option value="">Auto</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="4">4</option>
-      </select>
-    </div>
-  </div>
-</div>
+
 <div style="padding:8px 20px">
   <div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">LENGTH BY ID — CHOOSE BASED ON INVENTORY</div>
   <div id="sp-id-cards" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px"></div>
@@ -689,6 +646,9 @@ function calcSprings() {
 
   // Update main fields
   document.getElementById('sp-nsprings').textContent = nS;
+  document.getElementById('sp-nsprings-label').textContent = nS+' springs (auto)';
+  document.getElementById('sp-wire-label').textContent = ref.wire+'" (auto)';
+  document.getElementById('sp-id-label').textContent = 'Showing all IDs';
   var lenFor2625 = spGetLength(ref,tippt,nS,2.625);
   if(document.getElementById('sp-length')) document.getElementById('sp-length').textContent = lenFor2625 ? lenFor2625.toFixed(2)+'"' : '—';
   document.getElementById('sp-wire').textContent = wire+'"';
@@ -709,7 +669,8 @@ function calcSprings() {
 
   // ID cards
   var usable = spShaftUsable(wd,drum);
-  var IDS = [2.625,3.750,5.250];
+  var idOvr=document.getElementById('sp-id-override');var idOvrVal=idOvr&&idOvr.value?parseFloat(idOvr.value):null;
+  var IDS = idOvrVal?[idOvrVal]:[2.625,3.750,5.250];
   // Min wire per ID from SSC specs
   var MIN_WIRE_ID = {2.625:0.243, 3.750:0.273, 5.250:0.331};
   var cardsHTML = '';
