@@ -233,8 +233,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <button class="clear-btn" onclick="clearAll()">Clear</button>
   </div>
   <div class="card">
-    <div class="card-title">Label Information <span class="badge">Optional</span></div>
-    <div class="field-row">
+    <div class="card-title" onclick="toggleLabel()" style="cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between">Label Information <span style="display:flex;align-items:center;gap:8px"><span class="badge">Optional</span><span id="lbl-chev" style="font-size:18px;transition:transform .3s">&#9654;</span></span></div>
+    <div id="lbl-body" style="display:none"><div class="field-row">
       <div class="field"><label>W/O #</label><input type="text" id="wo" placeholder="e.g. 721"></div>
       <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-mark')" onmouseleave="hideSuggest('cs-mark')">
     <label>Mark</label>
@@ -274,6 +274,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     <input type="text" id="frame-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
     <input type="hidden" id="frame" value="">
     <div id="cs-frame" class="suggest-list"></div>
+    </div>
   </div>
   </div>
   <div class="results" id="results">
@@ -652,6 +653,12 @@ function printSpPreview(){
   if(a){a.textContent=t;window.print();}
 }
 
+
+function toggleLabel(){
+  var b=document.getElementById("lbl-body");
+  var c=document.getElementById("lbl-chev");
+  if(b.style.display==="none"){b.style.display="";c.innerHTML="&#9660;";}else{b.style.display="none";c.innerHTML="&#9654;";}
+}
 function openSettings(){document.getElementById('settings-overlay').classList.add('open');document.getElementById('settings-drawer').classList.add('open');document.body.style.overflow='hidden';renderSettings();loadJBSettingsUI();}
 function closeSettings(){document.getElementById('settings-overlay').classList.remove('open');document.getElementById('settings-drawer').classList.remove('open');document.body.style.overflow='';}
 function getPrinters(){var s=load();var all=DEF_PRINTERS.concat(s.extraPrinters||[]);return all.filter(function(v,i,a){return a.indexOf(v)===i;});}
