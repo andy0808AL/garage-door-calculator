@@ -325,6 +325,50 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     </div>
     <div class="page active" id="page-2">
 <div class="card" style="padding:0">
+<div style="padding:12px 20px;border-bottom:1px solid #e8ecf0;background:#f8f9fa">
+  <div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">OVERRIDE (optional)</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+    <div>
+      <div style="font-size:11px;color:#8a9bb0;margin-bottom:3px">Wire Size</div>
+      <select id="sp-wire-override" onchange="calcSprings()" style="width:100%;padding:4px 6px;border:1px solid #dee2e6;border-radius:6px;font-size:13px;background:white">
+        <option value="">Auto</option>
+        <option value="0.2253">0.2253"</option>
+        <option value="0.2437">0.2437"</option>
+        <option value="0.250">0.250"</option>
+        <option value="0.2625">0.2625"</option>
+        <option value="0.273">0.273"</option>
+        <option value="0.283">0.283"</option>
+        <option value="0.289">0.289"</option>
+        <option value="0.295">0.295"</option>
+        <option value="0.306">0.306"</option>
+        <option value="0.3065">0.3065"</option>
+        <option value="0.3125">0.3125"</option>
+        <option value="0.319">0.319"</option>
+        <option value="0.331">0.331"</option>
+        <option value="0.343">0.343"</option>
+        <option value="0.362">0.362"</option>
+      </select>
+    </div>
+    <div>
+      <div style="font-size:11px;color:#8a9bb0;margin-bottom:3px">Spring ID</div>
+      <select id="sp-id-override" onchange="calcSprings()" style="width:100%;padding:4px 6px;border:1px solid #dee2e6;border-radius:6px;font-size:13px;background:white">
+        <option value="">Auto</option>
+        <option value="2.625">2.625"</option>
+        <option value="3.750">3.750"</option>
+        <option value="5.250">5.250"</option>
+      </select>
+    </div>
+    <div>
+      <div style="font-size:11px;color:#8a9bb0;margin-bottom:3px">Spring Qty</div>
+      <select id="sp-qty-override" onchange="calcSprings()" style="width:100%;padding:4px 6px;border:1px solid #dee2e6;border-radius:6px;font-size:13px;background:white">
+        <option value="">Auto</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="4">4</option>
+      </select>
+    </div>
+  </div>
+</div>
 <div style="padding:16px 20px 8px;border-bottom:1px solid #e8ecf0">
   <div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">SPRING INFORMATION</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
@@ -639,7 +683,7 @@ function calcSprings() {
   var mr = spGetMultiTurns(drum,ht,hl,lt);
   var tippt = mr.multi*wt;
   var ref = spFindBestRef(tippt,nS,drum,lt);
-  var wire = ref.wire;
+  var wireOvr=document.getElementById('sp-wire-override');var wire=wireOvr&&wireOvr.value?parseFloat(wireOvr.value):ref.wire;
   var cyc = ref.cyc; // Direct from SSC reference - no artificial scaling
   // Wire min validation will be applied per ID in the cards
 
@@ -679,7 +723,7 @@ function calcSprings() {
     var fits = len ? (spaceLeft>=-2) : false;
     var wts = len ? spWt(wire,id,len) : 0;
     var ok = fits && wireOK;
-    cardsHTML += '<div style="border:'+(ok?'2px solid #28a745':'0.5px solid #dee2e6')+';border-radius:8px;padding:.6rem .75rem;background:'+(ok?'#f0fff4':'white')+'">';
+    cardsHTML += '<div data-cycles="'+cyc.toLocaleString()+' cycles" style="border:'+(ok?'2px solid #28a745':'0.5px solid #dee2e6')+';border-radius:8px;padding:.6rem .75rem;background:'+(ok?'#f0fff4':'white')+'">';
     cardsHTML += '<div style="font-size:13px;font-weight:600;color:'+(ok?'#155724':'#333')+'">Spring ID: '+id+'"</div>';
     if(!wireOK){
       cardsHTML += '<div style="font-size:12px;color:#C0272D;margin-top:4px;line-height:1.4">⚠ Wire '+wire+'" below minimum<br/>Min for this ID: '+minW+'"</div>';
@@ -687,6 +731,7 @@ function calcSprings() {
       cardsHTML += '<div style="font-size:12px;color:#666;margin-top:2px">'+(len?len.toFixed(2):'N/A')+'"</div>';
       cardsHTML += '<div style="font-size:12px;color:#666;">'+(wts?wts.toFixed(2):'0.00')+' lbs</div>';
       cardsHTML += '<div style="font-size:11px;margin-top:4px;color:'+(fits?'#28a745':'#dc3545')+'">'+(fits?'✓ fits':'✗ no fit')+' ('+(spaceLeft>=0?'+':'')+spaceLeft.toFixed(1)+'" shaft)</div>';
+    cardsHTML += '<div style="font-size:11px;color:#1B2A6B;font-weight:600;margin-top:3px" data-cycles="'+cyc.toLocaleString()+' cycles">'+cyc.toLocaleString()+' cycles</div>';
     }
     cardsHTML += '</div>';
   });
@@ -734,7 +779,8 @@ function openSpringPreview(){
     var len   = c.querySelector('div:nth-child(2)') ? c.querySelector('div:nth-child(2)').textContent.trim() : '';
     var wt    = c.querySelector('div:nth-child(3)') ? c.querySelector('div:nth-child(3)').textContent.trim() : '';
     if(title && len && !len.includes('below') && !len.includes('Min')){
-      idLines += 'Spring ID: '+title+'\nSpring Length: '+len+'\nWeight: '+wt+'\n\n';
+      var cycText = ''; var cycEl = c.querySelector('[data-cycles]'); if(cycEl) cycText = cycEl.getAttribute('data-cycles');
+      idLines += 'Spring ID: '+title+'\nSpring Length: '+len+'\nWeight: '+wt+(cycText?'\nCycles: '+cycText:'')+'\n\n';
     }
   });
 
