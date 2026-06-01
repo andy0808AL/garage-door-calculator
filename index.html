@@ -334,7 +334,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 </div>
 <div style="padding:8px 20px;border-bottom:1px solid #e8ecf0">
 <div style="font-size:11px;font-weight:600;color:#8a9bb0;letter-spacing:.06em;margin-bottom:.6rem">RESULTS</div>
-<div class="result-row"><span class="rlabel">Drum</span><span class="rvalue"><select id="sp-drum" onchange="runSprings()" style="border:1px solid #dee2e6;border-radius:5px;padding:2px 4px;font-size:13px;font-weight:600;color:#1B2A6B;background:white"><option value="">Auto</option><option value="D400-96">D400-96</option><option value="D400-144">D400-144</option><option value="5250-18">5250-18</option><option value="D525-54">D525-54 (HL)</option><option value="D575-120">D575-120 (HL)</option><option value="D800-120">D800-120 (HL)</option></select></span></div>
+<div class="result-row"><span class="rlabel">Drum</span><span class="rvalue"><span style="display:flex;align-items:center;gap:6px"><select id="sp-drum" onchange="runSprings()" style="border:1px solid #dee2e6;border-radius:5px;padding:2px 4px;font-size:13px;font-weight:600;color:#1B2A6B;background:white"><option value="">Auto</option><option value="D400-96">D400-96</option><option value="D400-144">D400-144</option><option value="5250-18">5250-18</option><option value="D525-54" class="hl-only">D525-54 (HL)</option><option value="D575-120" class="hl-only">D575-120 (HL)</option><option value="D800-120" class="hl-only">D800-120 (HL)</option></select><span id="sp-warn" style="display:none;cursor:help;font-size:18px;position:relative" title=""><span style="color:#C0272D">&#9888;</span></span></span></span></div>
 <div class="result-row"><span class="rlabel">TIPPT</span><span class="rvalue" id="sp-tippt">--</span></div>
 <div class="result-row"><span class="rlabel">Multiplier</span><span class="rvalue" id="sp-multi">--</span></div>
 <div class="result-row"><span class="rlabel">Turns</span><span class="rvalue" id="sp-turns">--</span></div>
@@ -544,15 +544,22 @@ function runSprings(){
   var wEl=spEl('sp-wire');
   var iEl=spEl('sp-id');
   var dEl=spEl('sp-drum');
+  // Filter drum options by lift type
+  if(dEl){
+    var opts=dEl.querySelectorAll('option');
+    var isHL=lt==='highlift';
+    opts.forEach(function(o){
+      if(o.classList.contains('hl-only')){
+        o.style.display=isHL?'':'none';
+        if(!isHL&&o.selected){dEl.value='';}
+      }
+    });
+  }
   var nS=qEl&&qEl.value?parseInt(qEl.value):(wd>144?4:2);
   var autoDrum=spDrum(lt,wt,hl);
   var drum=dEl&&dEl.value?dEl.value:autoDrum;
-  // Check if drum is over capacity
-  var maxWt={
-    'D400-96':530,'D400-144':750,'5250-18':1500,
-    'D525-54':1000,'D575-120':1000,'D800-120':2200
-  };
-  var drumOverCap = wt > (maxWt[drum]||9999);
+  var maxWt={'D400-96':530,'D400-144':750,'5250-18':1500,'D525-54':1000,'D575-120':1000,'D800-120':2200};
+  var drumOverCap=wt>(maxWt[drum]||9999);
   var mr=spMT(drum,ht);
   var tippt=mr.multi*wt;
   var ref=spRef(tippt,nS,drum);
@@ -569,22 +576,40 @@ function runSprings(){
   spSet('sp-qty-lbl',nS+' (auto)');
   spSet('sp-wire-lbl',wire+'" (auto)');
   spSet('sp-id-lbl',idOvr?idOvr+'"':'All IDs');
-  // Set results - red if drum over capacity
-  var resColor=drumOverCap?'#C0272D':'#111';
-  var setRes=function(id,val){var el=spEl(id);if(el&&el.tagName!=='SELECT'){el.textContent=val;el.style.color=drumOverCap?'#C0272D':'';} };
+  // Results color
+  var setRes=function(id,val,forceRed){
+    var el=spEl(id);
+    if(el&&el.tagName!=='SELECT'){
+      el.textContent=val;
+      el.style.color=forceRed||drumOverCap?'#C0272D':'';
+    }
+  };
   setRes('sp-tippt',tippt.toFixed(1));
   setRes('sp-multi',mr.multi.toFixed(6));
   setRes('sp-turns',mr.turns.toFixed(2));
   setRes('sp-len',len2?len2.toFixed(2)+'"':'--');
-  setRes('sp-cyc',cyc.toLocaleString()+' cycles');
-  // Drum dropdown - set auto if not overridden, highlight if over cap
+  setRes('sp-cyc',cyc.toLocaleString()+' cycles',cyc<10000);
+  // Drum dropdown color
   if(dEl){
-    if(!dEl.value) dEl.setAttribute('data-auto',autoDrum);
     dEl.style.color=drumOverCap?'#C0272D':'#1B2A6B';
     dEl.style.borderColor=drumOverCap?'#C0272D':'#dee2e6';
-    // Show auto drum label
     var autoOpt=dEl.querySelector('option[value=""]');
     if(autoOpt) autoOpt.textContent=dEl.value?'Auto':'Auto ('+autoDrum+')';
+  }
+  // Warning icon
+  var warnEl=spEl('sp-warn');
+  if(warnEl){
+    var warnings=[];
+    if(drumOverCap) warnings.push('Drum '+drum+' max capacity is '+maxWt[drum]+' lbs but door weighs '+wt+' lbs');
+    if(cyc<10000) warnings.push('Estimated cycles ('+cyc.toLocaleString()+') are below 10,000 - consider a different wire or drum');
+    if(warnings.length>0){
+      warnEl.style.display='inline';
+      warnEl.setAttribute('title',warnings.join(' | '));
+      warnEl.querySelector('span').style.color=drumOverCap?'#C0272D':'#f59f00';
+    } else {
+      warnEl.style.display='none';
+      warnEl.setAttribute('title','');
+    }
   }
   // ID Cards
   var cards='';
@@ -597,8 +622,7 @@ function runSprings(){
     var fits=ln?sl>=-2:false;
     var wts=ln?spW(wire,id,ln):0;
     var good=fits&&wireOK;
-    // Color logic: red=drum over cap OR wire below min, yellow=cycles<10k, green=ok
-    var cardColor, textColor, borderColor;
+    var cardColor,borderColor,textColor;
     if(drumOverCap||!wireOK){
       cardColor='#fff5f5'; borderColor='2px solid #C0272D'; textColor='#C0272D';
     } else if(cyc<10000){
@@ -617,13 +641,12 @@ function runSprings(){
       cards+='<div style="font-size:12px;color:#666;margin-top:2px">'+ln.toFixed(2)+'" / '+wts.toFixed(2)+' lbs</div>';
       cards+='<div style="font-size:12px;font-weight:600;color:'+cycColor+';margin-top:2px">'+cyc.toLocaleString()+' cycles</div>';
       if(drumOverCap){
-        cards+='<div style="font-size:11px;color:#C0272D;margin-top:3px">Drum over capacity!</div>';
+        cards+='<div style="font-size:11px;color:#C0272D;margin-top:3px">&#9888; Drum over capacity!</div>';
       } else {
-        var fit2=fits?'fits':'no fit';
+        var fc=fits?(cyc<10000?'#b76e00':'#28a745'):'#dc3545';
+        var fitTxt=fits?'fits':'no fit';
         var slStr=(sl>=0?'+':'')+sl.toFixed(1)+'"';
-        var fc=fits?'#28a745':'#dc3545';
-        if(cyc<10000) fc='#b76e00';
-        cards+='<div style="font-size:11px;color:'+fc+';margin-top:3px">'+fit2+' ('+slStr+')'+(cyc<10000?' - Low cycles!':'')+'</div>';
+        cards+='<div style="font-size:11px;color:'+fc+';margin-top:3px">'+fitTxt+' ('+slStr+')'+(cyc<10000?' &#9888; Low cycles':'')+'</div>';
       }
     }
     cards+='</div>';
