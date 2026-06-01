@@ -102,7 +102,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   @page { margin:15mm; }
 }
 #preview-print-area { display:none; }
-@media print{body>*:not(#spring-print-area){display:none!important;}#spring-print-area{display:block!important;}}
+@media print{body>*:not(#sp-print-area){display:none!important;}#sp-print-area{display:block!important;}}
 </style>
 </head>
 <body>
@@ -318,11 +318,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     </div>
     <div class="page" id="page-2">
 <div class="card" style="padding:0">
-<div style="padding:16px 20px 8px;border-bottom:1px solid #e8ecf0"><div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">SPRING INFORMATION</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px"><div><div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Lift Type</div><div style="font-size:14px;font-weight:600" id="sp-lift-display">--</div></div><div id="sp-hl-box" style="display:none"><div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">High Lift</div><div style="font-size:14px;font-weight:600" id="sp-hl-display">--</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:8px"><div><div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Spring Qty</div><select id="sp-qty-override" onchange="calcSprings()" style="width:100%;padding:5px 6px;border:1.5px solid #1B2A6B;border-radius:7px;font-size:15px;font-weight:700;color:#1B2A6B;background:white"><option value="">Auto</option><option value="1">1</option><option value="2">2</option><option value="4">4</option></select><div style="font-size:11px;color:#8a9bb0;margin-top:2px" id="sp-nsprings">--</div></div><div><div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Wire Size</div><select id="sp-wire-override" onchange="calcSprings()" style="width:100%;padding:5px 6px;border:1.5px solid #1B2A6B;border-radius:7px;font-size:15px;font-weight:700;color:#1B2A6B;background:white"><option value="">Auto</option><option value="0.2253">0.2253"</option><option value="0.2437">0.2437"</option><option value="0.250">0.250"</option><option value="0.2625">0.2625"</option><option value="0.273">0.273"</option><option value="0.283">0.283"</option><option value="0.289">0.289"</option><option value="0.295">0.295"</option><option value="0.306">0.306"</option><option value="0.3065">0.3065"</option><option value="0.3125">0.3125"</option><option value="0.319">0.319"</option><option value="0.331">0.331"</option><option value="0.343">0.343"</option><option value="0.362">0.362"</option></select><div style="font-size:11px;color:#8a9bb0;margin-top:2px" id="sp-wire">--</div></div><div><div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Spring ID</div><select id="sp-id-override" onchange="calcSprings()" style="width:100%;padding:5px 6px;border:1.5px solid #1B2A6B;border-radius:7px;font-size:15px;font-weight:700;color:#1B2A6B;background:white"><option value="">All IDs</option><option value="2.625">2.625"</option><option value="3.750">3.750"</option><option value="5.250">5.250"</option></select><div style="font-size:11px;color:#8a9bb0;margin-top:2px" id="sp-length">--</div></div></div><div style="font-size:12px;color:#8a9bb0;margin-bottom:2px">TIPPT</div><div style="font-size:24px;font-weight:700;color:#1B2A6B" id="sp-tippt">--</div></div><div style="padding:8px 20px;border-bottom:1px solid #e8ecf0"><div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem">RESULTS</div><div class="result-row"><span class="rlabel">Drum</span><span class="rvalue" id="sp-drum">--</span></div><div class="result-row"><span class="rlabel">Multiplier</span><span class="rvalue" id="sp-multi">--</span></div><div class="result-row"><span class="rlabel">Turns</span><span class="rvalue" id="sp-turns">--</span></div><div class="result-row"><span class="rlabel">Length (2.625")</span><span class="rvalue" id="sp-length-result">--</span></div><div class="result-row"><span class="rlabel">Cycles</span><span class="rvalue" id="sp-cycles">--</span></div></div><div style="padding:8px 20px"><div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">LENGTH BY ID</div><div id="sp-id-cards" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px"></div></div>
+<div style="padding:16px 20px;border-bottom:1px solid #e8ecf0">
+<div style="font-size:11px;font-weight:600;color:#8a9bb0;letter-spacing:.06em;margin-bottom:10px">SPRING INFORMATION</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+<div><div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Lift Type</div><div style="font-size:14px;font-weight:600" id="sp-lift">--</div></div>
+<div id="sp-hlbox" style="display:none"><div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">High Lift</div><div style="font-size:14px;font-weight:600" id="sp-hlval">--</div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+<div><div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Spring Qty</div><select id="sp-qty" onchange="runSprings()" style="width:100%;padding:5px 6px;border:1.5px solid #1B2A6B;border-radius:7px;font-size:15px;font-weight:700;color:#1B2A6B;background:white"><option value="">Auto</option><option value="1">1</option><option value="2">2</option><option value="4">4</option></select><div style="font-size:11px;color:#8a9bb0;margin-top:2px" id="sp-qty-lbl">--</div></div>
+<div><div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Wire Size</div><select id="sp-wire" onchange="runSprings()" style="width:100%;padding:5px 6px;border:1.5px solid #1B2A6B;border-radius:7px;font-size:15px;font-weight:700;color:#1B2A6B;background:white"><option value="">Auto</option><option value="0.2253">0.2253</option><option value="0.2437">0.2437</option><option value="0.250">0.250</option><option value="0.2625">0.2625</option><option value="0.273">0.273</option><option value="0.283">0.283</option><option value="0.289">0.289</option><option value="0.295">0.295</option><option value="0.306">0.306</option><option value="0.3065">0.3065</option><option value="0.3125">0.3125</option><option value="0.319">0.319</option><option value="0.331">0.331</option><option value="0.343">0.343</option><option value="0.362">0.362</option></select><div style="font-size:11px;color:#8a9bb0;margin-top:2px" id="sp-wire-lbl">--</div></div>
+<div><div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Spring ID</div><select id="sp-id" onchange="runSprings()" style="width:100%;padding:5px 6px;border:1.5px solid #1B2A6B;border-radius:7px;font-size:15px;font-weight:700;color:#1B2A6B;background:white"><option value="">All IDs</option><option value="2.625">2.625</option><option value="3.75">3.750</option><option value="5.25">5.250</option></select><div style="font-size:11px;color:#8a9bb0;margin-top:2px" id="sp-id-lbl">--</div></div>
+</div>
+<div style="margin-top:10px"><div style="font-size:12px;color:#8a9bb0;margin-bottom:2px">TIPPT</div><div style="font-size:24px;font-weight:700;color:#1B2A6B" id="sp-tippt">--</div></div>
+</div>
+<div style="padding:8px 20px;border-bottom:1px solid #e8ecf0">
+<div style="font-size:11px;font-weight:600;color:#8a9bb0;letter-spacing:.06em;margin-bottom:.6rem">RESULTS</div>
+<div class="result-row"><span class="rlabel">Drum</span><span class="rvalue" id="sp-drum">--</span></div>
+<div class="result-row"><span class="rlabel">Multiplier</span><span class="rvalue" id="sp-multi">--</span></div>
+<div class="result-row"><span class="rlabel">Turns</span><span class="rvalue" id="sp-turns">--</span></div>
+<div class="result-row"><span class="rlabel">Length (2.625")</span><span class="rvalue" id="sp-len">--</span></div>
+<div class="result-row"><span class="rlabel">Cycles</span><span class="rvalue" id="sp-cyc">--</span></div>
+</div>
+<div style="padding:8px 20px">
+<div style="font-size:11px;font-weight:600;color:#8a9bb0;letter-spacing:.06em;margin-bottom:8px">LENGTH BY ID</div>
+<div id="sp-cards" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"></div>
+</div>
 </div>
 <div style="display:flex;gap:8px;padding:4px 0 8px">
 <button class="print-btn" style="flex:1" onclick="doPrint('springs')">&#128424; Print Springs</button>
-<button class="print-btn" style="flex:1;background:white;color:#111;border:2px solid #1B2A6B" onclick="openSpringPreview()">&#128065; Preview</button>
+<button class="print-btn" style="flex:1;background:white;color:#111;border:2px solid #1B2A6B" onclick="openSpPreview()">&#128065; Preview</button>
 </div>
 <div class="page" id="page-3">
       <div id="label-missing" class="label-missing">Fill in Label Information above to preview labels.</div>
@@ -423,7 +447,7 @@ function buildTracksPreviewHTML(d, info){
   h+='<tr style="background:#f8f9fa;"><td style="padding:10px;">Configuration</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.config+'</td></tr>';
   h+='</table>';
   if(d.jb && d.jb.length){
-    h+='<div style="margin-top:16px;font-weight:700;font-size:14px;color:#1B2A6B;">JAMB BRACKETS -- PER SIDE</div>';
+    h+='<div style="margin-top:16px;font-weight:700;font-size:14px;color:#1B2A6B;">JAMB BRACKETS — PER SIDE</div>';
     h+='<div style="display:flex;gap:12px;margin-top:8px;">';
     d.jb.forEach(function(j){if(j.qty!==null){h+='<div style="background:#f8f9fa;border-radius:8px;padding:12px 16px;text-align:center;"><div style="font-size:12px;color:#666;">'+j.label+'</div><div style="font-size:22px;font-weight:700;color:#1B2A6B;">'+j.qty+'</div></div>';}});
     h+='</div>';
@@ -448,43 +472,185 @@ function buildCablesPreviewHTML(d, info){
   return h;
 }
 
-function spSet(id,val){var el=document.getElementById(id);if(el&&el.tagName!=="SELECT")el.textContent=val;}
-function chr(n){return String.fromCharCode(n);}
-var SP_REF=[{nS:4,wire:0.2253,l2:21.75,tippt:116,turns:8.82,cyc:13000,drum:"D400-96"},{nS:4,wire:0.2437,l2:25.75,tippt:144,turns:8.8,cyc:14000,drum:"D400-144"},{nS:4,wire:0.2625,l2:31.25,tippt:170.2,turns:8.76,cyc:16000,drum:"D400-144"},{nS:4,wire:0.2625,l2:29.0,tippt:183.3,turns:8.8,cyc:12000,drum:"D400-144"},{nS:4,wire:0.3065,l2:32.5,tippt:349.4,turns:6.7,cyc:15000,drum:"5250-18"},{nS:4,wire:0.3125,l2:32.0,tippt:393,turns:6.7,cyc:11000,drum:"5250-18"},{nS:2,wire:0.331,l2:48.0,tippt:170.2,turns:8.76,cyc:13000,drum:"D400-144"},{nS:4,wire:0.273,l2:26.74,tippt:242.6,turns:7.49,cyc:10804,drum:"D525-54"},{nS:4,wire:0.3065,l2:32.48,tippt:350.7,turns:7.02,cyc:11814,drum:"D525-54"}];
-var ID_RATIO={2.625:1.0,3.75:0.729,5.25:0.531};var MIN_WIRE_ID={2.625:0.243,3.75:0.273,5.25:0.331};
-var SP_DRUMS={"D400-96":{m:0.257806,hma:2.275,dw:1.64},"D400-144":{m:0.261803,hma:2.293,dw:1.64},"5250-18":{m:0.436698,hma:2.936,dw:3.62},"D525-54":{m:null,hma:2.719,dw:3.66},"D575-120":{m:null,hma:2.969,dw:3.71},"D800-120":{m:null,hma:4.125,dw:5.22}};
-function spGetDrum(lt,wt,hl){if(lt==="highlift"){if(hl<=54&&wt<=1000)return "D525-54";if(wt<=1000)return "D575-120";return "D800-120";}if(wt<=530)return "D400-96";if(wt<=750)return "D400-144";return "5250-18";}
-function spMT(drum,height){var d=SP_DRUMS[drum];if(!d||!d.m)return{multi:0.257806*(96/height),turns:8.82};var multi=d.m*(96/height);return{multi:multi,turns:d.hma/multi};}
-function spLen(ref,tippt,nS,id){if(!ref.l2)return null;return ref.l2*(ref.tippt/tippt)*(nS/ref.nS)*(ID_RATIO[id]||1);}
-function spWt(d,id,len){var mD=id+d;return Math.PI*mD*(Math.PI*d*d/4)*0.283*(1/d)*len;}
-function spRef(tippt,nS,drum){var r=SP_REF.filter(function(x){return x.drum===drum&&x.nS===nS;});if(!r.length)r=SP_REF.filter(function(x){return x.drum===drum;});if(!r.length)r=SP_REF;var tps=tippt/nS;r=r.map(function(x){return Object.assign({},x,{dist:Math.abs(x.tippt/x.nS-tps)});});r.sort(function(a,b){return a.dist-b.dist;});return r[0];}
-function calcSprings(){var wt=parseFloat((document.getElementById("weight")||{}).value)||0;var ht=parseFloat((document.getElementById("height")||{}).value)||96;var wd=parseFloat((document.getElementById("width")||{}).value)||144;var lt=(document.getElementById("lift-type")||{}).value||"standard";var hl=parseFloat((document.getElementById("highlift")||{}).value)||0;if(!wt){return;}var qEl=document.getElementById("sp-qty-override");var wEl=document.getElementById("sp-wire-override");var iEl=document.getElementById("sp-id-override");var nS=qEl&&qEl.value?parseInt(qEl.value):(wd>144?4:2);var drum=spGetDrum(lt,wt,hl);var mr=spMT(drum,ht);var tippt=mr.multi*wt;var ref=spRef(tippt,nS,drum);var wire=wEl&&wEl.value?parseFloat(wEl.value):ref.wire;var cyc=ref.cyc;var len2625=spLen(ref,tippt,nS,2.625);spSet("sp-nsprings",nS+" (auto)");spSet("sp-wire",wire+chr(34));spSet("sp-tippt",tippt.toFixed(1));spSet("sp-drum",drum);spSet("sp-multi",mr.multi.toFixed(6));spSet("sp-turns",mr.turns.toFixed(2));spSet("sp-cycles",cyc.toLocaleString()+" cycles");spSet("sp-length-result",len2625?len2625.toFixed(2)+chr(34):"--");spSet("sp-lift-display",lt==="highlift"?"High Lift":"Standard");var hlBox=document.getElementById("sp-hl-box");if(hlBox)hlBox.style.display=lt==="highlift"?"":"none";spSet("sp-hl-display",hl+chr(34));var idOvr=iEl&&iEl.value?parseFloat(iEl.value):null;var IDS=idOvr?[idOvr]:[2.625,3.75,5.25];var usable=(wd+4)-2*(SP_DRUMS[drum]?SP_DRUMS[drum].dw:2)-8;var ch="";IDS.forEach(function(id){var minW=MIN_WIRE_ID[id]||0;var wireOK=wire>=minW;var len=wireOK?spLen(ref,tippt,nS,id):null;var totalLen=len?len*nS:0;var sl=len?(usable-totalLen):0;var fits=len?(sl>=-2):false;var wts=len?spWt(wire,id,len):0;var ok=fits&&wireOK;ch+="<div style="+chr(34)+"border:"+(ok?"2px solid #28a745":"0.5px solid #dee2e6")+";border-radius:8px;padding:.6rem .75rem;background:"+(ok?"#f0fff4":"white")+chr(34)+">";ch+="<div style="+chr(34)+"font-size:13px;font-weight:600;color:"+(ok?"#155724":"#333")+chr(34)+">Spring ID: "+id+chr(34)+"</div>";if(!wireOK){ch+="<div style="+chr(34)+"font-size:12px;color:#C0272D;margin-top:4px"+chr(34)+">Wire "+wire+chr(34)+" below min ("+minW+chr(34)+")</div>";}else{ch+="<div style="+chr(34)+"font-size:12px;color:#666;margin-top:2px"+chr(34)+">"+len.toFixed(2)+chr(34)+"  "+wts.toFixed(2)+" lbs</div>";ch+="<div style="+chr(34)+"font-size:12px;font-weight:600;color:#1B2A6B;margin-top:2px"+chr(34)+">"+cyc.toLocaleString()+" cycles</div>";ch+="<div style="+chr(34)+"font-size:11px;margin-top:3px;color:"+(fits?"#28a745":"#dc3545")+chr(34)+">"+(fits?"fits":"no fit")+" ("+(sl>=0?"+":"")+sl.toFixed(1)+chr(34)+")</div>";}ch+="</div>";});var c=document.getElementById("sp-id-cards");if(c)c.innerHTML=ch;}
-function openSpringPreview(){var wo=(document.getElementById("wo")||{}).value||"--";var w=(document.getElementById("width")||{}).value||"--";var h=(document.getElementById("height")||{}).value||"--";var wt=(document.getElementById("weight")||{}).value||"--";var mk=(document.getElementById("mark")||{}).value||"";var lt=(document.getElementById("lift-type-display")||{}).value||"Standard";var hl=(document.getElementById("highlift")||{}).value||"";var ns=(document.getElementById("sp-nsprings")||{}).textContent||"--";var wire=(document.getElementById("sp-wire")||{}).textContent||"--";var tippt=(document.getElementById("sp-tippt")||{}).textContent||"--";var drum=(document.getElementById("sp-drum")||{}).textContent||"--";var multi=(document.getElementById("sp-multi")||{}).textContent||"--";var turns=(document.getElementById("sp-turns")||{}).textContent||"--";var cyc=(document.getElementById("sp-cycles")||{}).textContent||"--";var lenR=(document.getElementById("sp-length-result")||{}).textContent||"--";var mkStr=mk?" MK-"+mk:"";var hlLine=(lt.toLowerCase().indexOf("high")!==-1&&hl)?"
-Hi-Lift: "+hl+chr(34):"";var txt="Spring Engineering
-===============
-W/O: "+wo+mkStr+"
-Assembly: Single
-Cycles: 10,000
-Lift Type: "+lt+hlLine+"
-Radius: 15
-Drum: CANIMEX/TF "+drum+"
-Width: "+w+chr(34)+" Height: "+h+chr(34)+" Weight: "+wt+" lb
-Springs: "+ns+"
------- Results ------
-Wire Size: "+wire+"
-Length (2.625"+chr(34)+"): "+lenR+"
-Turns: "+turns+"
-Cycles: "+cyc+"
-TIPPT: "+tippt+"
-Multiplier: "+multi+"
-
---- Length by ID ---
-";var cards=document.querySelectorAll("#sp-id-cards > div");cards.forEach(function(c){var divs=c.querySelectorAll("div");if(divs.length>=2){txt+=divs[0].textContent+"
-  "+divs[1].textContent+"
-";if(divs[2])txt+="  "+divs[2].textContent+"
-";txt+="
-";}});var ov=document.getElementById("spring-preview-overlay");var ct=document.getElementById("spring-preview-content");if(ov&&ct){ct.textContent=txt;ov.style.display="flex";document.body.style.overflow="hidden";}}
-function closeSpringPreview(){var o=document.getElementById("spring-preview-overlay");if(o){o.style.display="none";document.body.style.overflow="";}}function printSpringPreview(){var txt=(document.getElementById("spring-preview-content")||{}).textContent||"";var a=document.getElementById("spring-print-area");if(a){a.textContent=txt;window.print();}}
+var SP_REF=[
+  {nS:4,wire:0.2253,l2:21.75,tippt:116,turns:8.82,cyc:13000,drum:'D400-96'},
+  {nS:4,wire:0.2437,l2:25.75,tippt:144,turns:8.8,cyc:14000,drum:'D400-144'},
+  {nS:4,wire:0.2625,l2:31.25,tippt:170.2,turns:8.76,cyc:16000,drum:'D400-144'},
+  {nS:4,wire:0.2625,l2:29.0,tippt:183.3,turns:8.8,cyc:12000,drum:'D400-144'},
+  {nS:4,wire:0.3065,l2:32.5,tippt:349.4,turns:6.7,cyc:15000,drum:'5250-18'},
+  {nS:4,wire:0.3125,l2:32.0,tippt:393,turns:6.7,cyc:11000,drum:'5250-18'},
+  {nS:2,wire:0.2437,l2:31.6,tippt:116,turns:8.82,cyc:35850,drum:'D400-96'},
+  {nS:2,wire:0.250,l2:35.7,tippt:116,turns:8.82,cyc:49993,drum:'D400-96'},
+  {nS:2,wire:0.331,l2:48.0,tippt:170.2,turns:8.76,cyc:13000,drum:'D400-144'},
+  {nS:4,wire:0.273,l2:26.74,tippt:242.6,turns:7.49,cyc:10804,drum:'D525-54'},
+  {nS:4,wire:0.3065,l2:32.48,tippt:350.7,turns:7.02,cyc:11814,drum:'D525-54'}
+];
+var SP_ID_R={2.625:1.0,3.75:0.729,5.25:0.531};
+var SP_MIN={2.625:0.243,3.75:0.273,5.25:0.331};
+var SP_DR={
+  'D400-96':{m:0.257806,hma:2.275,dw:1.64},
+  'D400-144':{m:0.261803,hma:2.293,dw:1.64},
+  '5250-18':{m:0.436698,hma:2.936,dw:3.62},
+  'D525-54':{m:null,hma:2.719,dw:3.66},
+  'D575-120':{m:null,hma:2.969,dw:3.71},
+  'D800-120':{m:null,hma:4.125,dw:5.22}
+};
+function spDrum(lt,wt,hl){
+  if(lt==='highlift'){
+    if(hl<=54&&wt<=1000) return 'D525-54';
+    if(wt<=1000) return 'D575-120';
+    return 'D800-120';
+  }
+  if(wt<=530) return 'D400-96';
+  if(wt<=750) return 'D400-144';
+  return '5250-18';
+}
+function spMT(drum,height){
+  var d=SP_DR[drum];
+  if(!d||!d.m) return {multi:0.257806*(96/height),turns:8.82};
+  var m=d.m*(96/height);
+  return {multi:m,turns:d.hma/m};
+}
+function spRef(tippt,nS,drum){
+  var r=SP_REF.filter(function(x){return x.drum===drum&&x.nS===nS;});
+  if(!r.length) r=SP_REF.filter(function(x){return x.drum===drum;});
+  if(!r.length) r=SP_REF;
+  var tps=tippt/nS;
+  r=r.map(function(x){return {dist:Math.abs(x.tippt/x.nS-tps),ref:x};});
+  r.sort(function(a,b){return a.dist-b.dist;});
+  return r[0].ref;
+}
+function spLen(ref,tippt,nS,id){
+  if(!ref.l2) return null;
+  var ratio=SP_ID_R[id]||1;
+  return ref.l2*(ref.tippt/tippt)*(nS/ref.nS)*ratio;
+}
+function spW(d,id,len){
+  var mD=id+d;
+  return Math.PI*mD*(Math.PI*d*d/4)*0.283*(1/d)*len;
+}
+function spEl(id){return document.getElementById(id);}
+function spSet(id,val){var el=spEl(id);if(el&&el.tagName!=='SELECT')el.textContent=val;}
+function runSprings(){
+  var wt=parseFloat((spEl('weight')||{value:0}).value)||0;
+  var ht=parseFloat((spEl('height')||{value:96}).value)||96;
+  var wd=parseFloat((spEl('width')||{value:144}).value)||144;
+  var lt=(spEl('lift-type')||{value:'standard'}).value||'standard';
+  var hl=parseFloat((spEl('highlift')||{value:0}).value)||0;
+  if(!wt){return;}
+  var qEl=spEl('sp-qty');
+  var wEl=spEl('sp-wire');
+  var iEl=spEl('sp-id');
+  var nS=qEl&&qEl.value?parseInt(qEl.value):(wd>144?4:2);
+  var drum=spDrum(lt,wt,hl);
+  var mr=spMT(drum,ht);
+  var tippt=mr.multi*wt;
+  var ref=spRef(tippt,nS,drum);
+  var wire=wEl&&wEl.value?parseFloat(wEl.value):ref.wire;
+  var cyc=ref.cyc;
+  var len2=spLen(ref,tippt,nS,2.625);
+  spSet('sp-lift',lt==='highlift'?'High Lift':'Standard');
+  var hlb=spEl('sp-hlbox');
+  if(hlb) hlb.style.display=lt==='highlift'?'':'none';
+  spSet('sp-hlval',hl+'"');
+  spSet('sp-qty-lbl',nS+' (auto)');
+  spSet('sp-wire-lbl',wire+'" (auto)');
+  spSet('sp-id-lbl','All IDs');
+  spSet('sp-tippt',tippt.toFixed(1));
+  spSet('sp-drum',drum);
+  spSet('sp-multi',mr.multi.toFixed(6));
+  spSet('sp-turns',mr.turns.toFixed(2));
+  spSet('sp-len',len2?len2.toFixed(2)+'"':'--');
+  spSet('sp-cyc',cyc.toLocaleString()+' cycles');
+  var idOvr=iEl&&iEl.value?parseFloat(iEl.value):null;
+  var IDS=idOvr?[idOvr]:[2.625,3.75,5.25];
+  var usable=(wd+4)-2*(SP_DR[drum]?SP_DR[drum].dw:2)-8;
+  var cards='';
+  IDS.forEach(function(id){
+    var mn=SP_MIN[id]||0;
+    var ok2=wire>=mn;
+    var ln=ok2?spLen(ref,tippt,nS,id):null;
+    var tot=ln?ln*nS:0;
+    var sl=ln?(usable-tot):0;
+    var fits=ln?sl>=-2:false;
+    var wts=ln?spW(wire,id,ln):0;
+    var good=fits&&ok2;
+    var bdr=good?'2px solid #28a745':'0.5px solid #dee2e6';
+    var bg=good?'#f0fff4':'white';
+    var tc=good?'#155724':'#333';
+    cards+='<div style="border:'+bdr+';border-radius:8px;padding:.6rem .75rem;background:'+bg+'">';
+    cards+='<div style="font-size:13px;font-weight:600;color:'+tc+'">ID '+id+'"</div>';
+    if(!ok2){
+      cards+='<div style="font-size:12px;color:#C0272D;margin-top:4px">Wire below min ('+mn+'")</div>';
+    } else {
+      cards+='<div style="font-size:12px;color:#666;margin-top:2px">'+ln.toFixed(2)+'" / '+wts.toFixed(2)+' lbs</div>';
+      cards+='<div style="font-size:12px;font-weight:600;color:#1B2A6B;margin-top:2px">'+cyc.toLocaleString()+' cycles</div>';
+      var fit2=fits?'fits':'no fit';
+      var slStr=(sl>=0?'+':'')+sl.toFixed(1)+'"';
+      var cc=fits?'#28a745':'#dc3545';
+      cards+='<div style="font-size:11px;color:'+cc+';margin-top:3px">'+fit2+' ('+slStr+')</div>';
+    }
+    cards+='</div>';
+  });
+  var cd=spEl('sp-cards');
+  if(cd) cd.innerHTML=cards;
+}
+function openSpPreview(){
+  var wo=(spEl('wo')||{value:'--'}).value||'--';
+  var w=(spEl('width')||{value:'--'}).value;
+  var h=(spEl('height')||{value:'--'}).value;
+  var wt=(spEl('weight')||{value:'--'}).value;
+  var mk=(spEl('mark')||{value:''}).value;
+  var lt=(spEl('lift-type-display')||{value:'Standard'}).value||'Standard';
+  var hl=(spEl('highlift')||{value:''}).value;
+  var ns=(spEl('sp-qty-lbl')||{textContent:'--'}).textContent;
+  var wire=(spEl('sp-wire-lbl')||{textContent:'--'}).textContent;
+  var tippt=(spEl('sp-tippt')||{textContent:'--'}).textContent;
+  var drum=(spEl('sp-drum')||{textContent:'--'}).textContent;
+  var multi=(spEl('sp-multi')||{textContent:'--'}).textContent;
+  var turns=(spEl('sp-turns')||{textContent:'--'}).textContent;
+  var cycs=(spEl('sp-cyc')||{textContent:'--'}).textContent;
+  var lenr=(spEl('sp-len')||{textContent:'--'}).textContent;
+  var mkStr=mk?' MK-'+mk:'';
+  var hlLine=lt.toLowerCase().indexOf('high')!==-1&&hl?'\nHi-Lift: '+hl+'"':'';
+  var txt='Spring Engineering\n===============\n';
+  txt+='W/O: '+wo+mkStr+'\n';
+  txt+='Assembly: Single\nCycles: 10,000\n';
+  txt+='Lift Type: '+lt+hlLine+'\n';
+  txt+='Radius: 15\nDrum: CANIMEX/TF '+drum+'\n';
+  txt+='Width: '+w+'" Height: '+h+'" Weight: '+wt+' lb\n';
+  txt+='Springs: '+ns+'\n';
+  txt+='------ Results ------\n';
+  txt+='Wire Size: '+wire+'\n';
+  txt+='Length (2.625"): '+lenr+'\n';
+  txt+='Turns: '+turns+'\n';
+  txt+='Cycles: '+cycs+'\n';
+  txt+='TIPPT: '+tippt+'\n';
+  txt+='Multiplier: '+multi+'\n\n';
+  txt+='--- Length by ID ---\n';
+  var cs=document.querySelectorAll('#sp-cards > div');
+  cs.forEach(function(c){
+    var ds=c.querySelectorAll('div');
+    if(ds.length>=2){
+      txt+=ds[0].textContent+'\n';
+      if(ds[1]) txt+='  '+ds[1].textContent+'\n';
+      if(ds[2]) txt+='  '+ds[2].textContent+'\n';
+      txt+='\n';
+    }
+  });
+  var ov=spEl('sp-overlay');
+  var ct=spEl('sp-preview-txt');
+  if(ov&&ct){ct.textContent=txt;ov.style.display='flex';document.body.style.overflow='hidden';}
+}
+function closeSpPreview(){
+  var o=spEl('sp-overlay');
+  if(o){o.style.display='none';document.body.style.overflow='';}
+}
+function printSpPreview(){
+  var t=(spEl('sp-preview-txt')||{textContent:''}).textContent;
+  var a=spEl('sp-print-area');
+  if(a){a.textContent=t;window.print();}
+}
 
 function openSettings(){document.getElementById('settings-overlay').classList.add('open');document.getElementById('settings-drawer').classList.add('open');document.body.style.overflow='hidden';renderSettings();loadJBSettingsUI();}
 function closeSettings(){document.getElementById('settings-overlay').classList.remove('open');document.getElementById('settings-drawer').classList.remove('open');document.body.style.overflow='';}
@@ -757,7 +923,7 @@ function renderBigLabelPreview(){
 }
 function prevLabel(){curLabel=Math.max(0,curLabel-1);updateLabels();}
 function nextLabel(){curLabel=Math.min(labelRoles.length-1,curLabel+1);updateLabels();}
-function showTab(n){if(n===2&&typeof calcSprings==="function")setTimeout(calcSprings,50);document.querySelectorAll('.tab').forEach(function(t,i){t.classList.toggle('active',i===n);});document.querySelectorAll('.page').forEach(function(p,i){p.classList.toggle('active',i===n);});}
+function showTab(n){if(n===2&&typeof runSprings==="function")setTimeout(runSprings,50);document.querySelectorAll('.tab').forEach(function(t,i){t.classList.toggle('active',i===n);});document.querySelectorAll('.page').forEach(function(p,i){p.classList.toggle('active',i===n);});}
 function clearAll(){
   ['width','height','highlift','weight','wo','mark','lites'].forEach(function(id){document.getElementById(id).value='';});
   document.getElementById('track-type').value='';document.getElementById('lift-type').value='';
@@ -845,6 +1011,6 @@ try{setInterval(checkServer,15000);}catch(e){}
     </div>
     <div id="preview-content" style="background:white;border-radius:12px;padding:24px;overflow-y:auto;max-height:calc(100vh - 120px);"></div>
   </div>
-</div><div id="spring-preview-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:2000;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px;overflow-y:auto;"><div style="width:100%;max-width:480px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><button onclick="closeSpringPreview()" style="background:white;color:#1B2A6B;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">&#8592; Back</button><div style="color:white;font-size:16px;font-weight:700;">Spring Engineering</div><button onclick="printSpringPreview()" style="background:#C0272D;color:white;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">&#128424; Print</button></div><div id="spring-preview-content" style="background:white;border-radius:12px;padding:20px;font-family:monospace;font-size:13px;white-space:pre-wrap;line-height:1.6;"></div></div></div><div id="spring-print-area" style="display:none;font-family:monospace;font-size:13px;white-space:pre-wrap;padding:20px;"></div>
+</div><div id="sp-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:2000;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px;overflow-y:auto;"><div style="width:100%;max-width:480px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><button onclick="closeSpPreview()" style="background:white;color:#1B2A6B;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">&#8592; Back</button><div style="color:white;font-size:16px;font-weight:700;">Spring Engineering</div><button onclick="printSpPreview()" style="background:#C0272D;color:white;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">&#128424; Print</button></div><div id="sp-preview-txt" style="background:white;border-radius:12px;padding:20px;font-family:monospace;font-size:13px;white-space:pre-wrap;line-height:1.6;"></div></div></div><div id="sp-print-area" style="display:none;font-family:monospace;font-size:13px;white-space:pre-wrap;padding:20px;"></div>
 </body>
 </html>
