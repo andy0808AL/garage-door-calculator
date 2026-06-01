@@ -633,7 +633,7 @@ function calcSprings() {
   var lt = document.getElementById('lift-type') ? document.getElementById('lift-type').value : 'standard';
   var hl = document.getElementById('highlift') ? parseFloat(document.getElementById('highlift').value)||0 : 0;
 
-  if(!wt) { document.getElementById('sp-wire').textContent='—'; return; }
+  if(!wt) { spSet('sp-wire','—'; return; }
 
   var nS = wd>144?4:2;
   var drum = spGetDrum(lt,wt,hl);
@@ -645,27 +645,27 @@ function calcSprings() {
   // Wire min validation will be applied per ID in the cards
 
   // Update main fields
-  document.getElementById('sp-nsprings').textContent = nS+' (auto)';
+  spSet('sp-nsprings',nS+' (auto)';
   // Sync wire label
-  document.getElementById('sp-wire').textContent = wire+'"';
-  document.getElementById('sp-length').textContent = 'ID: all';
-  document.getElementById('sp-nsprings-label').textContent = nS+' springs (auto)';
-  document.getElementById('sp-wire-label').textContent = ref.wire+'" (auto)';
-  document.getElementById('sp-id-label').textContent = 'Showing all IDs';
+  spSet('sp-wire',wire+'"';
+  spSet('sp-length','ID: all';
+  spSet('sp-nsprings-label',nS+' springs (auto)';
+  spSet('sp-wire-label',ref.wire+'" (auto)';
+  spSet('sp-id-label','Showing all IDs';
   var lenFor2625 = spGetLength(ref,tippt,nS,2.625);
-  if(document.getElementById('sp-length')) document.getElementById('sp-length').textContent = lenFor2625 ? lenFor2625.toFixed(2)+'"' : '—';
-  document.getElementById('sp-wire').textContent = wire+'"';
-  document.getElementById('sp-tippt').textContent = tippt.toFixed(1);
-  document.getElementById('sp-drum').textContent = drum;
-  document.getElementById('sp-multi').textContent = mr.multi.toFixed(6);
-  document.getElementById('sp-turns').textContent = mr.turns.toFixed(2);
+  if(document.getElementById('sp-length')) spSet('sp-length',lenFor2625 ? lenFor2625.toFixed(2)+'"' : '—';
+  spSet('sp-wire',wire+'"';
+  spSet('sp-tippt',tippt.toFixed(1);
+  spSet('sp-drum',drum;
+  spSet('sp-multi',mr.multi.toFixed(6);
+  spSet('sp-turns',mr.turns.toFixed(2);
   var lenFor2625 = spGetLength(ref,tippt,nS,2.625);
-  document.getElementById('sp-length').textContent = lenFor2625 ? lenFor2625.toFixed(2)+'"' : '—';
-  document.getElementById('sp-cycles').textContent = cyc.toLocaleString()+' cycles';
-  document.getElementById('sp-lift-display').textContent = lt==='highlift'?'High Lift':'Standard';
+  spSet('sp-length',lenFor2625 ? lenFor2625.toFixed(2)+'"' : '—';
+  spSet('sp-cycles',cyc.toLocaleString()+' cycles';
+  spSet('sp-lift-display',lt==='highlift'?'High Lift':'Standard';
   if(lt==='highlift') {
     document.getElementById('sp-hl-box').style.display='';
-    document.getElementById('sp-hl-display').textContent = hl+'"';
+    spSet('sp-hl-display',hl+'"';
   } else {
     document.getElementById('sp-hl-box').style.display='none';
   }
