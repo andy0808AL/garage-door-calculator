@@ -325,8 +325,47 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     </div>
     <div class="page active" id="page-2">
 <div class="card" style="padding:0">
-<div style="padding:12px 20px;border-bottom:1px solid #e8ecf0;background:#f8f9fa">
-  <div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">OVERRIDE (optional)</div>
+<div style="padding:16px 20px 8px;border-bottom:1px solid #e8ecf0">
+  <div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">SPRING INFORMATION</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+    <div>
+      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Lift Type</div>
+      <div style="font-size:14px;font-weight:600" id="sp-lift-display">—</div>
+    </div>
+    <div id="sp-hl-box" style="display:none">
+      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">High Lift</div>
+      <div style="font-size:14px;font-weight:600" id="sp-hl-display">—</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px">
+    <div>
+      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Springs</div>
+      <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-nsprings">—</div>
+    </div>
+    <div>
+      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Length (2.625")</div>
+      <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-length">—</div>
+    </div>
+    <div>
+      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Wire Size</div>
+      <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-wire">—</div>
+    </div>
+    <div>
+      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">TIPPT</div>
+      <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-tippt">—</div>
+    </div>
+  </div>
+</div>
+
+<div style="padding:8px 20px;border-bottom:1px solid #e8ecf0">
+  <div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">DRUM & TURNS</div>
+  <div class="result-row"><span class="rlabel">Drum</span><span class="rvalue" id="sp-drum">—</span></div>
+  <div class="result-row"><span class="rlabel">Multiplier</span><span class="rvalue" id="sp-multi">—</span></div>
+  <div class="result-row"><span class="rlabel">Turns</span><span class="rvalue" id="sp-turns">—</span></div>
+</div>
+
+<div style="padding:12px 20px;border-bottom:1px solid #e8ecf0">
+  <div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">ADJUST</div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
     <div>
       <div style="font-size:11px;color:#8a9bb0;margin-bottom:3px">Wire Size</div>
@@ -369,45 +408,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     </div>
   </div>
 </div>
-<div style="padding:16px 20px 8px;border-bottom:1px solid #e8ecf0">
-  <div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">SPRING INFORMATION</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-    <div>
-      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Lift Type</div>
-      <div style="font-size:14px;font-weight:600" id="sp-lift-display">—</div>
-    </div>
-    <div id="sp-hl-box" style="display:none">
-      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">High Lift</div>
-      <div style="font-size:14px;font-weight:600" id="sp-hl-display">—</div>
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px">
-    <div>
-      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Springs</div>
-      <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-nsprings">—</div>
-    </div>
-    <div>
-      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Length (2.625")</div>
-      <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-length">—</div>
-    </div>
-    <div>
-      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">Wire Size</div>
-      <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-wire">—</div>
-    </div>
-    <div>
-      <div style="font-size:12px;color:#8a9bb0;margin-bottom:4px">TIPPT</div>
-      <div style="font-size:22px;font-weight:700;color:#1B2A6B" id="sp-tippt">—</div>
-    </div>
-  </div>
-</div>
-
-<div style="padding:8px 20px;border-bottom:1px solid #e8ecf0">
-  <div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">DRUM & TURNS</div>
-  <div class="result-row"><span class="rlabel">Drum</span><span class="rvalue" id="sp-drum">—</span></div>
-  <div class="result-row"><span class="rlabel">Multiplier</span><span class="rvalue" id="sp-multi">—</span></div>
-  <div class="result-row"><span class="rlabel">Turns</span><span class="rvalue" id="sp-turns">—</span></div>
-</div>
-
 <div style="padding:8px 20px">
   <div style="font-size:11px;font-weight:600;color:#8a9bb0;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">LENGTH BY ID — CHOOSE BASED ON INVENTORY</div>
   <div id="sp-id-cards" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px"></div>
