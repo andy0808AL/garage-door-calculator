@@ -627,6 +627,7 @@ function spShaftUsable(width, drum) {
   return (width+4)-2*dw-6-2;
 }
 
+function spSet(id,val){var el=document.getElementById(id);if(el){if(typeof el.value!=="undefined"&&el.tagName==="SELECT"){}else{el.textContent=val;}}}
 function calcSprings() {
   var wt = parseFloat(document.getElementById('weight').value)||0;
   var ht = parseFloat(document.getElementById('height').value)||96;
