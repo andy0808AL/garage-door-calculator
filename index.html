@@ -844,7 +844,7 @@ function setSelect(fieldId, val, label, triggerLabels){
   if(triggerLabels){ updateLabels(); saveForm(); }
   else {
     if(fieldId==='lift-type'){
-      document.getElementById('hl-field').classList.toggle('visible', val==='highlift');
+      document.getElementById('hl-field').classList.toggle('visible', val==='highlift'); setTimeout(runSprings,0);
     }
     calculate(); saveForm();
   }
