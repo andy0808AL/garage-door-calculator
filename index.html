@@ -547,14 +547,11 @@ function runSprings(){
   var dEl=spEl('sp-drum');
   // Filter drum options by lift type
   if(dEl){
-    var opts=dEl.querySelectorAll('option');
     var isHL=lt==='highlift';
-    opts.forEach(function(o){
-      if(o.classList.contains('hl-only')){
-        o.style.display=isHL?'':'none';
-        if(!isHL&&o.selected){dEl.value='';}
-      }
-    });
+    var DRUMS=[{val:'',text:'Auto',cls:''},{val:'D400-96',text:'D400-96',cls:'std-only'},{val:'D400-144',text:'D400-144',cls:'std-only'},{val:'5250-18',text:'5250-18',cls:'std-only'},{val:'D525-54',text:'D525-54 (HL)',cls:'hl-only'},{val:'D575-120',text:'D575-120 (HL)',cls:'hl-only'},{val:'D800-120',text:'D800-120 (HL)',cls:'hl-only'}];
+    var cur=dEl.value; dEl.innerHTML='';
+    DRUMS.forEach(function(od){if(od.cls==='hl-only'&&!isHL)return;if(od.cls==='std-only'&&isHL)return;var o=document.createElement('option');o.value=od.val;o.textContent=od.text;o.className=od.cls;dEl.appendChild(o);});
+    if(Array.from(dEl.options).some(function(o){return o.value===cur;})){dEl.value=cur;}else{dEl.value='';}
   }
   var nS=qEl&&qEl.value?parseInt(qEl.value):(wd>144?4:2);
   var autoDrum=spDrum(lt,wt,hl);
