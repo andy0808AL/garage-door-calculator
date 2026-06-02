@@ -350,6 +350,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 <button class="print-btn" style="flex:1" onclick="doPrint('springs')">&#128424; Print Springs</button>
 <button class="print-btn" style="flex:1;background:white;color:#111;border:2px solid #1B2A6B" onclick="openSpPreview()">&#128065; Preview</button>
 </div>
+    </div>
 <div class="page" id="page-3">
       <div id="label-missing" class="label-missing">Fill in Label Information above to preview labels.</div>
       <div id="label-content" style="display:none">
@@ -980,21 +981,15 @@ function updateLabels(){
 function renderBigLabelPreview(){
   var container=document.getElementById('big-label-preview');if(!container)return;
   var wo=document.getElementById('wo').value.trim();
-  var deg=0; // preview always upright
   var role=labelRoles[curLabel]||'',panels=CD.panels||4;
   var woText='W/O: '+(wo||'--'),panelText=role+' ('+(curLabel+1)+'/'+panels+')';
-  var netDeg=(deg+180)%360;
-  var landscape=netDeg===90||netDeg===270,flip=netDeg===180||netDeg===270;
-  var pAlign=(flip&&!landscape)||netDeg===270?'left':'right';
+  // Preview is always shown upright for readability. Physical print orientation
+  // is handled separately by the print server.
   var svg,wrapStyle;
-  if(landscape){
-    wrapStyle='aspect-ratio:2/1;min-height:110px;max-height:160px;';
-    svg='<svg width="100%" style="flex:1;display:block;min-height:0;" viewBox="0 0 500 160" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">'+(flip?'<g transform="rotate(180 250 80)">':'')+'<text x="250" y="82" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="62" textLength="480" lengthAdjust="spacingAndGlyphs">'+woText+'</text>'+(flip?'</g>':'')+'</svg>';
-  }else{
-    wrapStyle='min-height:200px;width:100%;display:flex;justify-content:center;';
-    svg='<svg width="100%" style="flex:1;display:block;min-height:0;width:100%;height:auto;" viewBox="0 0 270 200" width="270" height="200" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">'+(flip?'<g transform="rotate(180 135 100)">':'')+'<text x="135" y="100" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="55" textLength="258" lengthAdjust="spacingAndGlyphs">'+woText+'</text>'+(flip?'</g>':'')+'</svg>';
-  }
-  container.innerHTML='<div class="big-label-wrap" style="'+wrapStyle+'">'+svg+'<div class="big-label-panel" style="text-align:'+pAlign+';">'+panelText+'</div></div>';
+  // Big label is 3" wide x 6" tall (portrait). Show it upright.
+  wrapStyle='width:100%;max-width:240px;margin:0 auto;display:flex;flex-direction:column;';
+  svg='<svg viewBox="0 0 270 200" style="display:block;width:100%;height:auto;" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"><text x="135" y="100" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="55" textLength="258" lengthAdjust="spacingAndGlyphs">'+woText+'</text></svg>';
+  container.innerHTML='<div class="big-label-wrap" style="'+wrapStyle+'">'+svg+'<div class="big-label-panel" style="text-align:right;">'+panelText+'</div></div>';
 }
 function prevLabel(){curLabel=Math.max(0,curLabel-1);updateLabels();}
 function nextLabel(){curLabel=Math.min(labelRoles.length-1,curLabel+1);updateLabels();}
@@ -1079,16 +1074,19 @@ function doPrintAll(){
       return srvFetch('/print/labels',{wo:wo,mark:mark,lites:lites,glass:glass,frame:frame,panels:panels,size:size,roles:labelRoles,printerSmall:s.pSmall||'',printerBig:s.pBig||'',printSmall:true,printBig:true,bigRotation:curRotation});
     });
   }
-  // Run jobs one after another, waiting for each to finish
+  // Run jobs sequentially but DO NOT wait on a hung/slow printer:
+  // each job is fired with a short cap, then we move to the next regardless.
+  // This keeps the original behaviour where labels still print even if
+  // tracks/cables hang on a non-responsive printer.
   var i=0;
   function next(){
-    if(i>=jobs.length){toast('All printed!',3000);return;}
+    if(i>=jobs.length){toast('All sent!',3000);return;}
     var job=jobs[i++];
-    job().then(function(){
-      setTimeout(next,400);
-    }).catch(function(e){
-      setTimeout(next,400);
-    });
+    // Fire the job; move on after it settles OR after 1.2s, whichever first.
+    var moved=false;
+    function go(){ if(moved)return; moved=true; setTimeout(next,200); }
+    try{ job().then(go).catch(go); }catch(e){ go(); }
+    setTimeout(go,1200);
   }
   next();
 }
