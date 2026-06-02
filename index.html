@@ -550,7 +550,7 @@ function runSprings(){
   // Filter drum options by lift type
   if(dEl){
     var isHL=lt==='highlift';
-    // Master drum list — hardcoded so it never gets corrupted by filtering
+    // Master drum list â hardcoded so it never gets corrupted by filtering
     var DRUMS=[
       {val:'',text:'Auto',cls:''},
       {val:'D400-96',text:'D400-96',cls:'std-only'},
@@ -844,7 +844,7 @@ function setSelect(fieldId, val, label, triggerLabels){
   if(triggerLabels){ updateLabels(); saveForm(); }
   else {
     if(fieldId==='lift-type'){
-      document.getElementById('hl-field').classList.toggle('visible', val==='highlift'); setTimeout(runSprings,0);
+      document.getElementById('hl-field').classList.toggle('visible', val==='highlift'); setTimeout(runSprings,0); setTimeout(runSprings,0);
     }
     calculate(); saveForm();
   }
