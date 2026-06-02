@@ -838,7 +838,6 @@ function buildGlassOptions(){
     return '<div onmousedown="setSelect(\'glass\',\''+g+'\',\''+g+'\',true)"'+(g===cur?' style="font-weight:700;"':'')+'>'+g+'</div>';
   }).join('');
 }
-function buildFrameOptions(){
   var list=document.getElementById('cs-frame');
   if(!list||list.children.length>0)return;
   var cur=document.getElementById('frame').value;
