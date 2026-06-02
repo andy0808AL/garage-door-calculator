@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -333,7 +334,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 </div>
 <div style="padding:8px 20px;border-bottom:1px solid #e8ecf0">
 <div style="font-size:11px;font-weight:600;color:#8a9bb0;letter-spacing:.06em;margin-bottom:.6rem">RESULTS</div>
-<div class="result-row"><span class="rlabel">Drum</span><span class="rvalue"><span style="display:flex;align-items:center;gap:6px"><select id="sp-drum" onchange="runSprings()" style="border:1px solid #dee2e6;border-radius:5px;padding:2px 4px;font-size:13px;font-weight:600;color:#1B2A6B;background:white"><option value="">Auto</option><option value="D400-96">D400-96</option><option value="D400-144">D400-144</option><option value="5250-18">5250-18</option><option value="D525-54" class="hl-only">D525-54 (HL)</option><option value="D575-120" class="hl-only">D575-120 (HL)</option><option value="D800-120" class="hl-only">D800-120 (HL)</option></select><span id="sp-warn" onclick="showSpWarn()" style="display:none;cursor:pointer;font-size:22px;line-height:1;position:relative;padding:2px 4px" title=""><span style="color:#C0272D">&#9888;</span></span></span></span></div>
+<div class="result-row"><span class="rlabel">Drum</span><span class="rvalue"><span style="display:flex;align-items:center;gap:6px"><select id="sp-drum" onchange="runSprings()" style="border:1px solid #dee2e6;border-radius:5px;padding:2px 4px;font-size:13px;font-weight:600;color:#1B2A6B;background:white"><option value="">Auto</option><option value="D400-96" class="std-only">D400-96</option><option value="D400-144" class="std-only">D400-144</option><option value="5250-18" class="std-only">5250-18</option><option value="D525-54" class="hl-only">D525-54 (HL)</option><option value="D575-120" class="hl-only">D575-120 (HL)</option><option value="D800-120" class="hl-only">D800-120 (HL)</option></select><span id="sp-warn" onclick="showSpWarn()" style="display:none;cursor:pointer;font-size:22px;line-height:1;position:relative;padding:2px 4px" title=""><span style="color:#C0272D">&#9888;</span></span></span></span></div>
 <div class="result-row"><span class="rlabel">Length (2.625")</span><span class="rvalue" id="sp-len">--</span></div>
 <div class="result-row"><span class="rlabel">Cycles</span><span class="rvalue" id="sp-cyc">--</span></div>
 <div class="result-row"><span class="rlabel">TIPPT</span><span class="rvalue" id="sp-tippt">--</span></div>
@@ -454,19 +455,8 @@ function buildTracksPreviewHTML(d, info){
     d.jb.forEach(function(j){if(j.qty!==null){h+='<div style="background:#f8f9fa;border-radius:8px;padding:12px 16px;text-align:center;"><div style="font-size:12px;color:#666;">'+j.label+'</div><div style="font-size:22px;font-weight:700;color:#1B2A6B;">'+j.qty+'</div></div>';}});
     h+='</div>';
   }
-wire:0.2500,l2:24.54,tippt:85.79,turns:8.38,cyc:10234,drum:'D400-96'},
-  {nS:2,wire:0.2500,l2:24.49,tippt:85.98,turns:7.94,cyc:13045,drum:'D400-96'},
-  {nS:2,wire:0.2625,l2:28.83,tippt:92.28,turns:7.94,cyc:17701,drum:'D400-96'},
-  {nS:2,wire:0.2830,l2:36.50,tippt:104.67,turns:8.82,cyc:15972,drum:'D400-96'},
-  {nS:2,wire:0.2890,l2:30.77,tippt:100.13,turns:10.69,cyc:10525,drum:'D400-144'},
-  {nS:2,wire:0.2890,l2:34.87,tippt:121.74,turns:8.76,cyc:10738,drum:'D400-144'},
-  {nS:4,wire:0.2437,l2:22.37,tippt:166.63,turns:7.73,cyc:12239,drum:'D400-144'},
-  {nS:4,wire:0.2500,l2:25.77,tippt:162.98,turns:7.88,cyc:17354,drum:'D400-144'},
-  {nS:4,wire:0.2500,l2:25.13,tippt:167.34,turns:7.88,cyc:15338,drum:'D400-144'},
-  {nS:4,wire:0.3065,l2:31.16,tippt:366.39,turns:6.72,cyc:11779,drum:'5250-18'},
-  {nS:4,wire:0.2730,l2:26.74,tippt:242.60,turns:7.49,cyc:10804,drum:'D525-54'},
-  {nS:4,wire:0.2730,l2:26.78,tippt:242.25,turns:7.32,cyc:12104,drum:'D525-54'},
-  {nS:4,wire:0.3065,l2:32.48,tippt:350.74,turns:7.02,cyc:11814,drum:'D525-54'return h;
+  h+='</div>';
+  return h;
 }
 
 function buildCablesPreviewHTML(d, info){
@@ -486,9 +476,19 @@ function buildCablesPreviewHTML(d, info){
 }
 
 var SP_REF=[
-  {nS:4,wire:0.2253,l2:21.75,tippt:116,turns:8.82,cyc:13000,drum:'D400-96'},
-  {nS:4,wire:0.273,l2:26.74,tippt:242.6,turns:7.49,cyc:10804,drum:'D525-54'},
-  {nS:4,wire:0.3065,l2:32.48,tippt:350.7,turns:7.02,cyc:11814,drum:'D525-54'}
+  {nS:2,wire:0.2500,l2:24.54,tippt:85.79,turns:8.38,cyc:10234,drum:'D400-96'},
+  {nS:2,wire:0.2500,l2:24.49,tippt:85.98,turns:7.94,cyc:13045,drum:'D400-96'},
+  {nS:2,wire:0.2625,l2:28.83,tippt:92.28,turns:7.94,cyc:17701,drum:'D400-96'},
+  {nS:2,wire:0.2830,l2:36.50,tippt:104.67,turns:8.82,cyc:15972,drum:'D400-96'},
+  {nS:2,wire:0.2890,l2:30.77,tippt:100.13,turns:10.69,cyc:10525,drum:'D400-144'},
+  {nS:2,wire:0.2890,l2:34.87,tippt:121.74,turns:8.76,cyc:10738,drum:'D400-144'},
+  {nS:4,wire:0.2437,l2:22.37,tippt:166.63,turns:7.73,cyc:12239,drum:'D400-144'},
+  {nS:4,wire:0.2500,l2:25.77,tippt:162.98,turns:7.88,cyc:17354,drum:'D400-144'},
+  {nS:4,wire:0.2500,l2:25.13,tippt:167.34,turns:7.88,cyc:15338,drum:'D400-144'},
+  {nS:4,wire:0.3065,l2:31.16,tippt:366.39,turns:6.72,cyc:11779,drum:'5250-18'},
+  {nS:4,wire:0.2730,l2:26.74,tippt:242.60,turns:7.49,cyc:10804,drum:'D525-54'},
+  {nS:4,wire:0.2730,l2:26.78,tippt:242.25,turns:7.32,cyc:12104,drum:'D525-54'},
+  {nS:4,wire:0.3065,l2:32.48,tippt:350.74,turns:7.02,cyc:11814,drum:'D525-54'}
 ];
 var SP_ID_R={2.625:1.0,3.75:0.729,5.25:0.531};
 var SP_MIN={2.625:0.243,3.75:0.273,5.25:0.331};
@@ -550,10 +550,30 @@ function runSprings(){
   // Filter drum options by lift type
   if(dEl){
     var isHL=lt==='highlift';
-    var DRUMS=[{val:'',text:'Auto',cls:''},{val:'D400-96',text:'D400-96',cls:'std-only'},{val:'D400-144',text:'D400-144',cls:'std-only'},{val:'5250-18',text:'5250-18',cls:'std-only'},{val:'D525-54',text:'D525-54 (HL)',cls:'hl-only'},{val:'D575-120',text:'D575-120 (HL)',cls:'hl-only'},{val:'D800-120',text:'D800-120 (HL)',cls:'hl-only'}];
-    var cur=dEl.value; dEl.innerHTML='';
-    DRUMS.forEach(function(od){if(od.cls==='hl-only'&&!isHL)return;if(od.cls==='std-only'&&isHL)return;var o=document.createElement('option');o.value=od.val;o.textContent=od.text;o.className=od.cls;dEl.appendChild(o);});
-    if(Array.from(dEl.options).some(function(o){return o.value===cur;})){dEl.value=cur;}else{dEl.value='';}
+    // Master drum list — hardcoded so it never gets corrupted by filtering
+    var DRUMS=[
+      {val:'',text:'Auto',cls:''},
+      {val:'D400-96',text:'D400-96',cls:'std-only'},
+      {val:'D400-144',text:'D400-144',cls:'std-only'},
+      {val:'5250-18',text:'5250-18',cls:'std-only'},
+      {val:'D525-54',text:'D525-54 (HL)',cls:'hl-only'},
+      {val:'D575-120',text:'D575-120 (HL)',cls:'hl-only'},
+      {val:'D800-120',text:'D800-120 (HL)',cls:'hl-only'}
+    ];
+    var cur=dEl.value;
+    dEl.innerHTML='';
+    DRUMS.forEach(function(od){
+      if(od.cls==='hl-only'&&!isHL) return;
+      if(od.cls==='std-only'&&isHL) return;
+      var o=document.createElement('option');
+      o.value=od.val; o.textContent=od.text; o.className=od.cls;
+      dEl.appendChild(o);
+    });
+    if(Array.from(dEl.options).some(function(o){return o.value===cur;})){
+      dEl.value=cur;
+    } else {
+      dEl.value='';
+    }
   }
   var nS=qEl&&qEl.value?parseInt(qEl.value):(wd>144?4:2);
   var autoDrum=spDrum(lt,wt,hl);
@@ -837,6 +857,7 @@ function buildGlassOptions(){
     return '<div onmousedown="setSelect(\'glass\',\''+g+'\',\''+g+'\',true)"'+(g===cur?' style="font-weight:700;"':'')+'>'+g+'</div>';
   }).join('');
 }
+function buildFrameOptions(){
   var list=document.getElementById('cs-frame');
   if(!list||list.children.length>0)return;
   var cur=document.getElementById('frame').value;
@@ -858,7 +879,7 @@ function syncDisplayFields(){
     disp.value = m ? (m[v]||v||'') : (v||'');
   });
 }
-var _rdy=false;document.addEventListener('mousemove',function(){_rdy=true;},{once:true,passive:true});setTimeout(function(){document.querySelectorAll('.suggest-list').forEach(function(e){e.classList.remove('open');e.style.display='none';});},0);function showSuggest(id){if(!_rdy)return;var el=document.getElementById(id);if(el){el.classList.add('open');el.style.display='block';}}
+setTimeout(function(){document.querySelectorAll('.suggest-list').forEach(function(e){e.classList.remove('open');e.style.display='none';});},0);function showSuggest(id){var el=document.getElementById(id);if(el){el.classList.add('open');el.style.display='block';}}
 function hideSuggest(id){setTimeout(function(){var el=document.getElementById(id);if(el){el.classList.remove('open');el.style.display='none';}},300);}
 function setSuggest(fieldId,val){
   var el=document.getElementById(fieldId);
