@@ -494,9 +494,9 @@ var SP_REF=[
 var SP_ID_R={2.625:1.0,3.75:0.729,5.25:0.531};
 var SP_MIN={2.625:0.243,3.75:0.273,5.25:0.331};
 var SP_DR={
-  'D400-96':{m:0.257806,hma:2.275,dw:1.64},
-  'D400-144':{m:0.254654,hma:2.293,dw:1.64},
-  '5250-18':{m:0.436698,hma:2.936,dw:3.62},
+  'D400-96':{m:0.257806,hma:2.27478,a:8.24462,b:0.29479,dw:1.64},
+  'D400-144':{m:0.254654,hma:2.29329,a:8.82065,b:0.240367,dw:1.64},
+  '5250-18':{m:0.436698,hma:2.93165,a:12.12421,b:0.332726,dw:3.62},
   'D525-54':{m:0.359566,hma:2.719,dw:3.66},
   'D575-120':{m:null,hma:2.969,dw:3.71},
   'D800-120':{m:null,hma:4.125,dw:5.22}
@@ -514,6 +514,14 @@ function spDrum(lt,wt,hl){
 function spMT(drum,height){
   var d=SP_DR[drum];
   if(!d||!d.m) return {multi:0.257806*(96/height),turns:8.82};
+  // Drum cable build-up: effective radius grows as cable wraps, so door height
+  // is quadratic in turns:  height = a*turns + b*turns^2.  Invert for turns.
+  // Then multiplier follows from the (drum-constant) torque relation hma = multi*turns.
+  if(d.a&&d.b){
+    var turns=(-d.a+Math.sqrt(d.a*d.a+4*d.b*height))/(2*d.b);
+    return {multi:d.hma/turns,turns:turns};
+  }
+  // Fallback (hi-lift drums without fitted coefficients): legacy linear model
   var m=d.m*(96/height);
   return {multi:m,turns:d.hma/m};
 }
@@ -925,7 +933,7 @@ function getJBOverride(key,calculated){
   return ov[key]!==undefined?ov[key]:calculated;
 }
 function setupListeners(){
-  ['width','height','highlift','weight'].forEach(function(id){document.getElementById(id).addEventListener('input',function(){calculate();saveForm();});});
+  ['width','height','highlift','weight'].forEach(function(id){document.getElementById(id).addEventListener('input',function(){calculate();runSprings();saveForm();});});
   // track-type handled by setSelect
   // lift-type handled by setSelect
   ['wo','mark','lites'].forEach(function(id){document.getElementById(id).addEventListener('input',function(){updateLabels();saveForm();});});
