@@ -534,10 +534,16 @@ function spRef(tippt,nS,drum){
   r.sort(function(a,b){return a.dist-b.dist;});
   return r[0].ref;
 }
-function spLen(ref,tippt,nS,id){
-  if(!ref.l2) return null;
-  var ratio=SP_ID_R[id]||1;
-  return ref.l2*(ref.tippt/tippt)*(nS/ref.nS)*ratio;
+function spLen(wire,id,tippt,nS){
+  // Physical close-wound torsion spring length.
+  // Active coils N = (E*d^4)/(10.8*Dm*ipptPerSpring), length = N*d.
+  // Steel torsion modulus E ~= 33.38e6 psi; K = E/10.8 fitted to SSC data.
+  if(!wire||!tippt||!nS) return null;
+  var K=3091089;
+  var Dm=id+wire;
+  var ipptPS=tippt/nS;
+  if(!ipptPS) return null;
+  return K*Math.pow(wire,5)/(Dm*ipptPS);
 }
 function spW(d,id,len){
   var mD=id+d;
@@ -601,7 +607,7 @@ function runSprings(){
   var newMD=wire+dispID;
   var cyc=Math.round(ref.cyc*Math.pow(wire/ref.wire,3)*(refMD/newMD));
   // Length for the displayed ID
-  var len2=spLen(ref,tippt,nS,dispID);
+  var len2=spLen(wire,dispID,tippt,nS);
   var usable=(wd+4)-2*(SP_DR[drum]?SP_DR[drum].dw:2)-8;
   spSet('sp-lift',lt==='highlift'?'High Lift':'Standard');
   var hlb=spEl('sp-hlbox');
