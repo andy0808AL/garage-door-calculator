@@ -53,7 +53,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .hl-field{display:none;}.hl-field.visible{display:block;}
 .clear-btn{width:100%;height:46px;background:var(--red-light);color:var(--red);border:1.5px solid #f5c6c2;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;}
 .results{display:none;}.results.visible{display:block;}
-.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:12px;}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:12px;}
 .tab{height:38px;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);background:var(--white);font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .tab.active{background:var(--blue);color:white;border-color:var(--blue);}
 .page{display:none;}.page.active{display:block;}
@@ -174,6 +174,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   <div class="card">
     <div class="card-title">Door Information</div>
     <div class="field-row">
+      <div class="field"><label>W/O #</label><input type="text" id="wo" placeholder="e.g. 721"></div>
+      <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-mark')" onmouseleave="hideSuggest('cs-mark')">
+        <label>Mark</label>
+        <input type="text" id="mark-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
+        <input type="hidden" id="mark" value="">
+        <div id="cs-mark" class="suggest-list" style="display:none;">
+          <div onmousedown="setSelect('mark','A','A',true)">A</div>
+          <div onmousedown="setSelect('mark','B','B',true)">B</div>
+          <div onmousedown="setSelect('mark','C','C',true)">C</div>
+          <div onmousedown="setSelect('mark','D','D',true)">D</div>
+          <div onmousedown="setSelect('mark','E','E',true)">E</div>
+        </div>
+      </div>
+    </div>
+    <div class="field-row">
       <div class="field" style="position:relative;" onmouseenter="showSuggest('width-suggest')" onmouseleave="hideSuggest('width-suggest')">
     <label>Width (inches)</label>
     <input type="number" id="width" placeholder="e.g. 192" inputmode="decimal" autocomplete="off"
@@ -232,23 +247,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     </div>
     <button class="clear-btn" onclick="clearAll()">Clear</button>
   </div>
-  <div class="card">
+  <div class="card" style="display:none">
     <div class="card-title" onclick="toggleLabel()" style="cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between">Label Information <span style="display:flex;align-items:center;gap:8px"><span class="badge">Optional</span><span id="lbl-chev" style="font-size:18px;transition:transform .3s">&#9654;</span></span></div>
-    <div id="lbl-body" style="display:none"><div class="field-row">
-      <div class="field"><label>W/O #</label><input type="text" id="wo" placeholder="e.g. 721"></div>
-      <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-mark')" onmouseleave="hideSuggest('cs-mark')">
-    <label>Mark</label>
-    <input type="text" id="mark-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
-    <input type="hidden" id="mark" value="">
-    <div id="cs-mark" class="suggest-list" style="display:none;">
-      <div onmousedown="setSelect('mark','A','A',true)">A</div>
-      <div onmousedown="setSelect('mark','B','B',true)">B</div>
-      <div onmousedown="setSelect('mark','C','C',true)">C</div>
-      <div onmousedown="setSelect('mark','D','D',true)">D</div>
-      <div onmousedown="setSelect('mark','E','E',true)">E</div>
-    </div>
-  </div>
-    </div>
+    <div id="lbl-body" style="display:none">
     <div class="field-row">
       <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-lites')" onmouseleave="hideSuggest('cs-lites')">
     <label>Lites</label>
@@ -282,7 +283,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       <div class="tab active" onclick="showTab(0)">Tracks</div>
       <div class="tab" onclick="showTab(1)">Cables</div>
       <div class="tab" onclick="showTab(2)">Springs</div>
-      <div class="tab" onclick="showTab(3)">Labels</div>
+      <div class="tab" onclick="showTab(3)" style="display:none">Labels</div>
       <div class="tab" onclick="showTab(4)">Hardware</div>
     </div>
     <div class="page active" id="page-0">
@@ -381,7 +382,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     </div>
   </div>
   <div class="results" id="print-all-wrap" style="margin-top:4px">
-    <button class="print-all-btn" onclick="doPrintAll()">&#128424; Print All</button>
+    <button class="print-all-btn" onclick="doPrintAllBrowser()">&#128424; Print All</button>
+    <button class="print-all-btn" style="display:none" onclick="doPrintAll()">&#128424; Print All (print server)</button>
   </div>
 </div>
 <script>
@@ -461,37 +463,52 @@ function closePreview(){
 }
 
 function buildTracksPreviewHTML(d, info){
+  var td='border:1px solid #888;padding:8px 12px;';
+  var tdv='border:1px solid #888;padding:8px 12px;text-align:right;font-weight:700;color:#1B2A6B;';
+  var tdhot='border:1px solid #888;padding:8px 12px;text-align:right;font-weight:800;color:#C0272D;font-size:17px;background:#fff5f5;';
+  var th='border:1px solid #888;padding:8px 12px;background:#1B2A6B;color:#fff;';
   var h='<div style="font-family:Arial,sans-serif;">';
-  h+='<div style="text-align:center;margin-bottom:16px;font-size:13px;color:#666;">W/O: '+(info.wo||'-')+' &nbsp;|&nbsp; '+info.width+'" x '+info.height+'" &nbsp;|&nbsp; '+info.trackType+'</div>';
-  h+='<table style="width:100%;border-collapse:collapse;font-size:15px;">';
-  h+='<tr style="background:#1B2A6B;color:white;"><th style="padding:10px;text-align:left;">Measurement</th><th style="padding:10px;text-align:right;">Value</th></tr>';
-  h+='<tr style="background:#f8f9fa;"><td style="padding:10px;">Vertical (L & R)</td><td style="padding:10px;text-align:right;font-weight:700;">'+String(d.vertical).replace(/"/g,'')+'"</td></tr>';
-  h+='<tr><td style="padding:10px;">Horizontal (L & R)</td><td style="padding:10px;text-align:right;font-weight:700;">'+String(d.horizontal).replace(/"/g,'')+'"</td></tr>';
-  h+='<tr style="background:#f8f9fa;"><td style="padding:10px;">2x2 Projection</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.projection+'"</td></tr>';
-  h+='<tr><td style="padding:10px;">Sections</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.sections+'</td></tr>';
-  h+='<tr style="background:#f8f9fa;"><td style="padding:10px;">Configuration</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.config+'</td></tr>';
+  h+='<div style="background:#1B2A6B;color:#fff;text-align:center;font-size:18px;font-weight:800;letter-spacing:.1em;padding:8px 0;border-bottom:4px solid #C0272D;">TRACKS</div>';
+  h+='<div style="text-align:center;margin:8px 0 12px;font-size:13px;color:#666;">W/O: '+(info.wo||'-')+' &nbsp;|&nbsp; '+info.width+'" x '+info.height+'" &nbsp;|&nbsp; '+info.trackType+'</div>';
+  h+='<table style="border-collapse:collapse;width:100%;max-width:480px;margin:0 auto 0 0;font-size:15px;">';
+  h+='<tr><th style="'+th+'text-align:left;">Measurement</th><th style="'+th+'text-align:right;">Value</th></tr>';
+  h+='<tr style="background:#f8f9fa;"><td style="'+td+'">Vertical (L &amp; R)</td><td style="'+tdhot+'">'+String(d.vertical).replace(/"/g,'')+'"</td></tr>';
+  h+='<tr><td style="'+td+'">Horizontal (L &amp; R)</td><td style="'+tdhot+'">'+String(d.horizontal).replace(/"/g,'')+'"</td></tr>';
+  h+='<tr style="background:#f8f9fa;"><td style="'+td+'">2x2 Projection</td><td style="'+tdv+'">'+d.projection+'"</td></tr>';
+  h+='<tr><td style="'+td+'">Sections</td><td style="'+tdv+'">'+d.sections+'</td></tr>';
+  h+='<tr style="background:#f8f9fa;"><td style="'+td+'">Configuration</td><td style="'+tdv+'">'+d.config+'</td></tr>';
   h+='</table>';
   if(d.jb && d.jb.length){
-    h+='<div style="margin-top:16px;font-weight:700;font-size:14px;color:#1B2A6B;">JAMB BRACKETS -- PER SIDE</div>';
-    h+='<div style="display:flex;gap:12px;margin-top:8px;">';
-    d.jb.forEach(function(j){if(j.qty!==null){h+='<div style="background:#f8f9fa;border-radius:8px;padding:12px 16px;text-align:center;"><div style="font-size:12px;color:#666;">'+j.label+'</div><div style="font-size:22px;font-weight:700;color:#1B2A6B;">'+j.qty+'</div></div>';}});
-    h+='</div>';
+    var jbs=d.jb.filter(function(j){return j.qty!==null && j.qty!=='--';});
+    if(jbs.length){
+      h+='<div style="margin:14px 0 4px;font-weight:800;font-size:13px;color:#1B2A6B;">JAMB BRACKETS &mdash; per side</div>';
+      h+='<table style="border-collapse:collapse;max-width:480px;margin:0 auto 0 0;font-size:14px;text-align:center;"><tr>';
+      jbs.forEach(function(j){h+='<th style="'+th+'padding:6px 14px;">'+j.label+'</th>';});
+      h+='</tr><tr>';
+      jbs.forEach(function(j){h+='<td style="border:1px solid #888;padding:6px 14px;font-weight:800;color:#C0272D;">'+j.qty+'</td>';});
+      h+='</tr></table>';
+    }
   }
   h+='</div>';
   return h;
 }
 
 function buildCablesPreviewHTML(d, info){
+  var td='border:1px solid #888;padding:8px 12px;';
+  var tdv='border:1px solid #888;padding:8px 12px;text-align:right;font-weight:700;color:#1B2A6B;';
+  var tdhot='border:1px solid #888;padding:8px 12px;text-align:right;font-weight:800;color:#C0272D;font-size:19px;background:#fff5f5;';
+  var th='border:1px solid #888;padding:8px 12px;background:#1B2A6B;color:#fff;';
   var h='<div style="font-family:Arial,sans-serif;">';
-  h+='<div style="text-align:center;margin-bottom:16px;font-size:13px;color:#666;">W/O: '+(info.wo||'-')+' &nbsp;|&nbsp; '+info.width+'" x '+info.height+'" &nbsp;|&nbsp; Door Weight: '+(info.weight||CD.wt||'-')+' lbs</div>';
-  h+='<table style="width:100%;border-collapse:collapse;font-size:15px;">';
-  h+='<tr style="background:#1B2A6B;color:white;"><th style="padding:10px;text-align:left;">Item</th><th style="padding:10px;text-align:right;">Value</th></tr>';
-  h+='<tr style="background:#f8f9fa;"><td style="padding:10px;">Drum</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.drum+'</td></tr>';
-  h+='<tr><td style="padding:10px;">EBF</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.ebf+'</td></tr>';
-  h+='<tr style="background:#f8f9fa;"><td style="padding:10px;">Capacity (per drum)</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.capacity+' lbs</td></tr>';
-  h+='<tr><td style="padding:10px;">FTSC</td><td style="padding:10px;text-align:right;font-weight:700;">'+String(d.ftsc).replace(/"/g,'')+'"</td></tr>';
-  h+='<tr style="background:#f8f9fa;"><td style="padding:10px;">Cable Length</td><td style="padding:10px;text-align:right;font-weight:700;color:#C0272D;font-size:18px;">'+String(d.cable).replace(/"/g,'')+'"</td></tr>';
-  h+='<tr><td style="padding:10px;">Cable Type</td><td style="padding:10px;text-align:right;font-weight:700;">'+d.cableType+'</td></tr>';
+  h+='<div style="background:#1B2A6B;color:#fff;text-align:center;font-size:18px;font-weight:800;letter-spacing:.1em;padding:8px 0;border-bottom:4px solid #C0272D;">CABLES</div>';
+  h+='<div style="text-align:center;margin:8px 0 12px;font-size:13px;color:#666;">W/O: '+(info.wo||'-')+' &nbsp;|&nbsp; '+info.width+'" x '+info.height+'" &nbsp;|&nbsp; Door Weight: '+(info.weight||CD.wt||'-')+' lbs</div>';
+  h+='<table style="border-collapse:collapse;width:100%;max-width:480px;margin:0 auto 0 0;font-size:15px;">';
+  h+='<tr><th style="'+th+'text-align:left;">Item</th><th style="'+th+'text-align:right;">Value</th></tr>';
+  h+='<tr style="background:#f8f9fa;"><td style="'+td+'">Drum</td><td style="'+tdv+'">'+d.drum+'</td></tr>';
+  h+='<tr><td style="'+td+'">EBF</td><td style="'+tdv+'">'+d.ebf+'</td></tr>';
+  h+='<tr style="background:#f8f9fa;"><td style="'+td+'">Capacity (per drum)</td><td style="'+tdv+'">'+d.capacity+' lbs</td></tr>';
+  h+='<tr><td style="'+td+'">FTSC</td><td style="'+tdv+'">'+String(d.ftsc).replace(/"/g,'')+'"</td></tr>';
+  h+='<tr><td style="'+td+'font-weight:700;">Cable Length</td><td style="'+tdhot+'">'+String(d.cable).replace(/"/g,'')+'"</td></tr>';
+  h+='<tr style="background:#f8f9fa;"><td style="'+td+'">Cable Type</td><td style="'+tdv+'">'+d.cableType+'</td></tr>';
   h+='</table>';
   h+='</div>';
   return h;
@@ -728,7 +745,7 @@ function showSpWarn(){
   var msg=w?w.getAttribute('data-msg'):'';
   if(msg){alert(msg);}
 }
-function openSpPreview(){
+function buildSpringsText(){
   var wo=(spEl('wo')||{value:'--'}).value||'--';
   var w=(spEl('width')||{value:'--'}).value;
   var h=(spEl('height')||{value:'--'}).value;
@@ -772,6 +789,10 @@ function openSpPreview(){
       txt+='\n';
     }
   });
+  return txt;
+}
+function openSpPreview(){
+  var txt=buildSpringsText();
   var ov=spEl('sp-overlay');
   var ct=spEl('sp-preview-txt');
   if(ov&&ct){ct.textContent=txt;ov.style.display='flex';document.body.style.overflow='hidden';}
@@ -784,6 +805,29 @@ function printSpPreview(){
   var t=(spEl('sp-preview-txt')||{textContent:''}).textContent;
   var a=spEl('sp-print-area');
   if(a){a.textContent=t;window.print();}
+}
+// Print Tracks + Cables + Springs + Hardware in one browser print job (no server).
+// Labels are intentionally excluded. Everything goes to whichever printer the user
+// picks in the single browser print dialog.
+function doPrintAllBrowser(){
+  try{calculate();}catch(e){}
+  try{runSprings();}catch(e){}
+  var info=getInfo();
+  var parts=[];
+  try{ parts.push(buildTracksPreviewHTML(getTracksData(), info)); }catch(e){console.error('tracks',e);}
+  if(CD.hasWeight){
+    try{ parts.push(buildCablesPreviewHTML(getCablesData(), info)); }catch(e){console.error('cables',e);}
+    try{ parts.push('<pre style="font-family:monospace;font-size:12px;white-space:pre-wrap;line-height:1.5;margin:0">'+buildSpringsText()+'</pre>'); }catch(e){console.error('springs',e);}
+  }
+  try{ var hw=computeHardware(); if(hw&&hw.series){ parts.push(buildHardwarePreviewHTML(hw, info, hwChecks())); } }catch(e){console.error('hardware',e);}
+  if(!parts.length){ try{toast('Fill in the door info first',2500);}catch(e){} return; }
+  var html='';
+  parts.forEach(function(p,i){
+    html+='<div style="'+(i<parts.length-1?'page-break-after:always;break-after:page;':'')+'padding:6px 0">'+p+'</div>';
+  });
+  var area=document.getElementById('preview-print-area');
+  area.innerHTML=html;
+  setTimeout(function(){window.print();},60);
 }
 
 
@@ -1348,13 +1392,25 @@ function buildHardwarePreviewHTML(hw,info,checks){
 function srvFetch(endpoint,payload){
   return fetch(SERVER+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:AbortSignal.timeout(15000)}).then(function(r){return r.json();});
 }
+// Browser-print a single section (no print server needed).
+function printOne(type){
+  if((type==='cables'||type==='springs') && !CD.hasWeight){ try{toast('Enter door weight first',2000);}catch(e){} return; }
+  try{ if(type==='springs') runSprings(); }catch(e){}
+  var info=getInfo();
+  var html='';
+  try{
+    if(type==='tracks') html=buildTracksPreviewHTML(getTracksData(), info);
+    else if(type==='cables') html=buildCablesPreviewHTML(getCablesData(), info);
+    else if(type==='springs') html='<pre style="font-family:monospace;font-size:13px;white-space:pre-wrap;line-height:1.5;margin:0">'+buildSpringsText()+'</pre>';
+    else if(type==='hardware'){ var hw=computeHardware(); if(hw&&hw.series) html=buildHardwarePreviewHTML(hw, info, hwChecks()); }
+  }catch(e){console.error('printOne',e);}
+  if(!html){ try{toast('Fill in the door info first',2000);}catch(e){} return; }
+  var area=document.getElementById('preview-print-area');
+  if(area){ area.innerHTML=html; setTimeout(function(){window.print();},60); }
+}
 function doPrint(type){
   var s=load();
-  if(type==='hardware'){
-    openPreview('hardware');
-    setTimeout(printPreview,200);
-    return;
-  }
+  if(type==='tracks'||type==='cables'||type==='springs'||type==='hardware'){ printOne(type); return; }
   if(type==='tracks'){
     if(!serverOK){toast('Print server offline',2000);return;}
     toast('Printing Tracks...',2000);
