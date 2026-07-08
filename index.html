@@ -1204,7 +1204,7 @@ function renderHardware(){
     ['Center bearings',hw.centerBearings],
     ['Spring anchor bolt',hw.springAnchorBolt],
     ['Perforated angle bolt/nut',12],
-    ['Track / hanger bolt/nut',3],
+    ['Track / hanger bolt/nut',4],
     ['Hinge screws',hw.hingeScrews],
     ['End bearing plate bolt/nut',6],
     ['Shaft key',hw.shaftKey==null?em(null):hw.shaftKey],
@@ -1278,7 +1278,7 @@ function buildHardwarePreviewHTML(hw,info,checks){
   var tracks=[['Q','Flag bracket (1 L &amp; 1 R)',2],['R',rDesc,2],['S',sDesc,2],['T',tDesc,3]];
   var bolts=[
     ['Center bearings',hw.centerBearings,'1 per spring'],['Spring anchor bolt',hw.springAnchorBolt,'2 per spring'],
-    ['Perforated angle bolt/nut',12,''],['Track / hanger bolt/nut',3,'1 per hanger'],
+    ['Perforated angle bolt/nut',12,''],['Track / hanger bolt/nut',4,''],
     ['Hinge screws',hw.hingeScrews,'4x(H,I,J)+26'],['End bearing plate bolt/nut',6,''],
     ['Shaft key',hw.shaftKey==null?'-':hw.shaftKey,''],['Lag screws',hw.lagScrews,'']
   ];
