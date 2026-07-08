@@ -53,7 +53,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .hl-field{display:none;}.hl-field.visible{display:block;}
 .clear-btn{width:100%;height:46px;background:var(--red-light);color:var(--red);border:1.5px solid #f5c6c2;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;}
 .results{display:none;}.results.visible{display:block;}
-.tabs{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-bottom:12px;}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:12px;}
 .tab{height:38px;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);background:var(--white);font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .tab.active{background:var(--blue);color:white;border-color:var(--blue);}
 .page{display:none;}.page.active{display:block;}
@@ -102,7 +102,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   @page { margin:15mm; }
 }
 #preview-print-area { display:none; }
-@media print{body>*:not(#sp-print-area){display:none!important;}#sp-print-area{display:block!important;}}
+@media print{body>*:not(#sp-print-area):not(#preview-print-area){display:none!important;}#sp-print-area{display:block!important;}}
 </style>
 </head>
 <body>
@@ -283,6 +283,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       <div class="tab" onclick="showTab(1)">Cables</div>
       <div class="tab" onclick="showTab(2)">Springs</div>
       <div class="tab" onclick="showTab(3)">Labels</div>
+      <div class="tab" onclick="showTab(4)">Hardware</div>
     </div>
     <div class="page active" id="page-0">
       <div class="card"><div class="card-title">Track Measurements</div>
@@ -366,6 +367,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
         <button class="print-btn" onclick="doPrint('labels')">&#128424; Print Labels</button>
       </div>
     </div>
+    <div class="page" id="page-4">
+      <div class="notice" id="hw-notice" style="display:none">Enter width, height, track &amp; lift to calculate hardware.</div>
+      <div id="hw-content" style="display:none">
+        <div class="card"><div class="card-title" id="hw-series-title">Hardware List</div>
+          <div id="hw-rows"></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="print-btn" style="flex:1;" onclick="doPrint('hardware')">&#128424; Print Hardware</button>
+          <button class="print-btn" style="flex:1;background:white;color:#111;border:2px solid #1B2A6B;" onclick="openPreview('hardware')">&#128065; Preview</button>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="results" id="print-all-wrap" style="margin-top:4px">
     <button class="print-all-btn" onclick="doPrintAll()">&#128424; Print All</button>
@@ -430,7 +443,16 @@ function openPreview(type){
     var d=getCablesData();
     var info=getInfo();
     content.innerHTML = buildCablesPreviewHTML(d, info);
+  } else if(type==='hardware'){
+    title.textContent='Hardware Preview';
+    content.innerHTML = buildHardwarePreviewHTML(computeHardware(), getInfo(), hwChecks());
   }
+}
+function hwChecks(){
+  var m={};
+  var els=document.querySelectorAll('#hw-rows .hw-chk');
+  Array.prototype.forEach.call(els,function(c){m[c.getAttribute('data-key')]=c.checked;});
+  return m;
 }
 
 function closePreview(){
@@ -663,7 +685,7 @@ function runSprings(){
   IDS.forEach(function(id){
     var mn=SP_MIN[id]||0;
     var wireOK=wire>=mn;
-    var ln=wireOK?spLen(ref,tippt,nS,id):null;
+    var ln=wireOK?spLen(wire,id,tippt,nS):null;
     var tot=ln?ln*nS:0;
     var sl=ln?(usable-tot):0;
     var fits=ln?sl>=-2:false;
@@ -855,7 +877,7 @@ function setSelect(fieldId, val, label, triggerLabels){
   document.getElementById(fieldId).value = val;
   var disp = document.getElementById(fieldId+'-display');
   if(disp) disp.value = label || val;
-  hideSuggest('cs-'+fieldId);
+  var _cl=document.getElementById('cs-'+fieldId); if(_cl){_cl.classList.remove('open');_cl.style.display='none';}
   if(triggerLabels){ updateLabels(); saveForm(); }
   else {
     if(fieldId==='lift-type'){
@@ -902,6 +924,19 @@ function setSuggest(fieldId,val){
   if(el){el.value=val;el.dispatchEvent(new Event('input'));}
   hideSuggest(fieldId+'-suggest');
 }
+// Touch-friendly dropdown handling: open the tapped field's list, close all
+// others, and close everything when tapping outside a field. Fixes menus that
+// stayed open on touch devices (no mouseleave) and the delay after selecting.
+document.addEventListener('click',function(e){
+  var t=e.target;
+  var insideList=t.closest?t.closest('.suggest-list'):null;
+  var field=t.closest?t.closest('.field'):null;
+  var thisList=field?field.querySelector('.suggest-list'):null;
+  document.querySelectorAll('.suggest-list').forEach(function(list){
+    if(list!==thisList){list.classList.remove('open');list.style.display='none';}
+  });
+  if(thisList&&!insideList){thisList.classList.add('open');thisList.style.display='block';}
+});
 
 function saveJBSettings(){
   var j10=document.getElementById('jb-j10').value;
@@ -1004,6 +1039,7 @@ function calculate(){
   document.getElementById('results').classList.add('visible');
   document.getElementById('print-all-wrap').classList.add('visible');
   updateLabels();
+  try{renderHardware();}catch(e){console.error('renderHardware:',e);}
 }
 function updateLabels(){
   var wo=document.getElementById('wo').value.trim(),mark=document.getElementById('mark').value.trim(),lites=document.getElementById('lites').value.trim(),glass=document.getElementById('glass').value,frame=document.getElementById('frame').value;
@@ -1058,11 +1094,267 @@ function getTracksData(){
 function getCablesData(){
   return{drum:document.getElementById('r-drum').textContent,qty:document.getElementById('r-drum-qty').textContent,ebf:document.getElementById('r-ebf').textContent,capacity:document.getElementById('r-capacity').textContent,ftsc:document.getElementById('r-ftsc').textContent,cableType:document.getElementById('r-cable-type').textContent,cable:document.getElementById('r-cable').textContent};
 }
+// ---------- HARDWARE ----------
+function hwSeries(width){
+  if(width<=144)return{name:'AA-1200',code:'1200',perRow:3};
+  if(width<=194)return{name:'AA-1600',code:'1600',perRow:5};
+  if(width<=220)return{name:'AA-1800',code:'1800',perRow:5};
+  return null;
+}
+function computeHardware(){
+  var d=CD;
+  if(!d||!d.width||!d.height)return null;
+  var width=d.width,height=d.height,sections=d.panels||getPanels(height);
+  var series=hwSeries(width);
+  var joints=Math.max(sections-1,0);
+  // spring count (same rule as runSprings)
+  var qEl=document.getElementById('sp-qty');
+  var nS=(qEl&&qEl.value)?parseInt(qEl.value):(width>144?4:2);
+  // jamb brackets: grid values (incl. overrides) are PER SIDE -> x2 for real total
+  var jambSide=0,jambList=[],grid=document.getElementById('jb-grid');
+  if(grid){Array.prototype.forEach.call(grid.children,function(box){
+    var t=box.querySelector('.jb-type'),q=box.querySelector('.jb-qty');
+    var n=q?parseInt(q.textContent):NaN;
+    if(t&&!isNaN(n)){jambSide+=n;jambList.push({label:t.textContent.trim(),perSide:n,total:n*2});}
+  });}
+  var jambTotal=jambSide*2;
+  // hinges
+  var H=2*joints,I=2*joints,J=series?series.perRow*joints:0;
+  var hingeNums=[];for(var k=0;k<joints;k++)hingeNums.push('#'+(k+3));
+  // rollers
+  var roller7=4,roller9=Math.max(2*sections-2,0);
+  // hinge screws = 4*(H+I+J) + 12 top + 14 bottom
+  var hingeScrews=4*(H+I+J)+26;
+  // weight -> shaft type
+  var wt=d.hasWeight?d.wt:null;
+  var solid=(wt!=null)&&wt>=500;
+  var endBearingPlate=2,springAnchorBracket=nS;
+  // lag screws = 1/jamb bracket + 2/end bearing plate + 3/spring anchor bracket + 8
+  var lagScrews=jambTotal*1+2*endBearingPlate+3*springAnchorBracket+8;
+  return{
+    series:series,width:width,height:height,sections:sections,joints:joints,
+    nS:nS,jambSide:jambSide,jambTotal:jambTotal,
+    H:H,I:I,J:J,hingeNums:hingeNums,
+    roller7:roller7,roller9:roller9,hingeScrews:hingeScrews,
+    wt:wt,solid:solid,
+    shaftType:(wt==null)?null:(solid?'2 Solid Shaft':'1 Hollow Shaft'),
+    shaftLen:(wt==null||solid)?null:(width+12),
+    coupler:solid?1:0,
+    shaftKey:(wt==null)?null:(solid?4:0),
+    springAnchorBracket:springAnchorBracket,
+    springsRight:Math.ceil(nS/2),springsLeft:Math.floor(nS/2),
+    centerBearings:nS,springAnchorBolt:2*nS,
+    endBearingPlate:endBearingPlate,lagScrews:lagScrews,
+    drum:d.hasWeight?d.drum:null,
+    ebf:d.hasWeight?d.ebf:null,
+    cable:d.hasWeight?d.cable:null,
+    cableGauge:d.hasWeight?d.cableType:null,
+    jambList:jambList,
+    vert:d.vert,horiz:d.horiz,x2:d.x2
+  };
+}
+function renderHardware(){
+  var notice=document.getElementById('hw-notice'),content=document.getElementById('hw-content');
+  if(!notice||!content)return;
+  var hw=computeHardware();
+  if(!hw){notice.style.display='block';content.style.display='none';notice.textContent='Enter width, height, track & lift to calculate hardware.';return;}
+  if(!hw.series){
+    notice.style.display='block';content.style.display='none';
+    notice.textContent='Width '+hw.width+'" is out of range (max 220").';
+    return;
+  }
+  notice.style.display='none';content.style.display='block';
+  document.getElementById('hw-series-title').textContent=hw.series.name+' — '+hw.width+'" x '+hw.height+'" — '+hw.sections+' sections';
+  var em=function(v){return v==null?'<span style="color:#C0272D">enter weight</span>':v;};
+  var hnum=hw.hingeNums.length?hw.hingeNums[0]+'–'+hw.hingeNums[hw.hingeNums.length-1]:'–';
+  var ebfDesc='End bearing plate'+(hw.ebf?' — '+hw.ebf:'');
+  var drumDesc='Drum (1 red, 1 black)'+(hw.drum?' — '+hw.drum:'');
+  var wireDesc='Steel wire'+(hw.cable?' — '+hw.cable+'" &middot; '+(hw.cableGauge||''):'');
+  var shaftDesc,shaftQty;
+  if(hw.wt==null){shaftDesc='Torsion shaft';shaftQty=em(null);}
+  else if(hw.solid){shaftDesc='Torsion shaft (solid shaft)';shaftQty=2;}
+  else{shaftDesc='Torsion shaft (hollow shaft'+(hw.shaftLen?' '+hw.shaftLen+'"':'')+')';shaftQty=1;}
+  var fmt=function(v){return (v!=null&&!isNaN(v))?frac(v):'';};
+  var rDesc='Vertical track'+(fmt(hw.vert)?' — '+fmt(hw.vert):'');
+  var sDesc='Horizontal track'+(fmt(hw.horiz)?' — '+fmt(hw.horiz):'');
+  var tDesc='Hanger track';
+  var rows=[
+    ['A',ebfDesc,hw.endBearingPlate],
+    ['B',drumDesc,2],
+    ['B1',wireDesc,2],
+    ['C',shaftDesc,shaftQty],
+    ['D','Spring anchor bracket',hw.springAnchorBracket],
+    ['E','Coupler',hw.wt==null?em(null):(hw.coupler||'—')],
+    ['E1','Right spring',hw.springsRight],
+    ['E2','Left spring',hw.springsLeft],
+    ['F','Bottom bracket',2],
+    ['G','Top bracket',2],
+    ['J','Center hinge',hw.J],
+    ['K','Roller 7"',hw.roller7],
+    ['L','Roller 9"',hw.roller9],
+    ['O','Lock',2]
+  ];
+  var tracks=[
+    ['Q','Flag bracket',2],
+    ['R',rDesc,2],
+    ['S',sDesc,2],
+    ['T',tDesc,3]
+  ];
+  var bolts=[
+    ['Center bearings',hw.centerBearings],
+    ['Spring anchor bolt',hw.springAnchorBolt],
+    ['Perforated angle bolt/nut',12],
+    ['Track / hanger bolt/nut',3],
+    ['Hinge screws',hw.hingeScrews],
+    ['End bearing plate bolt/nut',6],
+    ['Shaft key',hw.shaftKey==null?em(null):hw.shaftKey],
+    ['Lag screws',hw.lagScrews]
+  ];
+  var chk=function(key){return '<input type="checkbox" class="hw-chk" data-key="'+key+'" onchange="var r=this.closest(\'.result-row\')||this.closest(\'tr\');if(r)r.style.opacity=this.checked?\'0.45\':\'\';">';};
+  var h='';
+  rows.forEach(function(r){
+    h+='<div class="result-row"><span class="rlabel" style="display:flex;align-items:center;gap:10px">'+chk(r[0])+'<span><b style="color:#1B2A6B">'+r[0]+'</b> &nbsp;'+r[1]+'</span></span><span class="rvalue">'+r[2]+'</span></div>';
+  });
+  // Hinges table (# on top, qty below, a check per hinge) — like the PDFs
+  var chkCell=function(key){return '<input type="checkbox" class="hw-chk" data-key="'+key+'" onchange="var t=this.closest(\'td\');if(t)t.style.opacity=this.checked?\'0.4\':\'\';">';};
+  h+='<div class="card-title" style="margin-top:14px">Hinges</div>';
+  h+='<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;font-size:13px;text-align:center">';
+  h+='<tr style="background:#1B2A6B;color:#fff"><th style="padding:5px 6px">Pt</th><th style="padding:5px 6px;text-align:left">Hinge</th>';
+  hw.hingeNums.forEach(function(n){h+='<th style="padding:5px 6px">'+n+'</th>';});
+  h+='</tr>';
+  var hingeRow=function(letter,label){
+    var c='<tr><td style="border:1px solid #ccc;padding:4px 6px;font-weight:700;color:#1B2A6B">'+letter+'</td><td style="border:1px solid #ccc;padding:4px 6px;text-align:left">'+label+'</td>';
+    hw.hingeNums.forEach(function(n){c+='<td style="border:1px solid #ccc;padding:4px 6px;white-space:nowrap">2 '+chkCell(letter+n)+'</td>';});
+    c+='</tr>';
+    return c;
+  };
+  h+=hingeRow('H','Cut-down hinge');
+  h+=hingeRow('I','Hinges');
+  h+='</table></div>';
+  h+='<div class="card-title" style="margin-top:14px">Bolts &amp; Screws</div>';
+  bolts.forEach(function(r){
+    h+='<div class="result-row"><span class="rlabel" style="display:flex;align-items:center;gap:10px">'+chk(r[0])+'<span>'+r[0]+'</span></span><span class="rvalue">'+r[1]+'</span></div>';
+  });
+  // Jamb brackets + Q–T in one table (no checkboxes, no borders)
+  var jcols=hw.jambList?hw.jambList.length:0;
+  h+='<div class="card-title" style="margin-top:14px">Jamb brackets &amp; Tracks</div>';
+  h+='<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;font-size:13px;text-align:center">';
+  h+='<tr style="background:#1B2A6B;color:#fff"><th style="padding:5px 6px">Pt</th><th style="padding:5px 6px;text-align:left">Description</th>';
+  (hw.jambList||[]).forEach(function(j){h+='<th style="padding:5px 6px">'+j.label+'</th>';});
+  h+='<th style="padding:5px 6px">Qty</th></tr>';
+  h+='<tr><td style="padding:4px 6px;font-weight:700;color:#1B2A6B">N</td><td style="padding:4px 6px;text-align:left">Jamb bracket</td>';
+  (hw.jambList||[]).forEach(function(j){h+='<td style="padding:4px 6px">'+j.total+'</td>';});
+  h+='<td style="padding:4px 6px;font-weight:700">'+hw.jambTotal+'</td></tr>';
+  tracks.forEach(function(r){
+    h+='<tr><td style="padding:4px 6px;font-weight:700;color:#1B2A6B">'+r[0]+'</td><td style="padding:4px 6px;text-align:left">'+r[1]+'</td>';
+    for(var ci=0;ci<jcols;ci++){h+='<td style="padding:4px 6px"></td>';}
+    h+='<td style="padding:4px 6px;font-weight:700">'+r[2]+'</td></tr>';
+  });
+  h+='</table></div>';
+  document.getElementById('hw-rows').innerHTML=h;
+}
+function getHardwareData(){return computeHardware();}
+function buildHardwarePreviewHTML(hw,info,checks){
+  if(!hw||!hw.series)return'<div style="font-family:Arial">No hardware data.</div>';
+  checks=checks||{};
+  var ebfDesc='End bearing plate (1 L &amp; 1 R)'+(hw.ebf?' — '+hw.ebf:'');
+  var drumDesc='Drum (1 red &amp; 1 black)'+(hw.drum?' — '+hw.drum:'');
+  var wireDesc='Steel wire'+(hw.cable?' — '+hw.cable+'" &middot; '+(hw.cableGauge||''):'');
+  var shaftDesc,shaftQty;
+  if(hw.wt==null){shaftDesc='Torsion shaft';shaftQty='-';}
+  else if(hw.solid){shaftDesc='Torsion shaft (solid shaft)';shaftQty=2;}
+  else{shaftDesc='Torsion shaft (hollow shaft'+(hw.shaftLen?' '+hw.shaftLen+'"':'')+')';shaftQty=1;}
+  var fmt=function(v){return (v!=null&&!isNaN(v))?frac(v):'';};
+  var rDesc='Vertical track (1 L &amp; 1 R)'+(fmt(hw.vert)?' — '+fmt(hw.vert):'');
+  var sDesc='Horizontal track (1 L &amp; 1 R)'+(fmt(hw.horiz)?' — '+fmt(hw.horiz):'');
+  var tDesc='Hanger track';
+  var rows=[
+    ['A',ebfDesc,hw.endBearingPlate],['B',drumDesc,2],
+    ['B1',wireDesc,2],['C',shaftDesc,shaftQty],['D','Spring anchor bracket',hw.springAnchorBracket],
+    ['E','Coupler',hw.coupler||'-'],['E1','Right spring',hw.springsRight],['E2','Left spring',hw.springsLeft],
+    ['F','Bottom bracket',2],['G','Top bracket',2],['J','Center hinge',hw.J],['K','Roller (7")',hw.roller7],
+    ['L','Roller (9")',hw.roller9],['O','Lock',2]
+  ];
+  var tracks=[['Q','Flag bracket (1 L &amp; 1 R)',2],['R',rDesc,2],['S',sDesc,2],['T',tDesc,3]];
+  var bolts=[
+    ['Center bearings',hw.centerBearings,'1 per spring'],['Spring anchor bolt',hw.springAnchorBolt,'2 per spring'],
+    ['Perforated angle bolt/nut',12,''],['Track / hanger bolt/nut',3,'1 per hanger'],
+    ['Hinge screws',hw.hingeScrews,'4x(H,I,J)+26'],['End bearing plate bolt/nut',6,''],
+    ['Shaft key',hw.shaftKey==null?'-':hw.shaftKey,''],['Lag screws',hw.lagScrews,'']
+  ];
+  var box=function(on){return on
+    ?'<span style="display:inline-block;width:14px;height:14px;border:1.5px solid #1B2A6B;background:#1B2A6B;color:#fff;font-size:11px;line-height:14px;text-align:center;">&#10003;</span>'
+    :'<span style="display:inline-block;width:14px;height:14px;border:1.5px solid #333;"></span>';};
+  var h='<div class="hwsheet" style="font-family:Arial,sans-serif;">';
+  h+='<style>'
+    +'#preview-print-area h2{display:none;}'
+    +'.hwsheet .ttl{text-align:center;font-size:21px;font-weight:800;color:#1B2A6B;}'
+    +'.hwsheet .sub{text-align:center;margin-bottom:6px;font-size:13px;color:#666;}'
+    +'.hwsheet .hcap{text-align:center;font-weight:700;font-size:13px;color:#1B2A6B;margin:8px 0 3px;}'
+    +'.hwsheet table{page-break-inside:avoid;}'
+    +'.hwtbl{border-collapse:collapse;width:100%;max-width:520px;margin:0 auto 0 0;font-size:14px;}'
+    +'.hwtbl th,.hwtbl td{border:1px solid #888;padding:3px 8px;}'
+    +'.hwtbl th{background:#1B2A6B;color:#fff;text-align:left;}'
+    +'.hwtbl td.ck{width:24px;text-align:center;padding:2px;}'
+    +'.hwtbl td.pt{width:36px;font-weight:700;color:#1B2A6B;text-align:center;}'
+    +'.hwtbl td.qty{text-align:right;font-weight:700;background:#eef1f8;width:56px;}'
+    +'.hwtbl tr:nth-child(even) td{background:#f8f9fa;}'
+    +'.hwtbl tr:nth-child(even) td.qty{background:#e6ebf7;}'
+    +'.htbl{border-collapse:collapse;width:100%;max-width:540px;margin:0 auto 0 0;font-size:14px;text-align:center;}'
+    +'.htbl th,.htbl td{border:1px solid #888;padding:3px 6px;}'
+    +'.htbl th{background:#1B2A6B;color:#fff;}'
+    +'.htbl td.ck{width:24px;padding:2px;}'
+    +'.htbl td.pt{font-weight:700;color:#1B2A6B;}'
+    +'.htbl td.tot{font-weight:700;background:#eef1f8;}'
+    +'.jtbl{border-collapse:collapse;width:100%;max-width:540px;margin:0 auto 0 0;font-size:14px;text-align:center;}'
+    +'.jtbl th{background:#1B2A6B;color:#fff;padding:3px 6px;}'
+    +'.jtbl td{padding:3px 6px;}'
+    +'.jtbl td.pt{font-weight:700;color:#1B2A6B;}'
+    +'.jtbl td.tot{font-weight:700;}'
+    +'@media print{@page{size:letter portrait;margin:10mm;}.hwsheet{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}'
+    +'</style>';
+  h+='<div class="ttl">'+hw.series.name+' ELEGANT</div>';
+  h+='<div class="sub">W/O: '+(info.wo||'-')+' &nbsp;|&nbsp; '+hw.width+'" x '+hw.height+'" &nbsp;|&nbsp; '+hw.sections+' sections</div>';
+  h+='<table class="hwtbl"><tr><th style="text-align:center;width:22px">&#10003;</th><th style="text-align:center;width:34px">Pt</th><th>Description</th><th style="text-align:right">Qty</th></tr>';
+  rows.forEach(function(r){h+='<tr><td class="ck">'+box(checks[r[0]])+'</td><td class="pt">'+r[0]+'</td><td>'+r[1]+'</td><td class="qty">'+r[2]+'</td></tr>';});
+  h+='</table>';
+  h+='<div class="hcap">HINGES</div>';
+  h+='<table class="htbl"><tr><th style="width:30px">Pt</th><th style="text-align:left">Hinge</th>';
+  hw.hingeNums.forEach(function(n){h+='<th>'+n+'</th>';});
+  h+='</tr>';
+  var hr=function(letter,label){var c='<tr><td class="pt">'+letter+'</td><td style="text-align:left">'+label+'</td>';hw.hingeNums.forEach(function(n){c+='<td style="white-space:nowrap">2 '+box(checks[letter+n])+'</td>';});c+='</tr>';return c;};
+  h+=hr('H','Cut-down hinge')+hr('I','Hinges');
+  h+='</table>';
+  h+='<div class="hcap">BOLTS &amp; SCREWS</div>';
+  h+='<table class="hwtbl"><tr><th style="text-align:center;width:22px">&#10003;</th><th>Description</th><th style="text-align:right">Qty</th></tr>';
+  bolts.forEach(function(r){h+='<tr><td class="ck">'+box(checks[r[0]])+'</td><td>'+r[0]+(r[2]?' <span style="color:#888;font-size:10px">('+r[2]+')</span>':'')+'</td><td class="qty">'+r[1]+'</td></tr>';});
+  h+='</table>';
+  var jcols=hw.jambList?hw.jambList.length:0;
+  h+='<div class="hcap">JAMB BRACKETS &amp; TRACKS</div>';
+  h+='<table class="jtbl"><tr><th style="width:30px">Pt</th><th style="text-align:left">Description</th>';
+  (hw.jambList||[]).forEach(function(j){h+='<th>'+j.label+'</th>';});
+  h+='<th>Qty</th></tr>';
+  h+='<tr><td class="pt">N</td><td style="text-align:left">Jamb bracket</td>';
+  (hw.jambList||[]).forEach(function(j){h+='<td>'+j.total+'</td>';});
+  h+='<td class="tot">'+hw.jambTotal+'</td></tr>';
+  tracks.forEach(function(r){
+    h+='<tr><td class="pt">'+r[0]+'</td><td style="text-align:left">'+r[1]+'</td>';
+    for(var ci=0;ci<jcols;ci++){h+='<td></td>';}
+    h+='<td class="tot">'+r[2]+'</td></tr>';
+  });
+  h+='</table></div>';
+  return h;
+}
 function srvFetch(endpoint,payload){
   return fetch(SERVER+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:AbortSignal.timeout(15000)}).then(function(r){return r.json();});
 }
 function doPrint(type){
   var s=load();
+  if(type==='hardware'){
+    openPreview('hardware');
+    setTimeout(printPreview,200);
+    return;
+  }
   if(type==='tracks'){
     if(!serverOK){toast('Print server offline',2000);return;}
     toast('Printing Tracks...',2000);
