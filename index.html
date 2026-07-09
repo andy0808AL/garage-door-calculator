@@ -171,23 +171,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
   <button class="settings-icon-btn" onclick="openSettings()">&#9881;</button>
 </div>
 <div class="content">
+  <div class="card" id="order-preview">
+    <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <span style="display:flex;align-items:center;gap:8px">Order&nbsp;<input type="text" id="wo" placeholder="W/O #" style="width:110px;height:32px;padding:0 8px;border:1.5px solid var(--gray-border);border-radius:6px;font-size:14px;font-weight:700;color:#1B2A6B;text-transform:none"></span>
+      <span id="op-tot" style="font-size:11px;color:#8a9bb0;text-transform:none;letter-spacing:0">&mdash;</span>
+    </div>
+    <input type="hidden" id="mark" value="">
+    <div id="op-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"></div>
+    <div id="op-undo" style="display:none;align-items:center;justify-content:space-between;gap:8px;background:#fff3cd;border:1px solid #ffe08a;border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:13px;color:#7a5b00">
+      <span id="op-undo-txt">Mark removed</span>
+      <button type="button" onclick="opUndo()" style="border:1px solid #C0272D;background:#fff;color:#C0272D;border-radius:6px;padding:5px 14px;font-size:13px;font-weight:700;cursor:pointer">Undo</button>
+    </div>
+    <button type="button" onclick="opAddDoor()" style="width:100%;height:40px;background:var(--gray-light);color:var(--text-muted);border:1.5px dashed var(--gray-border);border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">+ Add door</button>
+  </div>
+  <script>
+  var opLastDeleted=null,opActive=null,opCur=null,opMidSeq=0,opData={};
+  var OPF=['width','height','highlift','weight'];
+  function opRecalc(){var mk=document.querySelectorAll('#op-list .op-mk');var t=0;mk.forEach(function(m){t+=parseInt(m.querySelector('.op-q').textContent)||0;});var el=document.getElementById('op-tot');if(el)el.textContent=mk.length+' marks · '+t+' doors';}
+  function saveMarkForm(){if(!opCur)return;var d=opData[opCur]||(opData[opCur]={});OPF.forEach(function(id){var e=document.getElementById(id);if(e)d[id]=e.value;});d.trackType=(document.getElementById('track-type')||{value:''}).value;d.liftType=(document.getElementById('lift-type')||{value:''}).value;}
+  function loadMarkForm(d){d=d||{};OPF.forEach(function(id){var e=document.getElementById(id);if(e)e.value=(d[id]!=null?d[id]:'');});var tt=document.getElementById('track-type');if(tt)tt.value=d.trackType||'';var lt=document.getElementById('lift-type');if(lt)lt.value=d.liftType||'';try{syncDisplayFields();}catch(e){}var hlf=document.getElementById('hl-field');if(hlf)hlf.classList.toggle('visible',d.liftType==='highlift');try{calculate();}catch(e){}try{runSprings();}catch(e){}try{renderDespacho();}catch(e){}}
+  function renderMarkBoxes(){var box=document.getElementById('mark-boxes');if(!box)return;box.innerHTML='';document.querySelectorAll('#op-list .op-mk').forEach(function(m){var mid=m.getAttribute('data-mid');var L=(m.querySelector('.op-lbl').value||'?');var on=(mid===opCur);var b=document.createElement('div');b.className='mark-box';b.setAttribute('data-mid',mid);b.setAttribute('data-letter',L);b.style.cssText='min-width:52px;height:52px;padding:0 8px;border:1.5px solid #1B2A6B;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:'+(on?'#fff':'#1B2A6B')+';background:'+(on?'#1B2A6B':'#fff')+';cursor:pointer';b.textContent=L;b.onclick=function(){opOpenMark(mid,L);};box.appendChild(b);});}
+  function opRefresh(){renderMarkBoxes();opRecalc();}
+  function opOpenMark(mid,label){if(opCur&&opCur!==mid){try{saveMarkForm();}catch(e){}}opCur=mid;opActive=label;loadMarkForm(opData[mid]||{});var ed=document.getElementById('door-editor');if(ed)ed.style.display='';var t=document.getElementById('editing-mark');if(t)t.textContent='Editing mark '+label;document.querySelectorAll('#mark-boxes .mark-box').forEach(function(b){var o=b.getAttribute('data-mid')===mid;b.style.background=o?'#1B2A6B':'#fff';b.style.color=o?'#fff':'#1B2A6B';});}
+  function opChg(b,d){var q=b.parentNode.querySelector('.op-q');q.textContent=Math.max(1,(parseInt(q.textContent)||1)+d);opRecalc();}
+  function opDel(b){var m=b.closest('.op-mk');if(!m)return;var mid=m.getAttribute('data-mid');var lbl=m.querySelector('.op-lbl').value;var q=parseInt(m.querySelector('.op-q').textContent)||1;opLastDeleted={label:lbl,qty:q,data:opData[mid]||{}};delete opData[mid];m.remove();if(opCur===mid){var ed=document.getElementById('door-editor');if(ed)ed.style.display='none';var t=document.getElementById('editing-mark');if(t)t.textContent='';opCur=null;opActive=null;}opRefresh();var ub=document.getElementById('op-undo');if(ub){document.getElementById('op-undo-txt').textContent='Mark '+lbl+' removed';ub.style.display='flex';}}
+  function opUndo(){if(opLastDeleted){var chip=opChip(opLastDeleted.label,opLastDeleted.qty);document.getElementById('op-list').appendChild(chip);opData[chip.getAttribute('data-mid')]=opLastDeleted.data||{};opLastDeleted=null;opRefresh();}var ub=document.getElementById('op-undo');if(ub)ub.style.display='none';}
+  function opChip(label,q){var mid='m'+(++opMidSeq);opData[mid]={};var d=document.createElement('div');d.className='op-mk';d.setAttribute('data-mid',mid);d.style.cssText='display:flex;align-items:center;gap:6px;border:1px solid #e8ecf0;border-radius:10px;padding:6px 8px';d.innerHTML='<input class="op-lbl" type="text" maxlength="4" value="'+label+'" oninput="renderMarkBoxes()" style="width:44px;height:34px;border:none;border-radius:8px;background:#1B2A6B;color:#fff;font-size:16px;font-weight:700;text-align:center" title="Edit mark"><button type="button" onclick="opChg(this,-1)" style="width:26px;height:26px;border:1px solid #dee2e6;border-radius:6px;background:#f5f5f7;font-size:15px;cursor:pointer">−</button><span class="op-q" style="min-width:18px;text-align:center;font-weight:700;color:#1B2A6B">'+q+'</span><button type="button" onclick="opChg(this,1)" style="width:26px;height:26px;border:1px solid #dee2e6;border-radius:6px;background:#f5f5f7;font-size:15px;cursor:pointer">+</button><button type="button" onclick="opDel(this)" aria-label="delete" style="width:26px;height:26px;margin-left:2px;border:1px solid #f1c9cc;border-radius:6px;background:#fdeef0;color:#C0272D;font-size:15px;cursor:pointer">×</button>';return d;}
+  function opAddDoor(){var n=document.querySelectorAll('#op-list .op-mk').length;var letter=String.fromCharCode(65+n);document.getElementById('op-list').appendChild(opChip(letter,1));opRefresh();}
+  (function(){function go(){var l=document.getElementById('op-list');if(!l)return;l.appendChild(opChip('A',1));opRefresh();var f=l.querySelector('.op-mk');if(f)opOpenMark(f.getAttribute('data-mid'),f.querySelector('.op-lbl').value);}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go();})();
+  </script>
+  <div id="mark-boxes" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"></div>
+  <div id="door-editor" style="display:none">
+  <div id="editing-mark" style="font-size:13px;font-weight:700;color:#1B2A6B;margin-bottom:8px"></div>
   <div class="card">
     <div class="card-title">Door Information</div>
-    <div class="field-row">
-      <div class="field"><label>W/O #</label><input type="text" id="wo" placeholder="e.g. 721"></div>
-      <div class="field" style="position:relative;" onmouseenter="showSuggest('cs-mark')" onmouseleave="hideSuggest('cs-mark')">
-        <label>Mark</label>
-        <input type="text" id="mark-display" readonly placeholder="Select..." style="cursor:pointer;" value="">
-        <input type="hidden" id="mark" value="">
-        <div id="cs-mark" class="suggest-list" style="display:none;">
-          <div onmousedown="setSelect('mark','A','A',true)">A</div>
-          <div onmousedown="setSelect('mark','B','B',true)">B</div>
-          <div onmousedown="setSelect('mark','C','C',true)">C</div>
-          <div onmousedown="setSelect('mark','D','D',true)">D</div>
-          <div onmousedown="setSelect('mark','E','E',true)">E</div>
-        </div>
-      </div>
-    </div>
     <div class="field-row">
       <div class="field" style="position:relative;" onmouseenter="showSuggest('width-suggest')" onmouseleave="hideSuggest('width-suggest')">
     <label>Width (inches)</label>
@@ -243,7 +260,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     </div>
     <div class="field-row">
       <div class="field hl-field" id="hl-field"><label>High Lift (in)</label><input type="number" id="highlift" placeholder="e.g. 24" inputmode="decimal"></div>
-      <div class="field"><label>Door weight (lbs) <span class="req-cable">for cables</span></label><input type="number" id="weight" placeholder="e.g. 400" inputmode="decimal"></div>
+      <div class="field"><label>Door weight (lbs)</label><input type="number" id="weight" placeholder="e.g. 400" inputmode="decimal"></div>
     </div>
     <button class="clear-btn" onclick="clearAll()">Clear</button>
   </div>
@@ -392,8 +409,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
     </div>
   </div>
   <div class="results" id="print-all-wrap" style="margin-top:4px">
-    <button class="print-all-btn" onclick="doPrintAllBrowser()">&#128424; Print All</button>
+    <button class="print-all-btn" onclick="opPrintChoice()">&#128424; Print All</button>
     <button class="print-all-btn" style="display:none" onclick="doPrintAll()">&#128424; Print All (print server)</button>
+  </div>
   </div>
 </div>
 <script>
@@ -819,10 +837,9 @@ function printSpPreview(){
 // Print Tracks + Cables + Springs + Hardware in one browser print job (no server).
 // Labels are intentionally excluded. Everything goes to whichever printer the user
 // picks in the single browser print dialog.
-function doPrintAllBrowser(){
+function buildAllSections(info){
   try{calculate();}catch(e){}
   try{runSprings();}catch(e){}
-  var info=getInfo();
   var parts=[];
   try{ parts.push(buildTracksPreviewHTML(getTracksData(), info)); }catch(e){console.error('tracks',e);}
   if(CD.hasWeight){
@@ -830,14 +847,50 @@ function doPrintAllBrowser(){
     try{ parts.push('<pre style="font-family:monospace;font-size:12px;white-space:pre-wrap;line-height:1.5;margin:0">'+buildSpringsText()+'</pre>'); }catch(e){console.error('springs',e);}
   }
   try{ var hw=computeHardware(); if(hw&&hw.series){ parts.push(buildHardwarePreviewHTML(hw, info, hwChecks())); } }catch(e){console.error('hardware',e);}
-  if(!parts.length){ try{toast('Fill in the door info first',2500);}catch(e){} return; }
+  return parts;
+}
+function partsToHtml(parts){
   var html='';
-  parts.forEach(function(p,i){
-    html+='<div style="'+(i<parts.length-1?'page-break-after:always;break-after:page;':'')+'padding:6px 0">'+p+'</div>';
+  parts.forEach(function(p,i){html+='<div style="'+(i<parts.length-1?'page-break-after:always;break-after:page;':'')+'padding:6px 0">'+p+'</div>';});
+  return html;
+}
+function printPageStyle(){return '<style>@media print{@page{size:letter portrait;margin:10mm}@page dl{size:letter landscape;margin:10mm}.disp-land{page:dl}}</style>';}
+function dispatchPageHtml(){var d;try{d=buildDespachoHTML(getInfo(),{noPage:true,checks:despChecks(),comments:despComments(),motor:despMotor(),recv:despRecv(),date:despDate(),sign:despSignature()});}catch(e){d='';}return d?'<div class="disp-land" style="page-break-before:always;break-before:page">'+d+'</div>':'';}
+function doPrintAllBrowser(){
+  var info=getInfo();
+  if(typeof opActive!=='undefined'&&opActive) info.mark=opActive;
+  var parts=buildAllSections(info);
+  var area=document.getElementById('preview-print-area');
+  area.innerHTML=printPageStyle()+partsToHtml(parts)+dispatchPageHtml();
+  setTimeout(function(){window.print();},60);
+}
+function doPrintAllMarks(){
+  var chips=document.querySelectorAll('#op-list .op-mk');
+  if(!chips.length){ doPrintAllBrowser(); return; }
+  var base=getInfo();
+  var blocks='';
+  Array.prototype.forEach.call(chips,function(m,idx){
+    var label=(m.querySelector('.op-lbl').value||'?');
+    var qty=(m.querySelector('.op-q').textContent||'1');
+    var info={}; for(var k in base) info[k]=base[k]; info.mark=label;
+    var parts=buildAllSections(info);
+    if(!parts.length) return;
+    var header='<div style="font-family:Arial,sans-serif;font-size:16px;font-weight:800;color:#1B2A6B;border-bottom:2px solid #C0272D;padding:4px 0;margin-bottom:8px">Mark '+label+' &mdash; qty '+qty+'</div>';
+    blocks+='<div style="'+(idx>0?'page-break-before:always;break-before:page;':'')+'">'+header+partsToHtml(parts)+'</div>';
   });
   var area=document.getElementById('preview-print-area');
-  area.innerHTML=html;
+  area.innerHTML=printPageStyle()+blocks+dispatchPageHtml();
   setTimeout(function(){window.print();},60);
+}
+function opCloseChoice(){var o=document.getElementById('op-print-choice');if(o)o.remove();}
+function opPickPrint(w){opCloseChoice();if(w===1)doPrintAllBrowser();else doPrintAllMarks();}
+function opPrintChoice(){
+  if(document.getElementById('op-print-choice'))return;
+  var ov=document.createElement('div');ov.id='op-print-choice';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px';
+  ov.onclick=function(e){if(e.target===ov)opCloseChoice();};
+  ov.innerHTML='<div style="background:#fff;border-radius:14px;padding:20px;max-width:320px;width:100%;text-align:center;font-family:-apple-system,sans-serif"><div style="font-size:16px;font-weight:700;color:#1B2A6B;margin-bottom:16px">What do you want to print?</div><button type="button" onclick="opPickPrint(1)" style="width:100%;height:46px;background:#C0272D;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px">Print this mark</button><button type="button" onclick="opPickPrint(2)" style="width:100%;height:46px;background:#1B2A6B;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px">Print all marks</button><button type="button" onclick="opCloseChoice()" style="width:100%;height:40px;background:#f5f5f7;color:#111;border:1px solid #dee2e6;border-radius:8px;font-size:14px;cursor:pointer">Cancel</button></div>';
+  document.body.appendChild(ov);
 }
 
 
@@ -1036,6 +1089,7 @@ function setupListeners(){
   // frame handled by setSelect
 }
 function calculate(){
+  try{if(typeof opCur!=='undefined'&&opCur&&typeof saveMarkForm==='function')saveMarkForm();}catch(e){}
   var width=parseFloat(document.getElementById('width').value);
   var height=parseFloat(document.getElementById('height').value);
   var tt=document.getElementById('track-type').value;
@@ -1404,17 +1458,11 @@ function srvFetch(endpoint,payload){
   return fetch(SERVER+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:AbortSignal.timeout(15000)}).then(function(r){return r.json();});
 }
 // ---------- DESPACHO (dispatch / signing page) ----------
+function markCalc(d){d=d||{};var w=parseFloat(d.width)||0,h=parseFloat(d.height)||0,hl=parseFloat(d.highlift)||0,wt=parseFloat(d.weight)||0;var lt=d.liftType||'standard',tt=d.trackType||'';var panels=h?getPanels(h):0;var nS=w>144?4:2;var vert,horiz;if(lt==='highlift'){vert=(h-8)+(hl-9);horiz=(h+12)-(hl-9);}else if(lt==='lhr'){vert=tt==='3-LHR'?h-18:h-16;horiz=h+12;}else{vert=h-8;horiz=h+12;}return {w:w,h:h,hl:hl,wt:wt,lt:lt,tt:tt,panels:panels,nS:nS,vert:vert,horiz:horiz};}
+function markList(){var out=[];document.querySelectorAll('#op-list .op-mk').forEach(function(m){var mid=m.getAttribute('data-mid');var lbl=(m.querySelector('.op-lbl')||{value:'?'}).value||'?';var q=parseInt((m.querySelector('.op-q')||{textContent:'1'}).textContent)||1;var d=(typeof opData!=='undefined'&&opData[mid])?opData[mid]:{};out.push({label:lbl,qty:q,d:d,calc:markCalc(d)});});return out;}
 function buildDespachoHTML(info,opts){
   opts=opts||{};
   var elegFont="'Segoe Script','Brush Script MT','Lucida Handwriting','Snell Roundhand',cursive";
-  var hw=computeHardware()||{};
-  var panels=(hw.sections!=null)?hw.sections:(CD.height?getPanels(CD.height):'—');
-  var nS=(hw.nS!=null)?hw.nS:(CD.width?(CD.width>144?4:2):'—');
-  var vert=(CD.vert!=null)?frac(CD.vert):'—';
-  var horiz=(CD.horiz!=null)?frac(CD.horiz):'—';
-  var tt=info.trackType||'—';
-  var shaftLen=(hw.shaftLen!=null)?hw.shaftLen:(CD.width?CD.width+12:null);
-  var shaft=(hw.wt==null)?'____________':(hw.solid?'SOLID shaft (x2)':'HOLLOW shaft &mdash; <b>'+(shaftLen!=null?shaftLen+'"':'—')+'</b>');
   var logo=(document.querySelector('img[alt="AA Impact Garage Door"]')||{}).src||'';
   var boxOf=function(key){
     if(opts.interactive) return '<input type="checkbox" class="desp-chk" data-key="'+key+'" style="width:19px;height:19px;cursor:pointer;accent-color:#1B2A6B;" onchange="var r=this.closest(\'tr\');if(r)r.style.background=this.checked?\'#eef7ee\':\'\';">';
@@ -1440,23 +1488,32 @@ function buildDespachoHTML(info,opts){
   var td='border:1px solid #111;padding:6px 12px;vertical-align:top;';
   var tdcm='border:1px solid #111;padding:6px 12px;vertical-align:top;';
   function row(key,art){return '<tr><td style="'+tdc+'">'+boxOf(key)+'</td><td style="'+td+'">'+art+'</td><td style="'+tdcm+'height:'+(opts.interactive?26:30)+'px;">'+cmtCell(key)+'</td></tr>';}
-  var h='<style>@media print{@page{size:landscape;margin:9mm;}.desp-sheet{page-break-inside:avoid;}}</style>';
-  h+='<div class="desp-sheet" style="font-family:Arial,sans-serif;border:2px solid #111;padding:12px 26px;max-width:1040px;margin:0 auto 0 0;-webkit-print-color-adjust:exact;print-color-adjust:exact;">';
+  var tls={'3-15R':'3" 15R','2-12R':'2" 12R','3-LHR':'3" LHR','2-LHR':'2" LHR'};
+  var lts={standard:'Std lift',highlift:'High lift',lhr:'Low HR'};
+  var ms=(typeof markList==='function')?markList():[];
+  var totalDoors=0;ms.forEach(function(m){totalDoors+=m.qty;});
+  var per=function(fn){return ms.length?ms.map(fn).join(' &nbsp;&middot;&nbsp; '):'&mdash;';};
+  var panelsTxt=per(function(m){return 'MK '+esc(m.label)+' <b>'+(m.calc.h?m.calc.panels:'—')+'</b>';});
+  var springTxt=per(function(m){return 'MK '+esc(m.label)+' <b>'+(m.calc.w?m.calc.nS:'—')+'</b>';});
+  var shaftTxt=per(function(m){return 'MK '+esc(m.label)+' <b>'+(m.calc.wt?(m.calc.wt>=500?'2 Solid':'1 Hollow'):'—')+'</b>';});
+  var tracksDetail=per(function(m){return 'MK '+esc(m.label)+': '+(m.calc.h?(frac(m.calc.vert)+' / '+frac(m.calc.horiz)):'—')+' '+(tls[m.calc.tt]||'')+' '+(lts[m.calc.lt]||'');});
+  var h=opts.noPage?'':'<style>@media print{@page{size:letter landscape;margin:10mm;}}</style>';
+  h+='<div class="desp-sheet" style="font-family:Arial,sans-serif;border:2px solid #111;padding:14px 26px;max-width:1000px;margin:0 auto 0 0;-webkit-print-color-adjust:exact;print-color-adjust:exact;">';
   h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">';
-  h+='<div style="font-size:16px;font-weight:800;">W/O #: '+ln(info.wo?0:8)+(info.wo?'<b>&nbsp;'+info.wo+'&nbsp;</b>':'')+(info.mark?' &nbsp; Mark: <b>'+info.mark+'</b>':'')+'</div>';
+  h+='<div style="font-size:16px;font-weight:800;">W/O #: '+(info.wo?'<b>&nbsp;'+esc(info.wo)+'&nbsp;</b>':ln(8))+'<div style="font-size:12px;font-weight:400;color:#555;margin-top:3px">Total: <b>'+totalDoors+'</b> doors &middot; <b>'+ms.length+'</b> marks</div></div>';
   if(logo) h+='<img src="'+logo+'" style="height:50px;">';
   h+='</div>';
-  h+='<div style="text-align:center;font-size:19px;font-weight:800;color:#1B2A6B;letter-spacing:.12em;margin:6px 0 8px;border-bottom:3px solid #C0272D;padding-bottom:5px;">DISPATCH</div>';
+  h+='<div style="text-align:center;font-size:19px;font-weight:800;color:#1B2A6B;letter-spacing:.1em;margin:8px 0 10px;border-bottom:3px solid #C0272D;padding-bottom:5px;">DISPATCH &mdash; ORDER</div>';
   h+='<table style="width:100%;border-collapse:collapse;font-size:14px;">';
-  h+='<tr style="background:#1B2A6B;color:#fff;"><th style="'+tdc+'">&#10003;</th><th style="'+td+'text-align:left;">Article</th><th style="'+td+'text-align:left;width:40%;white-space:nowrap;">Comments</th></tr>';
-  h+=row('1','<b>1. Panels</b> &mdash; Qty: <b>'+panels+'</b>');
-  h+=row('2','<b>2. Hardware Box</b>');
-  h+=row('3','<b>3. Tracks</b> &mdash; '+tt+' &nbsp; Vert: <b>'+vert+'</b> &nbsp; Horiz: <b>'+horiz+'</b>');
-  h+=row('4','<b>4. Perforated Angles</b> &mdash; <b>3</b> &nbsp; Color: '+color);
-  h+=row('5','<b>5. Spring</b> &mdash; Qty: <b>'+nS+'</b>');
-  h+=row('6','<b>6. '+ln(4)+' Trims</b> &nbsp; Color: '+color);
-  h+=row('7','<b>7. Shaft</b> &mdash; '+shaft);
-  h+=row('8','<b>8. Motor</b> &mdash; '+motorField());
+  h+='<tr style="background:#1B2A6B;color:#fff;"><th style="'+tdc+'">&#10003;</th><th style="'+td+'text-align:left;">Article</th><th style="'+td+'text-align:left;width:32%;white-space:nowrap;">Comments</th></tr>';
+  h+=row('1','<b>1. Panels</b> &mdash; '+panelsTxt);
+  h+=row('2','<b>2. Hardware Box</b> &mdash; Qty: <b>'+totalDoors+'</b> <span style="color:#888;font-size:11px">(1 per door)</span>');
+  h+=row('3','<b>3. Tracks</b> &mdash; <b>'+totalDoors+'</b> set of tracks<div style="font-size:11px;color:#666;margin-top:3px">'+tracksDetail+'</div>');
+  h+=row('4','<b>4. Perforated Angles</b> &mdash; Qty: <b>'+(3*totalDoors)+'</b> <span style="color:#888;font-size:11px">(3 &times; '+totalDoors+')</span> &nbsp; '+color);
+  h+=row('5','<b>5. Spring</b> <span style="color:#888;font-size:11px">(per door)</span> &mdash; '+springTxt);
+  h+=row('6','<b>6. Trims</b> &mdash; Qty: <b>'+(3*totalDoors)+'</b> <span style="color:#888;font-size:11px">(3 &times; '+totalDoors+')</span> &nbsp; '+color);
+  h+=row('7','<b>7. Shaft</b> <span style="color:#888;font-size:11px">(per door)</span> &mdash; '+shaftTxt);
+  h+=row('8','<b>8. Motor</b> &mdash; '+motorField()+' <span style="color:#888;font-size:11px">(qty &amp; type per door)</span>');
   h+='</table>';
   var fmtDate=function(s){var p=String(s).split('-');return p.length===3?(p[1]+'/'+p[2]+'/'+p[0]):s;};
   if(opts.interactive){
@@ -1468,170 +1525,4 @@ function buildDespachoHTML(info,opts){
     h+='<div style="margin-bottom:14px;"><div style="'+lbl+'">DATE</div><input type="date" class="desp-date" value="'+today+'" style="border:1px solid #bbb;border-radius:6px;padding:7px 9px;font-size:15px;font-family:Arial;"></div>';
     h+='<div><div style="'+lbl+'">SIGNATURE OF RECIPIENT <span style="font-weight:400;color:#888;font-size:12px;">(sign with your finger)</span></div>';
     h+='<canvas id="desp-sign-canvas" width="640" height="150" style="border:1.5px solid #111;border-radius:8px;width:100%;max-width:640px;height:150px;touch-action:none;display:block;background:#fff;"></canvas>';
-    h+='<button type="button" onclick="clearSignPad()" style="margin-top:6px;font-size:12px;padding:5px 12px;border:1px solid #bbb;border-radius:6px;background:#f5f5f5;cursor:pointer;">Clear signature</button></div>';
-    h+='</div>';
-  } else {
-    var recvOut=opts.recv?'<span style="font-family:'+elegFont+';font-size:22px;">&nbsp;'+esc(opts.recv)+'&nbsp;</span>':ln(56);
-    var dateOut=opts.date?'<b>&nbsp;'+fmtDate(opts.date)+'&nbsp;</b>':ln(26);
-    var signOut=opts.sign?'<img src="'+opts.sign+'" style="height:46px;vertical-align:bottom;">':ln(78);
-    h+='<div style="margin-top:16px;font-size:15px;line-height:1.5;">';
-    h+='<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:30px;"><div style="flex:1;">RECEIVED BY: <u>'+recvOut+'</u></div><div style="white-space:nowrap;margin-right:80px;">ON: <u>'+dateOut+'</u></div></div>';
-    h+='<div style="display:flex;justify-content:space-between;font-size:11px;color:#555;margin-top:2px;"><span style="margin-left:92px;">(FULL NAME)</span><span style="margin-right:88px;">(DATE)</span></div>';
-    h+='<div style="margin-top:14px;">SIGNATURE OF RECIPIENT: '+signOut+'</div>';
-    h+='</div>';
-  }
-  h+='</div>';
-  return h;
-}
-function renderDespacho(){
-  var notice=document.getElementById('desp-notice'),content=document.getElementById('desp-content');
-  if(!notice||!content)return;
-  if(!CD||!CD.width||!CD.height){notice.style.display='block';content.style.display='none';return;}
-  notice.style.display='none';content.style.display='block';
-  try{document.getElementById('desp-preview').innerHTML=buildDespachoHTML(getInfo(),{interactive:true});setTimeout(initSignPad,0);}catch(e){console.error('despacho',e);}
-}
-function despChecks(){
-  var m={};
-  var els=document.querySelectorAll('#desp-preview .desp-chk');
-  Array.prototype.forEach.call(els,function(c){m[c.getAttribute('data-key')]=c.checked;});
-  return m;
-}
-function despComments(){
-  var m={};
-  var els=document.querySelectorAll('#desp-preview .desp-cmt');
-  Array.prototype.forEach.call(els,function(c){if(c.value&&c.value.trim())m[c.getAttribute('data-key')]=c.value;});
-  return m;
-}
-function despMotor(){
-  var el=document.querySelector('#desp-preview .desp-motor');
-  return el&&el.value?el.value:'';
-}
-function despRecv(){var el=document.querySelector('#desp-preview .desp-recv');return el&&el.value?el.value:'';}
-function despDate(){var el=document.querySelector('#desp-preview .desp-date');return el&&el.value?el.value:'';}
-var _signDrawing=false,_signHasInk=false;
-function initSignPad(){
-  var c=document.getElementById('desp-sign-canvas');
-  if(!c)return;
-  var ctx=c.getContext('2d');
-  ctx.lineWidth=2.6;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#111';
-  _signHasInk=false;_signDrawing=false;
-  var pos=function(e){var r=c.getBoundingClientRect();var t=(e.touches&&e.touches[0])?e.touches[0]:e;return {x:(t.clientX-r.left)*(c.width/r.width),y:(t.clientY-r.top)*(c.height/r.height)};};
-  var start=function(e){e.preventDefault();_signDrawing=true;var p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);};
-  var move=function(e){if(!_signDrawing)return;e.preventDefault();var p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();_signHasInk=true;};
-  c.addEventListener('mousedown',start);c.addEventListener('mousemove',move);
-  c.addEventListener('touchstart',start,{passive:false});c.addEventListener('touchmove',move,{passive:false});
-  if(!window._signEnd){window._signEnd=function(){_signDrawing=false;};window.addEventListener('mouseup',window._signEnd);window.addEventListener('touchend',window._signEnd);}
-}
-function clearSignPad(){var c=document.getElementById('desp-sign-canvas');if(c){c.getContext('2d').clearRect(0,0,c.width,c.height);_signHasInk=false;}}
-function despSignature(){var c=document.getElementById('desp-sign-canvas');return (c&&_signHasInk)?c.toDataURL('image/png'):'';}
-// Browser-print a single section (no print server needed).
-function printOne(type){
-  if((type==='cables'||type==='springs') && !CD.hasWeight){ try{toast('Enter door weight first',2000);}catch(e){} return; }
-  try{ if(type==='springs') runSprings(); }catch(e){}
-  var info=getInfo();
-  var html='';
-  try{
-    if(type==='tracks') html=buildTracksPreviewHTML(getTracksData(), info);
-    else if(type==='cables') html=buildCablesPreviewHTML(getCablesData(), info);
-    else if(type==='springs') html='<pre style="font-family:monospace;font-size:13px;white-space:pre-wrap;line-height:1.5;margin:0">'+buildSpringsText()+'</pre>';
-    else if(type==='hardware'){ var hw=computeHardware(); if(hw&&hw.series) html=buildHardwarePreviewHTML(hw, info, hwChecks()); }
-    else if(type==='despacho') html=buildDespachoHTML(info,{checks:despChecks(),comments:despComments(),motor:despMotor(),recv:despRecv(),date:despDate(),sign:despSignature()});
-  }catch(e){console.error('printOne',e);}
-  if(!html){ try{toast('Fill in the door info first',2000);}catch(e){} return; }
-  var area=document.getElementById('preview-print-area');
-  if(area){ area.innerHTML=html; setTimeout(function(){window.print();},60); }
-}
-function doPrint(type){
-  var s=load();
-  if(type==='tracks'||type==='cables'||type==='springs'||type==='hardware'||type==='despacho'){ printOne(type); return; }
-  if(type==='tracks'){
-    if(!serverOK){toast('Print server offline',2000);return;}
-    toast('Printing Tracks...',2000);
-    srvFetch('/print/tracks',{printer:s.pTracks||'',data:getTracksData(),info:getInfo()})
-      .then(function(d){toast(d.status==='ok'?'Tracks printed':'Error: '+d.error,3000);})
-      .catch(function(e){toast('Error: '+e.message,3000);});
-  } else if(type==='cables'){
-    if(!CD.hasWeight){toast('Enter door weight first');return;}
-    if(!serverOK){toast('Print server offline',2000);return;}
-    toast('Printing Cables...',2000);
-    srvFetch('/print/cables',{printer:s.pCables||'',data:getCablesData(),info:getInfo()})
-      .then(function(d){toast(d.status==='ok'?'Cables printed':'Error: '+d.error,3000);})
-      .catch(function(e){toast('Error: '+e.message,3000);});
-  } else if(type==='labels'){
-    if(!serverOK){toast('Print server offline',2000);return;}
-    var wo=document.getElementById('wo').value.trim(),mark=document.getElementById('mark').value.trim();
-    var lites=document.getElementById('lites').value.trim(),glass=document.getElementById('glass').value,frame=document.getElementById('frame').value;
-    var panels=CD.panels||4,size=CD.width&&CD.height?CD.width+' X '+CD.height:'';
-    toast('Printing Labels...',4000);
-    srvFetch('/print/labels',{wo:wo,mark:mark,lites:lites,glass:glass,frame:frame,panels:panels,size:size,roles:labelRoles,printerSmall:s.pSmall||'',printerBig:s.pBig||'',printSmall:true,printBig:true,bigRotation:curRotation})
-      .then(function(d){toast(d.status==='ok'?'Labels: '+d.printed.length+' jobs':'Error: '+d.error,3000);})
-      .catch(function(e){toast('Error: '+e.message,3000);});
-  }
-}
-function doPrintAll(){
-  var s=load();
-  if(!serverOK){toast('Print server offline',2000);return;}
-  toast('Printing all...',5000);
-  var jobs=[];
-  // Tracks
-  jobs.push(function(){
-    return srvFetch('/print/tracks',{printer:s.pTracks||'',data:getTracksData(),info:getInfo()});
-  });
-  // Cables (only if weight entered)
-  if(CD.hasWeight){
-    jobs.push(function(){
-      return srvFetch('/print/cables',{printer:s.pCables||'',data:getCablesData(),info:getInfo()});
-    });
-  }
-  // Springs (only if server supports it; skipped gracefully on error)
-  if(typeof getSpringsData==='function'){
-    jobs.push(function(){
-      return srvFetch('/print/springs',{printer:s.pSprings||s.pTracks||'',data:getSpringsData(),info:getInfo()});
-    });
-  }
-  // Labels (only if there is label info)
-  var wo=document.getElementById('wo').value.trim(),mark=document.getElementById('mark').value.trim();
-  if(wo||mark){
-    var lites=document.getElementById('lites').value.trim(),glass=document.getElementById('glass').value,frame=document.getElementById('frame').value;
-    var panels=CD.panels||4,size=CD.width&&CD.height?CD.width+' X '+CD.height:'';
-    jobs.push(function(){
-      return srvFetch('/print/labels',{wo:wo,mark:mark,lites:lites,glass:glass,frame:frame,panels:panels,size:size,roles:labelRoles,printerSmall:s.pSmall||'',printerBig:s.pBig||'',printSmall:true,printBig:true,bigRotation:curRotation});
-    });
-  }
-  // Run jobs sequentially but DO NOT wait on a hung/slow printer:
-  // each job is fired with a short cap, then we move to the next regardless.
-  // This keeps the original behaviour where labels still print even if
-  // tracks/cables hang on a non-responsive printer.
-  var i=0;
-  function next(){
-    if(i>=jobs.length){toast('All sent!',3000);return;}
-    var job=jobs[i++];
-    // Fire the job; move on after it settles OR after 1.2s, whichever first.
-    var moved=false;
-    function go(){ if(moved)return; moved=true; setTimeout(next,200); }
-    try{ job().then(go).catch(go); }catch(e){ go(); }
-    setTimeout(go,1200);
-  }
-  next();
-}
-try{rebuildDropdowns();}catch(e){console.error('rebuildDropdowns:',e);}
-try{restoreForm();syncDisplayFields();}catch(e){console.error('restoreForm:',e);}
-try{setupListeners();}catch(e){console.error('setupListeners:',e);}
-try{curRotation=load().bigRotation||0;}catch(e){console.error('curRotation:',e);}
-try{checkServer();}catch(e){console.error('checkServer:',e);}
-try{setInterval(checkServer,15000);}catch(e){}
-</script>
-
-<div id="preview-print-area"></div>
-<div id="preview-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:1000;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px;">
-  <div style="width:100%;max-width:780px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <button onclick="closePreview()" style="background:white;color:#1B2A6B;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">&#8592; Back</button>
-      <div id="preview-title" style="color:white;font-size:18px;font-weight:700;"></div>
-      <button onclick="printPreview()" style="background:#C0272D;color:white;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">&#128424; Print</button>
-    </div>
-    <div id="preview-content" style="background:white;border-radius:12px;padding:24px;overflow-y:auto;max-height:calc(100vh - 120px);"></div>
-  </div>
-</div><div id="sp-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:2000;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px;overflow-y:auto;"><div style="width:100%;max-width:480px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><button onclick="closeSpPreview()" style="background:white;color:#1B2A6B;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">&#8592; Back</button><div style="color:white;font-size:16px;font-weight:700;">Spring Engineering</div><button onclick="printSpPreview()" style="background:#C0272D;color:white;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">&#128424; Print</button></div><div id="sp-preview-txt" style="background:white;border-radius:12px;padding:20px;font-family:monospace;font-size:13px;white-space:pre-wrap;line-height:1.6;"></div></div></div><div id="sp-print-area" style="display:none;font-family:monospace;font-size:13px;white-space:pre-wrap;padding:20px;"></div>
-</body>
-</html>
+    h+='<button type="button" onclick="clearSignPad()" style="margin-top:6px;font-size:12px;padding:5px 12px;border:1px solid #bbb;border-radius:6px;background:#f5f5f5;cursor:pointer;">Clear signatu
