@@ -1475,8 +1475,8 @@ function buildDespachoHTML(info,opts){
     var dateOut=opts.date?'<b>&nbsp;'+fmtDate(opts.date)+'&nbsp;</b>':ln(26);
     var signOut=opts.sign?'<img src="'+opts.sign+'" style="height:46px;vertical-align:bottom;">':ln(78);
     h+='<div style="margin-top:16px;font-size:15px;line-height:1.5;">';
-    h+='<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:30px;"><div style="flex:1;">RECEIVED BY: <u>'+recvOut+'</u></div><div style="white-space:nowrap;">ON: <u>'+dateOut+'</u></div></div>';
-    h+='<div style="display:flex;justify-content:space-between;font-size:11px;color:#555;margin-top:2px;"><span style="margin-left:92px;">(FULL NAME)</span><span>(DATE)</span></div>';
+    h+='<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:30px;"><div style="flex:1;">RECEIVED BY: <u>'+recvOut+'</u></div><div style="white-space:nowrap;margin-right:80px;">ON: <u>'+dateOut+'</u></div></div>';
+    h+='<div style="display:flex;justify-content:space-between;font-size:11px;color:#555;margin-top:2px;"><span style="margin-left:92px;">(FULL NAME)</span><span style="margin-right:88px;">(DATE)</span></div>';
     h+='<div style="margin-top:14px;">SIGNATURE OF RECIPIENT: '+signOut+'</div>';
     h+='</div>';
   }
