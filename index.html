@@ -53,7 +53,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
 .hl-field{display:none;}.hl-field.visible{display:block;}
 .clear-btn{width:100%;height:46px;background:var(--red-light);color:var(--red);border:1.5px solid #f5c6c2;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;}
 .results{display:none;}.results.visible{display:block;}
-.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:12px;}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:12px;}
 .tab{height:38px;border:1.5px solid var(--gray-border);border-radius:var(--radius-sm);background:var(--white);font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .tab.active{background:var(--blue);color:white;border-color:var(--blue);}
 .page{display:none;}.page.active{display:block;}
@@ -285,6 +285,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
       <div class="tab" onclick="showTab(2)">Springs</div>
       <div class="tab" onclick="showTab(3)" style="display:none">Labels</div>
       <div class="tab" onclick="showTab(4)">Hardware</div>
+      <div class="tab" onclick="showTab(5)">Dispatch</div>
     </div>
     <div class="page active" id="page-0">
       <div class="card"><div class="card-title">Track Measurements</div>
@@ -378,6 +379,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;backg
           <button class="print-btn" style="flex:1;" onclick="doPrint('hardware')">&#128424; Print Hardware</button>
           <button class="print-btn" style="flex:1;background:white;color:#111;border:2px solid #1B2A6B;" onclick="openPreview('hardware')">&#128065; Preview</button>
         </div>
+      </div>
+    </div>
+    <div class="page" id="page-5">
+      <div class="notice" id="desp-notice" style="display:none">Enter Door Information to build the dispatch sheet.</div>
+      <div id="desp-content" style="display:none">
+        <div class="card"><div class="card-title">Dispatch &mdash; preview</div>
+          <div id="desp-preview" style="overflow-x:auto"></div>
+        </div>
+        <button class="print-btn" onclick="doPrint('despacho')">&#128424; Print Despacho</button>
       </div>
     </div>
   </div>
@@ -1084,6 +1094,7 @@ function calculate(){
   document.getElementById('print-all-wrap').classList.add('visible');
   updateLabels();
   try{renderHardware();}catch(e){console.error('renderHardware:',e);}
+  try{renderDespacho();}catch(e){console.error('renderDespacho:',e);}
 }
 function updateLabels(){
   var wo=document.getElementById('wo').value.trim(),mark=document.getElementById('mark').value.trim(),lites=document.getElementById('lites').value.trim(),glass=document.getElementById('glass').value,frame=document.getElementById('frame').value;
@@ -1116,7 +1127,7 @@ function renderBigLabelPreview(){
 }
 function prevLabel(){curLabel=Math.max(0,curLabel-1);updateLabels();}
 function nextLabel(){curLabel=Math.min(labelRoles.length-1,curLabel+1);updateLabels();}
-function showTab(n){if(n===2&&typeof runSprings==="function")setTimeout(runSprings,50);document.querySelectorAll('.tab').forEach(function(t,i){t.classList.toggle('active',i===n);});document.querySelectorAll('.page').forEach(function(p,i){p.classList.toggle('active',i===n);});}
+function showTab(n){if(n===2&&typeof runSprings==="function")setTimeout(runSprings,50);if(n===5&&typeof renderDespacho==="function")setTimeout(renderDespacho,20);document.querySelectorAll('.tab').forEach(function(t,i){t.classList.toggle('active',i===n);});document.querySelectorAll('.page').forEach(function(p,i){p.classList.toggle('active',i===n);});}
 function clearAll(){
   ['width','height','highlift','weight','wo','mark','lites'].forEach(function(id){document.getElementById(id).value='';});
   document.getElementById('track-type').value='';document.getElementById('lift-type').value='';
@@ -1392,6 +1403,127 @@ function buildHardwarePreviewHTML(hw,info,checks){
 function srvFetch(endpoint,payload){
   return fetch(SERVER+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:AbortSignal.timeout(15000)}).then(function(r){return r.json();});
 }
+// ---------- DESPACHO (dispatch / signing page) ----------
+function buildDespachoHTML(info,opts){
+  opts=opts||{};
+  var elegFont="'Segoe Script','Brush Script MT','Lucida Handwriting','Snell Roundhand',cursive";
+  var hw=computeHardware()||{};
+  var panels=(hw.sections!=null)?hw.sections:(CD.height?getPanels(CD.height):'—');
+  var nS=(hw.nS!=null)?hw.nS:(CD.width?(CD.width>144?4:2):'—');
+  var vert=(CD.vert!=null)?frac(CD.vert):'—';
+  var horiz=(CD.horiz!=null)?frac(CD.horiz):'—';
+  var tt=info.trackType||'—';
+  var shaftLen=(hw.shaftLen!=null)?hw.shaftLen:(CD.width?CD.width+12:null);
+  var shaft=(hw.wt==null)?'____________':(hw.solid?'SOLID shaft (x2)':'HOLLOW shaft &mdash; <b>'+(shaftLen!=null?shaftLen+'"':'—')+'</b>');
+  var logo=(document.querySelector('img[alt="AA Impact Garage Door"]')||{}).src||'';
+  var boxOf=function(key){
+    if(opts.interactive) return '<input type="checkbox" class="desp-chk" data-key="'+key+'" style="width:19px;height:19px;cursor:pointer;accent-color:#1B2A6B;" onchange="var r=this.closest(\'tr\');if(r)r.style.background=this.checked?\'#eef7ee\':\'\';">';
+    var on=opts.checks&&opts.checks[key];
+    return on
+      ?'<span style="display:inline-block;width:17px;height:17px;border:1.6px solid #1B2A6B;background:#1B2A6B;color:#fff;font-size:13px;line-height:17px;text-align:center;">&#10003;</span>'
+      :'<span style="display:inline-block;width:17px;height:17px;border:1.6px solid #111;"></span>';
+  };
+  var esc=function(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');};
+  var cmtCell=function(key){
+    if(opts.interactive) return '<input type="text" class="desp-cmt" data-key="'+key+'" placeholder="comment&hellip;" style="width:100%;box-sizing:border-box;border:none;outline:none;background:transparent;font-family:Arial;font-size:14px;color:#111;">';
+    var c=(opts.comments&&opts.comments[key])?opts.comments[key]:'';
+    return c?'<span style="font-size:14px;">'+esc(c)+'</span>':'';
+  };
+  var motorField=function(){
+    if(opts.interactive) return '<input type="text" class="desp-motor" placeholder="which motor&hellip;" style="border:none;outline:none;border-bottom:1.3px solid #111;background:transparent;font-family:Arial;font-size:14px;width:62%;min-width:170px;">';
+    var m=opts.motor||'';
+    return m?'<b>'+esc(m)+'</b>':ln(64);
+  };
+  var color='<span style="white-space:nowrap">White&nbsp;/&nbsp;Black&nbsp;/&nbsp;Bronze</span>';
+  var ln=function(n){var s='';for(var i=0;i<n;i++)s+='&nbsp;';return '<u>'+s+'</u>';};
+  var tdc='border:1px solid #111;padding:6px 6px;text-align:center;width:42px;vertical-align:top;';
+  var td='border:1px solid #111;padding:6px 12px;vertical-align:top;';
+  var tdcm='border:1px solid #111;padding:6px 12px;vertical-align:top;';
+  function row(key,art){return '<tr><td style="'+tdc+'">'+boxOf(key)+'</td><td style="'+td+'">'+art+'</td><td style="'+tdcm+'height:'+(opts.interactive?26:30)+'px;">'+cmtCell(key)+'</td></tr>';}
+  var h='<style>@media print{@page{size:landscape;margin:9mm;}.desp-sheet{page-break-inside:avoid;}}</style>';
+  h+='<div class="desp-sheet" style="font-family:Arial,sans-serif;border:2px solid #111;padding:12px 26px;max-width:1040px;margin:0 auto 0 0;-webkit-print-color-adjust:exact;print-color-adjust:exact;">';
+  h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">';
+  h+='<div style="font-size:16px;font-weight:800;">W/O #: '+ln(info.wo?0:8)+(info.wo?'<b>&nbsp;'+info.wo+'&nbsp;</b>':'')+(info.mark?' &nbsp; Mark: <b>'+info.mark+'</b>':'')+'</div>';
+  if(logo) h+='<img src="'+logo+'" style="height:50px;">';
+  h+='</div>';
+  h+='<div style="text-align:center;font-size:19px;font-weight:800;color:#1B2A6B;letter-spacing:.12em;margin:6px 0 8px;border-bottom:3px solid #C0272D;padding-bottom:5px;">DISPATCH</div>';
+  h+='<table style="width:100%;border-collapse:collapse;font-size:14px;">';
+  h+='<tr style="background:#1B2A6B;color:#fff;"><th style="'+tdc+'">&#10003;</th><th style="'+td+'text-align:left;">Article</th><th style="'+td+'text-align:left;width:40%;white-space:nowrap;">Comments</th></tr>';
+  h+=row('1','<b>1. Panels</b> &mdash; Qty: <b>'+panels+'</b>');
+  h+=row('2','<b>2. Hardware Box</b>');
+  h+=row('3','<b>3. Tracks</b> &mdash; '+tt+' &nbsp; Vert: <b>'+vert+'</b> &nbsp; Horiz: <b>'+horiz+'</b>');
+  h+=row('4','<b>4. Perforated Angles</b> &mdash; <b>3</b> &nbsp; Color: '+color);
+  h+=row('5','<b>5. Spring</b> &mdash; Qty: <b>'+nS+'</b>');
+  h+=row('6','<b>6. '+ln(4)+' Trims</b> &nbsp; Color: '+color);
+  h+=row('7','<b>7. Shaft</b> &mdash; '+shaft);
+  h+=row('8','<b>8. Motor</b> &mdash; '+motorField());
+  h+='</table>';
+  var fmtDate=function(s){var p=String(s).split('-');return p.length===3?(p[1]+'/'+p[2]+'/'+p[0]):s;};
+  if(opts.interactive){
+    var dn=new Date(),pad=function(n){return(n<10?'0':'')+n;};
+    var today=dn.getFullYear()+'-'+pad(dn.getMonth()+1)+'-'+pad(dn.getDate());
+    var lbl='font-weight:700;color:#1B2A6B;margin-bottom:5px;';
+    h+='<div style="margin-top:20px;font-size:14px;">';
+    h+='<div style="margin-bottom:14px;"><div style="'+lbl+'">RECEIVED BY <span style="font-weight:400;color:#888;font-size:12px;">(full name)</span></div><input type="text" class="desp-recv" style="width:100%;box-sizing:border-box;border:none;border-bottom:1.5px solid #111;outline:none;font-size:22px;padding:3px 0;font-family:'+elegFont+';background:transparent;"></div>';
+    h+='<div style="margin-bottom:14px;"><div style="'+lbl+'">DATE</div><input type="date" class="desp-date" value="'+today+'" style="border:1px solid #bbb;border-radius:6px;padding:7px 9px;font-size:15px;font-family:Arial;"></div>';
+    h+='<div><div style="'+lbl+'">SIGNATURE OF RECIPIENT <span style="font-weight:400;color:#888;font-size:12px;">(sign with your finger)</span></div>';
+    h+='<canvas id="desp-sign-canvas" width="640" height="150" style="border:1.5px solid #111;border-radius:8px;width:100%;max-width:640px;height:150px;touch-action:none;display:block;background:#fff;"></canvas>';
+    h+='<button type="button" onclick="clearSignPad()" style="margin-top:6px;font-size:12px;padding:5px 12px;border:1px solid #bbb;border-radius:6px;background:#f5f5f5;cursor:pointer;">Clear signature</button></div>';
+    h+='</div>';
+  } else {
+    var recvOut=opts.recv?'<span style="font-family:'+elegFont+';font-size:22px;">&nbsp;'+esc(opts.recv)+'&nbsp;</span>':ln(56);
+    var dateOut=opts.date?'<b>&nbsp;'+fmtDate(opts.date)+'&nbsp;</b>':ln(26);
+    var signOut=opts.sign?'<img src="'+opts.sign+'" style="height:46px;vertical-align:bottom;">':ln(78);
+    h+='<div style="margin-top:16px;font-size:15px;line-height:1.5;">';
+    h+='<div>RECEIVED BY: <u>'+recvOut+'</u> &nbsp;&nbsp; ON <u>'+dateOut+'</u></div>';
+    h+='<div style="font-size:11px;color:#555;margin-top:2px;"><span style="margin-left:92px;">(FULL NAME)</span><span style="margin-left:288px;">(DATE)</span></div>';
+    h+='<div style="margin-top:14px;">SIGNATURE OF RECIPIENT: '+signOut+'</div>';
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
+function renderDespacho(){
+  var notice=document.getElementById('desp-notice'),content=document.getElementById('desp-content');
+  if(!notice||!content)return;
+  if(!CD||!CD.width||!CD.height){notice.style.display='block';content.style.display='none';return;}
+  notice.style.display='none';content.style.display='block';
+  try{document.getElementById('desp-preview').innerHTML=buildDespachoHTML(getInfo(),{interactive:true});setTimeout(initSignPad,0);}catch(e){console.error('despacho',e);}
+}
+function despChecks(){
+  var m={};
+  var els=document.querySelectorAll('#desp-preview .desp-chk');
+  Array.prototype.forEach.call(els,function(c){m[c.getAttribute('data-key')]=c.checked;});
+  return m;
+}
+function despComments(){
+  var m={};
+  var els=document.querySelectorAll('#desp-preview .desp-cmt');
+  Array.prototype.forEach.call(els,function(c){if(c.value&&c.value.trim())m[c.getAttribute('data-key')]=c.value;});
+  return m;
+}
+function despMotor(){
+  var el=document.querySelector('#desp-preview .desp-motor');
+  return el&&el.value?el.value:'';
+}
+function despRecv(){var el=document.querySelector('#desp-preview .desp-recv');return el&&el.value?el.value:'';}
+function despDate(){var el=document.querySelector('#desp-preview .desp-date');return el&&el.value?el.value:'';}
+var _signDrawing=false,_signHasInk=false;
+function initSignPad(){
+  var c=document.getElementById('desp-sign-canvas');
+  if(!c)return;
+  var ctx=c.getContext('2d');
+  ctx.lineWidth=2.6;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#111';
+  _signHasInk=false;_signDrawing=false;
+  var pos=function(e){var r=c.getBoundingClientRect();var t=(e.touches&&e.touches[0])?e.touches[0]:e;return {x:(t.clientX-r.left)*(c.width/r.width),y:(t.clientY-r.top)*(c.height/r.height)};};
+  var start=function(e){e.preventDefault();_signDrawing=true;var p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);};
+  var move=function(e){if(!_signDrawing)return;e.preventDefault();var p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();_signHasInk=true;};
+  c.addEventListener('mousedown',start);c.addEventListener('mousemove',move);
+  c.addEventListener('touchstart',start,{passive:false});c.addEventListener('touchmove',move,{passive:false});
+  if(!window._signEnd){window._signEnd=function(){_signDrawing=false;};window.addEventListener('mouseup',window._signEnd);window.addEventListener('touchend',window._signEnd);}
+}
+function clearSignPad(){var c=document.getElementById('desp-sign-canvas');if(c){c.getContext('2d').clearRect(0,0,c.width,c.height);_signHasInk=false;}}
+function despSignature(){var c=document.getElementById('desp-sign-canvas');return (c&&_signHasInk)?c.toDataURL('image/png'):'';}
 // Browser-print a single section (no print server needed).
 function printOne(type){
   if((type==='cables'||type==='springs') && !CD.hasWeight){ try{toast('Enter door weight first',2000);}catch(e){} return; }
@@ -1403,6 +1535,7 @@ function printOne(type){
     else if(type==='cables') html=buildCablesPreviewHTML(getCablesData(), info);
     else if(type==='springs') html='<pre style="font-family:monospace;font-size:13px;white-space:pre-wrap;line-height:1.5;margin:0">'+buildSpringsText()+'</pre>';
     else if(type==='hardware'){ var hw=computeHardware(); if(hw&&hw.series) html=buildHardwarePreviewHTML(hw, info, hwChecks()); }
+    else if(type==='despacho') html=buildDespachoHTML(info,{checks:despChecks(),comments:despComments(),motor:despMotor(),recv:despRecv(),date:despDate(),sign:despSignature()});
   }catch(e){console.error('printOne',e);}
   if(!html){ try{toast('Fill in the door info first',2000);}catch(e){} return; }
   var area=document.getElementById('preview-print-area');
@@ -1410,7 +1543,7 @@ function printOne(type){
 }
 function doPrint(type){
   var s=load();
-  if(type==='tracks'||type==='cables'||type==='springs'||type==='hardware'){ printOne(type); return; }
+  if(type==='tracks'||type==='cables'||type==='springs'||type==='hardware'||type==='despacho'){ printOne(type); return; }
   if(type==='tracks'){
     if(!serverOK){toast('Print server offline',2000);return;}
     toast('Printing Tracks...',2000);
