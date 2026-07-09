@@ -854,7 +854,7 @@ function partsToHtml(parts){
   parts.forEach(function(p,i){html+='<div style="'+(i<parts.length-1?'page-break-after:always;break-after:page;':'')+'padding:6px 0">'+p+'</div>';});
   return html;
 }
-function printPageStyle(){return '<style>@media print{@page{size:letter landscape;margin:10mm}}</style>';}
+function printPageStyle(){return '<style>@media print{@page{size:letter portrait;margin:10mm}@page dland{size:letter landscape;margin:10mm}.disp-land{page:dland}}</style>';}
 function dispatchPageHtml(){var d;try{d=buildDespachoHTML(getInfo(),{noPage:true,checks:despChecks(),comments:despComments(),motor:despMotor(),recv:despRecv(),date:despDate(),sign:despSignature()});}catch(e){d='';}return d?'<div class="disp-land" style="page-break-before:always;break-before:page">'+d+'</div>':'';}
 function doPrintAllBrowser(){
   var info=getInfo();
@@ -1527,4 +1527,167 @@ function buildDespachoHTML(info,opts){
     h+='<canvas id="desp-sign-canvas" width="640" height="150" style="border:1.5px solid #111;border-radius:8px;width:100%;max-width:640px;height:150px;touch-action:none;display:block;background:#fff;"></canvas>';
     h+='<button type="button" onclick="clearSignPad()" style="margin-top:6px;font-size:12px;padding:5px 12px;border:1px solid #bbb;border-radius:6px;background:#f5f5f5;cursor:pointer;">Clear signature</button></div>';
     h+='</div>';
-  } e
+  } else {
+    var recvOut=opts.recv?'<span style="font-family:'+elegFont+';font-size:22px;">&nbsp;'+esc(opts.recv)+'&nbsp;</span>':ln(56);
+    var dateOut=opts.date?'<b>&nbsp;'+fmtDate(opts.date)+'&nbsp;</b>':ln(26);
+    var signOut=opts.sign?'<img src="'+opts.sign+'" style="height:46px;vertical-align:bottom;">':ln(78);
+    h+='<div style="margin-top:16px;font-size:15px;line-height:1.5;">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:30px;"><div style="flex:1;">RECEIVED BY: <u>'+recvOut+'</u></div><div style="white-space:nowrap;margin-right:80px;">ON: <u>'+dateOut+'</u></div></div>';
+    h+='<div style="display:flex;justify-content:space-between;font-size:11px;color:#555;margin-top:2px;"><span style="margin-left:92px;">(FULL NAME)</span><span style="margin-right:88px;">(DATE)</span></div>';
+    h+='<div style="margin-top:14px;">SIGNATURE OF RECIPIENT: '+signOut+'</div>';
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
+function renderDespacho(){
+  var notice=document.getElementById('desp-notice'),content=document.getElementById('desp-content');
+  if(!notice||!content)return;
+  var any=markList().some(function(m){return m.calc.h>0;});
+  if(!any){notice.style.display='block';content.style.display='none';notice.textContent='Enter door sizes to build the dispatch sheet.';return;}
+  notice.style.display='none';content.style.display='block';
+  try{document.getElementById('desp-preview').innerHTML=buildDespachoHTML(getInfo(),{interactive:true});setTimeout(initSignPad,0);}catch(e){console.error('despacho',e);}
+}
+function despChecks(){
+  var m={};
+  var els=document.querySelectorAll('#desp-preview .desp-chk');
+  Array.prototype.forEach.call(els,function(c){m[c.getAttribute('data-key')]=c.checked;});
+  return m;
+}
+function despComments(){
+  var m={};
+  var els=document.querySelectorAll('#desp-preview .desp-cmt');
+  Array.prototype.forEach.call(els,function(c){if(c.value&&c.value.trim())m[c.getAttribute('data-key')]=c.value;});
+  return m;
+}
+function despMotor(){
+  var el=document.querySelector('#desp-preview .desp-motor');
+  return el&&el.value?el.value:'';
+}
+function despRecv(){var el=document.querySelector('#desp-preview .desp-recv');return el&&el.value?el.value:'';}
+function despDate(){var el=document.querySelector('#desp-preview .desp-date');return el&&el.value?el.value:'';}
+var _signDrawing=false,_signHasInk=false;
+function initSignPad(){
+  var c=document.getElementById('desp-sign-canvas');
+  if(!c)return;
+  var ctx=c.getContext('2d');
+  ctx.lineWidth=2.6;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#111';
+  _signHasInk=false;_signDrawing=false;
+  var pos=function(e){var r=c.getBoundingClientRect();var t=(e.touches&&e.touches[0])?e.touches[0]:e;return {x:(t.clientX-r.left)*(c.width/r.width),y:(t.clientY-r.top)*(c.height/r.height)};};
+  var start=function(e){e.preventDefault();_signDrawing=true;var p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);};
+  var move=function(e){if(!_signDrawing)return;e.preventDefault();var p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();_signHasInk=true;};
+  c.addEventListener('mousedown',start);c.addEventListener('mousemove',move);
+  c.addEventListener('touchstart',start,{passive:false});c.addEventListener('touchmove',move,{passive:false});
+  if(!window._signEnd){window._signEnd=function(){_signDrawing=false;};window.addEventListener('mouseup',window._signEnd);window.addEventListener('touchend',window._signEnd);}
+}
+function clearSignPad(){var c=document.getElementById('desp-sign-canvas');if(c){c.getContext('2d').clearRect(0,0,c.width,c.height);_signHasInk=false;}}
+function despSignature(){var c=document.getElementById('desp-sign-canvas');return (c&&_signHasInk)?c.toDataURL('image/png'):'';}
+// Browser-print a single section (no print server needed).
+function printOne(type){
+  if((type==='cables'||type==='springs') && !CD.hasWeight){ try{toast('Enter door weight first',2000);}catch(e){} return; }
+  try{ if(type==='springs') runSprings(); }catch(e){}
+  var info=getInfo();
+  var html='';
+  try{
+    if(type==='tracks') html=buildTracksPreviewHTML(getTracksData(), info);
+    else if(type==='cables') html=buildCablesPreviewHTML(getCablesData(), info);
+    else if(type==='springs') html='<pre style="font-family:monospace;font-size:13px;white-space:pre-wrap;line-height:1.5;margin:0">'+buildSpringsText()+'</pre>';
+    else if(type==='hardware'){ var hw=computeHardware(); if(hw&&hw.series) html=buildHardwarePreviewHTML(hw, info, hwChecks()); }
+    else if(type==='despacho') html=buildDespachoHTML(info,{checks:despChecks(),comments:despComments(),motor:despMotor(),recv:despRecv(),date:despDate(),sign:despSignature()});
+  }catch(e){console.error('printOne',e);}
+  if(!html){ try{toast('Fill in the door info first',2000);}catch(e){} return; }
+  var area=document.getElementById('preview-print-area');
+  if(area){ area.innerHTML=html; setTimeout(function(){window.print();},60); }
+}
+function doPrint(type){
+  var s=load();
+  if(type==='tracks'||type==='cables'||type==='springs'||type==='hardware'||type==='despacho'){ printOne(type); return; }
+  if(type==='tracks'){
+    if(!serverOK){toast('Print server offline',2000);return;}
+    toast('Printing Tracks...',2000);
+    srvFetch('/print/tracks',{printer:s.pTracks||'',data:getTracksData(),info:getInfo()})
+      .then(function(d){toast(d.status==='ok'?'Tracks printed':'Error: '+d.error,3000);})
+      .catch(function(e){toast('Error: '+e.message,3000);});
+  } else if(type==='cables'){
+    if(!CD.hasWeight){toast('Enter door weight first');return;}
+    if(!serverOK){toast('Print server offline',2000);return;}
+    toast('Printing Cables...',2000);
+    srvFetch('/print/cables',{printer:s.pCables||'',data:getCablesData(),info:getInfo()})
+      .then(function(d){toast(d.status==='ok'?'Cables printed':'Error: '+d.error,3000);})
+      .catch(function(e){toast('Error: '+e.message,3000);});
+  } else if(type==='labels'){
+    if(!serverOK){toast('Print server offline',2000);return;}
+    var wo=document.getElementById('wo').value.trim(),mark=document.getElementById('mark').value.trim();
+    var lites=document.getElementById('lites').value.trim(),glass=document.getElementById('glass').value,frame=document.getElementById('frame').value;
+    var panels=CD.panels||4,size=CD.width&&CD.height?CD.width+' X '+CD.height:'';
+    toast('Printing Labels...',4000);
+    srvFetch('/print/labels',{wo:wo,mark:mark,lites:lites,glass:glass,frame:frame,panels:panels,size:size,roles:labelRoles,printerSmall:s.pSmall||'',printerBig:s.pBig||'',printSmall:true,printBig:true,bigRotation:curRotation})
+      .then(function(d){toast(d.status==='ok'?'Labels: '+d.printed.length+' jobs':'Error: '+d.error,3000);})
+      .catch(function(e){toast('Error: '+e.message,3000);});
+  }
+}
+function doPrintAll(){
+  var s=load();
+  if(!serverOK){toast('Print server offline',2000);return;}
+  toast('Printing all...',5000);
+  var jobs=[];
+  // Tracks
+  jobs.push(function(){
+    return srvFetch('/print/tracks',{printer:s.pTracks||'',data:getTracksData(),info:getInfo()});
+  });
+  // Cables (only if weight entered)
+  if(CD.hasWeight){
+    jobs.push(function(){
+      return srvFetch('/print/cables',{printer:s.pCables||'',data:getCablesData(),info:getInfo()});
+    });
+  }
+  // Springs (only if server supports it; skipped gracefully on error)
+  if(typeof getSpringsData==='function'){
+    jobs.push(function(){
+      return srvFetch('/print/springs',{printer:s.pSprings||s.pTracks||'',data:getSpringsData(),info:getInfo()});
+    });
+  }
+  // Labels (only if there is label info)
+  var wo=document.getElementById('wo').value.trim(),mark=document.getElementById('mark').value.trim();
+  if(wo||mark){
+    var lites=document.getElementById('lites').value.trim(),glass=document.getElementById('glass').value,frame=document.getElementById('frame').value;
+    var panels=CD.panels||4,size=CD.width&&CD.height?CD.width+' X '+CD.height:'';
+    jobs.push(function(){
+      return srvFetch('/print/labels',{wo:wo,mark:mark,lites:lites,glass:glass,frame:frame,panels:panels,size:size,roles:labelRoles,printerSmall:s.pSmall||'',printerBig:s.pBig||'',printSmall:true,printBig:true,bigRotation:curRotation});
+    });
+  }
+  // Run jobs sequentially but DO NOT wait on a hung/slow printer:
+  // each job is fired with a short cap, then we move to the next regardless.
+  // This keeps the original behaviour where labels still print even if
+  // tracks/cables hang on a non-responsive printer.
+  var i=0;
+  function next(){
+    if(i>=jobs.length){toast('All sent!',3000);return;}
+    var job=jobs[i++];
+    // Fire the job; move on after it settles OR after 1.2s, whichever first.
+    var moved=false;
+    function go(){ if(moved)return; moved=true; setTimeout(next,200); }
+    try{ job().then(go).catch(go); }catch(e){ go(); }
+    setTimeout(go,1200);
+  }
+  next();
+}
+try{rebuildDropdowns();}catch(e){console.error('rebuildDropdowns:',e);}
+try{restoreForm();syncDisplayFields();}catch(e){console.error('restoreForm:',e);}
+try{setupListeners();}catch(e){console.error('setupListeners:',e);}
+try{curRotation=load().bigRotation||0;}catch(e){console.error('curRotation:',e);}
+try{checkServer();}catch(e){console.error('checkServer:',e);}
+try{setInterval(checkServer,15000);}catch(e){}
+</script>
+
+<div id="preview-print-area"></div>
+<div id="preview-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:1000;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px;">
+  <div style="width:100%;max-width:780px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <button onclick="closePreview()" style="background:white;color:#1B2A6B;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">&#8592; Back</button>
+      <div id="preview-title" style="color:white;font-size:18px;font-weight:700;"></div>
+      <button onclick="printPreview()" style="background:#C0272D;color:white;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">&#128424; Print</button>
+    </div>
+    <div id="preview-content" style="background:white;border-radius:12px;padding:24px;overflow-y:auto;max-height:calc(100vh - 120px);"></div>
+  </div>
+</div><div id="sp-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:2000;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px;overflow-y:auto;"><div style="width:100%;max-width:480px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;"><button onclick="closeSpPreview()" style="background:white;color:#1B2A6B;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">&#8592; Back</button><div style="color:white;font-size:16px;font-weight:700;">Spring Engineering</div><button onclick="printSpPreview()" style="background:#C0272D;color:white;border:none;padding:10px 20px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;">&#128424; Print</button></div><div id="sp-preview-txt" style="background:white;border-radius:12px;padding:20px;font-family:monospace;font-size:13px;
